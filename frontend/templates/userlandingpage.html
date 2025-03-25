@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <title>Tasty Treat Express - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #34495e;   
+            --secondary: #f39c12;  
+            --bg-base: #dfe6e9;    
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #dfe6e9 0%, #ffffff 100%), url('https://www.transparenttextures.com/patterns/food.png');
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            z-index: -1;
+        }
+
+        .neu-card {
+            background: var(--bg-base);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--neu-shadow-dark),
+                        -8px -8px 16px var(--neu-shadow-light);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .neu-card:hover {
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                        -4px -4px 12px var(--neu-shadow-light);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .navbar {
+            padding: 1rem;
+            background: var(--primary);
+            margin: 0.5rem;
+            border-radius: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: rotate(5deg);
+        }
+
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .navbar .user-info img {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar .user-info img:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar .address {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            cursor: pointer;
+            position: relative;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar .address:hover {
+            opacity: 1;
+        }
+
+        .navbar .cart-icon {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar .cart-icon:hover {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .user-menu, .address-options {
+            display: none;
+            position: absolute;
+            background: var(--bg-base);
+            border-radius: 12px;
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                        -4px -4px 12px var(--neu-shadow-light);
+            padding: 0.5rem;
+            z-index: 1001;
+            animation: slideDown 0.3s ease;
+        }
+
+        .user-menu {
+            top: calc(100% + 0.5rem);
+            right: 0;
+            min-width: 160px;
+        }
+
+        .address-options {
+            top: calc(100% + 0.5rem);
+            left: 0;
+            min-width: 220px;
+            padding: 1rem;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu a, .address-options a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu a:hover, .address-options a:hover {
+            background: var(--secondary);
+            color: var(--text-dark);
+        }
+
+        .address-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .address-form input {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: inset 2px 2px 5px var(--neu-shadow-dark);
+            font-size: 0.9rem;
+        }
+
+        .address-form button {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--secondary);
+            color: var(--text-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .address-form button:hover {
+            background: var(--primary);
+            color: var(--text-light);
+        }
+
+        /* Updated Search Bar Styles */
+        .search-bar {
+            max-width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .search-container {
+            display: flex;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            display: flex;
+            background: var(--bg-base);
+            border-radius: 12px;
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                        -4px -4px 12px var(--neu-shadow-light);
+            height: 50px;
+            width: 100%;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .search-wrapper:hover,
+        .search-wrapper:focus-within {
+            box-shadow: 2px 2px 8px var(--neu-shadow-dark),
+                        -2px -2px 8px var(--neu-shadow-light);
+        }
+
+        .location-box, .search-box {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            height: 100%;
+        }
+
+        .location-box {
+            width: 200px;
+            position: relative;
+        }
+
+        .location-box i {
+            color: var(--secondary);
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .location-box input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--text-dark);
+            width: 100%;
+            background: transparent;
+        }
+
+        .location-box::after {
+            content: "▼";
+            position: absolute;
+            right: 15px;
+            font-size: 12px;
+            color: var(--text-dark);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .location-box::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 60%;
+            background-color: var(--text-dark);
+            opacity: 0.3;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-box i {
+            color: var(--primary);
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--text-dark);
+            width: 100%;
+            background: transparent;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+
+        .promotions-section {
+            max-width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .promotions-section h3 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .promo-card {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--secondary), #e67e22);
+            color: var(--text-light);
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .promo-card:hover {
+            transform: scale(1.05);
+        }
+
+        .promo-card h5 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .promo-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .food-slider {
+            max-width: 100%;
+            margin: 1rem auto;
+            padding: 1rem 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-slider .slider-container {
+            display: flex;
+            transition: transform 0.5s ease;
+            gap: 0.75rem;
+        }
+
+        .food-slide {
+            flex: 0 0 120px;
+            text-align: center;
+        }
+
+        .food-slide img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .food-slide img:hover {
+            transform: scale(1.1);
+        }
+
+        .food-slide p {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: var(--text-light);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .slider-btn:hover {
+            background: var(--secondary);
+        }
+
+        .slider-btn.prev {
+            left: 0.5rem;
+        }
+
+        .slider-btn.next {
+            right: 0.5rem;
+        }
+
+        .cuisine-section {
+            max-width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .cuisine-section h3 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .cuisine-card {
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cuisine-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .cuisine-card h5 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .cuisine-card:hover {
+            transform: scale(1.05);
+        }
+
+        .filter-bar {
+            max-width: 100%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 0.5rem;
+            overflow-x: auto;
+            justify-content: flex-start;
+            scroll-behavior: smooth;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: var(--bg-base);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                        -4px -4px 12px var(--neu-shadow-light);
+            color: var(--text-dark);
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--secondary);
+            color: var(--text-dark);
+            box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .recommended-section,
+        .featured-restaurant {
+            max-width: 100%;
+            margin: 0 auto 1.5rem;
+            padding: 0 0.5rem;
+        }
+
+        .recommended-section h3,
+        .featured-restaurant h3 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .recommended-card {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            height: 140px;
+        }
+
+        .recommended-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .recommended-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .recommended-info h5 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .recommended-info p {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .recommended-info .time {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .featured-card {
+            padding: 1rem;
+            height: 350px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .featured-card .carousel {
+            height: 180px;
+            flex-shrink: 0;
+        }
+
+        .featured-card .carousel-inner {
+            border-radius: 16px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .featured-card .carousel-item {
+            height: 180px;
+        }
+
+        .featured-card .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .featured-info {
+            padding: 0.75rem;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-info h4 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .featured-info .rating {
+            color: var(--secondary);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .featured-info .rating i {
+            margin-right: 2px;
+        }
+
+        .featured-info p {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .featured-info .time,
+        .featured-info .distance {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 10%;
+            opacity: 0.8;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: var(--primary);
+            border-radius: 50%;
+            padding: 8px;
+        }
+
+        .testimonials-section {
+            max-width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 0.5rem;
+        }
+
+        .testimonials-section h3 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .testimonial-card {
+            padding: 1rem;
+            background: var(--bg-base);
+            border-radius: 16px;
+            text-align: center;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .testimonial-card p {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .testimonial-card .author {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .footer {
+            padding: 1.5rem;
+            background: var(--primary);
+            margin: 0 0.5rem 0.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer h6 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .footer a {
+            color: var(--text-light);
+            padding: 0.25rem 0;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .footer a:hover {
+            color: var(--secondary);
+            padding-left: 0.5rem;
+        }
+
+        .footer .social-links i {
+            font-size: 1.1rem;
+            margin: 0 8px;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links i:hover {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .sort-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 320px;
+            padding: 1.5rem;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .sort-modal h4 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .sort-option {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .sort-option:hover,
+        .sort-option.selected {
+            background: var(--secondary);
+            color: var(--text-dark);
+            box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .sort-option i {
+            margin-right: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .sort-modal .btn {
+            background: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .sort-modal .btn:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0.75rem; margin: 0.5rem 0; }
+            .navbar .user-info { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .navbar-brand img { height: 35px; }
+            .navbar .user-info img { width: 20px; height: 20px; }
+            .navbar .address { font-size: 0.7rem; }
+            .navbar .cart-icon { font-size: 1rem; }
+            .search-bar { margin: 1rem 0.5rem; }
+            .promotions-section h3, .cuisine-section h3, .recommended-section h3, .featured-restaurant h3, .testimonials-section h3 { font-size: 1.25rem; }
+            .promo-card h5 { font-size: 1rem; }
+            .promo-card p { font-size: 0.8rem; }
+            .food-slide { flex: 0 0 100px; }
+            .food-slide img { width: 60px; height: 60px; }
+            .food-slide p { font-size: 0.8rem; }
+            .cuisine-card { height: 180px; }
+            .cuisine-card img { height: 100px; }
+            .cuisine-card h5 { font-size: 0.9rem; }
+            .filter-bar { justify-content: flex-start; padding: 0.5rem; gap: 0.5rem; }
+            .filter-btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+            .recommended-card { padding: 0.75rem; gap: 0.5rem; height: 120px; }
+            .recommended-card img { width: 60px; height: 60px; }
+            .recommended-info h5 { font-size: 0.9rem; }
+            .recommended-info p { font-size: 0.7rem; }
+            .featured-card { height: 260px; }
+            .featured-card .carousel, .featured-card .carousel-item { height: 150px; }
+            .featured-info h4 { font-size: 1rem; }
+            .featured-info .rating, .featured-info p { font-size: 0.8rem; }
+            .testimonial-card { height: 120px; }
+            .testimonial-card p { font-size: 0.8rem; }
+            .testimonial-card .author { font-size: 0.75rem; }
+            .footer { padding: 1rem; margin: 0 0 0.5rem; }
+            .footer h6 { font-size: 0.8rem; }
+            .footer a { font-size: 0.75rem; }
+            .footer .social-links i { font-size: 1rem; margin: 0 6px; }
+            .user-menu, .address-options { 
+                min-width: 100%;
+                left: 0;
+                right: 0;
+                top: calc(100% + 0.25rem);
+            }
+            .user-menu { width: 140px; }
+            .address-options { width: 200px; }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-wrapper {
+                width: 100%;
+                flex-direction: column;
+                height: auto;
+            }
+            .location-box, .search-box {
+                width: 100%;
+                max-width: none;
+                padding: 10px;
+            }
+            .location-box::before {
+                display: none;
+            }
+            .location-box::after {
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .promotions-section .row, .cuisine-section .row, .recommended-section .row, .featured-restaurant .row, .testimonials-section .row { row-gap: 0.5rem; }
+            .food-slide { flex: 0 0 80px; }
+            .food-slide img { width: 50px; height: 50px; }
+            .food-slide p { font-size: 0.7rem; }
+            .user-menu { width: 120px; font-size: 0.8rem; }
+            .address-options { width: 180px; font-size: 0.8rem; }
+            .address-form input, .address-form button { font-size: 0.8rem; padding: 0.4rem; }
+            .navbar .cart-icon { font-size: 0.9rem; }
+            .location-box, .search-box {
+                height: 45px;
+            }
+            .location-box i, .search-box i {
+                font-size: 18px;
+            }
+            .location-box input, .search-box input {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar glass-panel">
+        <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <a class="navbar-brand" href="/">
+                <img src="logo.jpg" alt="Tasty Treat Express Logo">
+            </a>
+            <div class="user-info">
+                <div class="d-flex align-items-center gap-1 position-relative">
+                    <img src="logo.jpg" alt="Profile Picture" class="rounded-circle" id="profilePic">
+                    <span id="userName" th:text="${user.firstName}">John</span>
+                    <div class="user-menu" id="userMenu">
+                        <a href="#" data-action="profile">Profile</a>
+                        <a href="#" data-action="orders">Orders</a>
+                        <a href="#" data-action="settings">Settings</a>
+                        <a href="#" data-action="logout">Logout</a>
+                    </div>
+                </div>
+                <div class="address" id="address">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    <span id="userAddress" th:text="${user.address}">123 Flavor Street, Foodie Town, Chennai</span>
+                    <i class="fas fa-shopping-cart cart-icon" id="cartIcon" title="View Cart"></i>
+                    <div class="address-options" id="addressOptions">
+                        <div class="address-form">
+                            <input type="text" id="newAddress" placeholder="Enter new address">
+                            <button id="updateAddressBtn">Update Address</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="search-bar">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <div class="location-box">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="locationInput" placeholder="Enter location">
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for food or restaurants">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="promotions-section">
+        <h3>Hot Deals</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="promo-card">
+                    <h5>50% Off First Order</h5>
+                    <p>Use code: TASTY50</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="promo-card">
+                    <h5>Free Delivery</h5>
+                    <p>Orders above $20</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="promo-card">
+                    <h5>Combo Deal</h5>
+                    <p>Burger + Fries for $10</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="food-slider">
+        <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="slider-container">
+            <div class="food-slide">
+                <img src="food.jpg" alt="Burger">
+                <p>Burger</p>
+            </div>
+            <div class="food-slide">
+                <img src="food2.jpg" alt="Pizza">
+                <p>Pizza</p>
+            </div>
+            <div class="food-slide">
+                <img src="food3.jpg" alt="Sushi">
+                <p>Sushi</p>
+            </div>
+            <div class="food-slide">
+                <img src="food.jpg" alt="Burger">
+                <p>Burger</p>
+            </div>
+            <div class="food-slide">
+                <img src="food2.jpg" alt="Pizza">
+                <p>Pizza</p>
+            </div>
+            <div class="food-slide">
+                <img src="food3.jpg" alt="Sushi">
+                <p>Sushi</p>
+            </div><div class="food-slide">
+                <img src="food.jpg" alt="Burger">
+                <p>Burger</p>
+            </div>
+            <div class="food-slide">
+                <img src="food2.jpg" alt="Pizza">
+                <p>Pizza</p>
+            </div>
+            <div class="food-slide">
+                <img src="food3.jpg" alt="Sushi">
+                <p>Sushi</p>
+            </div>
+        </div>
+        <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <div class="cuisine-section">
+        <h3>Explore Cuisines</h3>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+            <div class="col">
+                <div class="cuisine-card neu-card">
+                    <img src="food.jpg" alt="Italian">
+                    <h5>Italian</h5>
+                </div>
+            </div>
+            <div class="col">
+                <div class="cuisine-card neu-card">
+                    <img src="food.jpg" alt="Indian">
+                    <h5>Indian</h5>
+                </div>
+            </div>
+            <div class="col">
+                <div class="cuisine-card neu-card">
+                    <img src="food2.jpg" alt="Chinese">
+                    <h5>Chinese</h5>
+                </div>
+            </div>
+            <div class="col">
+                <div class="cuisine-card neu-card">
+                    <img src="food2.jpg" alt="Mexican">
+                    <h5>Mexican</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" id="allFilter">All</button>
+        <button class="filter-btn">Fast Delivery</button>
+        <button class="filter-btn">High Rating</button>
+        <button class="filter-btn">Vegetarian</button>
+        <button class="filter-btn">Offers</button>
+    </div>
+
+    <div class="recommended-section">
+        <h3>Recommended for You</h3>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            <div class="col">
+                <div class="recommended-card neu-card">
+                    <img src="food.jpg" alt="Margherita Pizza">
+                    <div class="recommended-info">
+                        <h5>Margherita Pizza</h5>
+                        <p>Pizza Palace</p>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 25 mins</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="recommended-card neu-card">
+                    <img src="food2.jpg" alt="Cheese Burger">
+                    <div class="recommended-info">
+                        <h5>Cheese Burger</h5>
+                        <p>Burger Bonanza</p>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 20 mins</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="recommended-card neu-card">
+                    <img src="food3.jpg" alt="Sushi Roll">
+                    <div class="recommended-info">
+                        <h5>Sushi Roll</h5>
+                        <p>Sushi Haven</p>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 30 mins</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="featured-restaurant">
+        <h3>Featured Restaurants</h3>
+        <div class="row row-cols-1 row-cols-lg-3 g-3">
+            <div class="col">
+                <div class="featured-card neu-card">
+                    <div id="carousel1" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="food.jpg" class="d-block w-100" alt="Italian Interior">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="food2.jpg" class="d-block w-100" alt="Pasta Dish">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="food3.jpg" class="d-block w-100" alt="Pizza Special">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel1" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel1" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="featured-info">
+                        <h4>Flavors of Italy</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span> (4.2)</span>
+                        </div>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 28 mins</p>
+                        <p class="distance"><i class="fas fa-map-marker-alt me-1"></i> 2.5 km away</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="featured-card neu-card">
+                    <div id="carousel2" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="food.jpg" class="d-block w-100" alt="Burger Joint">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="food2.jpg" class="d-block w-100" alt="Burger Combo">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="food.jpg" class="d-block w-100" alt="Fries Special">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel2" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel2" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="featured-info">
+                        <h4>Burger Bonanza</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span> (4.5)</span>
+                        </div>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 20 mins</p>
+                        <p class="distance"><i class="fas fa-map-marker-alt me-1"></i> 1.8 km away</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="featured-card neu-card">
+                    <div id="carousel3" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="https://via.placeholder.com/1000x300?text=Sushi+Bar" class="d-block w-100" alt="Sushi Bar">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://via.placeholder.com/1000x300?text=Sushi+Roll" class="d-block w-100" alt="Sushi Roll">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://via.placeholder.com/1000x300?text=Sashimi" class="d-block w-100" alt="Sashimi">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel3" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carousel3" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="featured-info">
+                        <h4>Sushi Haven</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span> (4.8)</span>
+                        </div>
+                        <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: 30 mins</p>
+                        <p class="distance"><i class="fas fa-map-marker-alt me-1"></i> 3.2 km away</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="testimonials-section">
+        <h3>What Our Customers Say</h3>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            <div class="col">
+                <div class="testimonial-card neu-card">
+                    <p>"Fast delivery and delicious food! My go-to app for meals."</p>
+                    <p class="author">— Sarah M.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="testimonial-card neu-card">
+                    <p>"The variety of cuisines is amazing. Highly recommend!"</p>
+                    <p class="author">— Rajesh K.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="testimonial-card neu-card">
+                    <p>"Great deals and friendly service. Love Tasty Treat Express!"</p>
+                    <p class="author">— Emily T.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="sortOverlay"></div>
+    <div class="sort-modal neu-card" id="sortModal">
+        <h4>Sort By</h4>
+        <div class="sort-option" data-sort="relevance"><i class="fas fa-sort"></i> Relevance (Default)</div>
+        <div class="sort-option" data-sort="delivery-time-asc"><i class="fas fa-clock"></i> Fastest Delivery</div>
+        <div class="sort-option" data-sort="rating-desc"><i class="fas fa-star"></i> Highest Rated</div>
+        <div class="sort-option" data-sort="price-asc"><i class="fas fa-tag"></i> Price: Low to High</div>
+        <div class="sort-option" data-sort="price-desc"><i class="fas fa-tag"></i> Price: High to Low</div>
+        <div class="sort-option" data-sort="distance-asc"><i class="fas fa-map-marker-alt"></i> Nearest First</div>
+        <div class="sort-option" data-sort="popularity-desc"><i class="fas fa-fire"></i> Most Popular</div>
+        <button class="btn" id="applySort">Apply Sort</button>
+    </div>
+
+    <footer class="footer glass-panel">
+        <div class="container">
+            <div class="row row-cols-2 row-cols-md-4 g-3">
+                <div class="col">
+                    <h6>ABOUT TASTY TREAT EXPRESS</h6>
+                    <a href="#">Who We Are</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Work With Us</a>
+                </div>
+                <div class="col">
+                    <h6>FOR RESTAURANTS</h6>
+                    <a href="#">Partner With Us</a>
+                    <a href="#">Apps For You</a>
+                </div>
+                <div class="col">
+                    <h6>LEARN MORE</h6>
+                    <a href="#">Privacy</a>
+                    <a href="#">Security</a>
+                    <a href="#">Terms</a>
+                </div>
+                <div class="col">
+                    <h6>SOCIAL LINKS</h6>
+                    <div class="social-links d-flex justify-content-center gap-3">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mock user data
+        let userData = {
+            firstName: "John",
+            address: "123 Flavor Street, Foodie Town, Chennai",
+            mobile: "9876543210"
+        };
+
+        // Mock cart data (to be shared between pages)
+        let cartItems = [
+            { id: 1, name: "Margherita Pizza", price: 10, quantity: 1 },
+            { id: 2, name: "Cheese Burger", price: 8, quantity: 2 }
+        ];
+
+        // Save cart data to localStorage to share with cart page
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        // Function to update UI with user data
+        function updateUserUI() {
+            const userNameElement = document.getElementById('userName');
+            const userAddressElement = document.getElementById('userAddress');
+            if (userNameElement && userAddressElement) {
+                userNameElement.textContent = userData.firstName;
+                userAddressElement.textContent = userData.address;
+            } else {
+                console.error("UI elements for userName or userAddress not found.");
+            }
+        }
+
+        // Initial UI update
+        updateUserUI();
+
+        // Profile Picture Menu Toggle
+        const profilePic = document.getElementById('profilePic');
+        const userMenu = document.getElementById('userMenu');
+        const addressElement = document.getElementById('address');
+        const addressOptions = document.getElementById('addressOptions');
+        const updateAddressBtn = document.getElementById('updateAddressBtn');
+        const newAddressInput = document.getElementById('newAddress');
+        const cartIcon = document.getElementById('cartIcon');
+
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu(userMenu, addressOptions);
+        });
+
+        addressElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!e.target.closest('#cartIcon')) {
+                toggleMenu(addressOptions, userMenu);
+            }
+        });
+
+        function toggleMenu(menuToShow, menuToHide) {
+            const isShown = menuToShow.style.display === 'block';
+            menuToHide.style.display = 'none';
+            menuToShow.style.display = isShown ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target) && !profilePic.contains(e.target)) {
+                userMenu.style.display = 'none';
+            }
+            if (!addressOptions.contains(e.target) && !addressElement.contains(e.target)) {
+                addressOptions.style.display = 'none';
+            }
+        });
+
+        updateAddressBtn.addEventListener('click', () => {
+            const newAddress = newAddressInput.value.trim();
+            if (newAddress && newAddress.length >= 5) {
+                updateAddressBtn.disabled = true;
+                updateAddressBtn.textContent = "Updating...";
+                setTimeout(() => {
+                    userData.address = newAddress;
+                    updateUserUI();
+                    addressOptions.style.display = 'none';
+                    newAddressInput.value = '';
+                    updateAddressBtn.disabled = false;
+                    updateAddressBtn.textContent = "Update Address";
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    alert('Address updated successfully!');
+                }, 1000);
+            } else {
+                alert('Please enter a valid address (minimum 5 characters).');
+            }
+        });
+
+        cartIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = 'cart.html';
+        });
+
+        userMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = link.getAttribute('data-action');
+                handleMenuAction(action);
+            });
+        });
+
+        function handleMenuAction(action) {
+            switch (action) {
+                case 'profile': console.log('Navigating to Profile...'); break;
+                case 'orders': console.log('Navigating to Orders...'); break;
+                case 'settings': console.log('Navigating to Settings...'); break;
+                case 'logout':
+                    console.log('Logging out...');
+                    setTimeout(() => {
+                        userData = { firstName: 'Guest', address: 'Please set an address', mobile: '' };
+                        updateUserUI();
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        alert('Logged out successfully!');
+                    }, 500);
+                    break;
+            }
+            userMenu.style.display = 'none';
+        }
+
+        // Slider Functionality
+        const sliderContainer = document.querySelector('.slider-container');
+        const prevBtn = document.querySelector('.slider-btn.prev');
+        const nextBtn = document.querySelector('.slider-btn.next');
+        const slideWidth = 120 + 0.75 * 16;
+        let currentPosition = 0;
+        const slides = document.querySelectorAll('.food-slide');
+        const totalSlides = slides.length;
+        const visibleSlides = 5;
+
+        function updateSlider() {
+            const maxPosition = (totalSlides - visibleSlides) * slideWidth;
+            if (currentPosition < 0) currentPosition = 0;
+            if (currentPosition > maxPosition) currentPosition = maxPosition;
+            sliderContainer.style.transform = `translateX(-${currentPosition}px)`;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentPosition -= slideWidth * visibleSlides;
+            updateSlider();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentPosition += slideWidth * visibleSlides;
+            updateSlider();
+        });
+
+        // Filter and Sort Functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const allFilterBtn = document.getElementById('allFilter');
+        const sortModal = document.getElementById('sortModal');
+        const sortOverlay = document.getElementById('sortOverlay');
+        const sortOptions = document.querySelectorAll('.sort-option');
+        const applySortBtn = document.getElementById('applySort');
+        let selectedSort = 'relevance';
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn !== allFilterBtn) {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            });
+        });
+
+        allFilterBtn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            allFilterBtn.classList.add('active');
+            sortModal.style.display = 'block';
+            sortOverlay.style.display = 'block';
+            sortOptions.forEach(o => o.classList.remove('selected'));
+            document.querySelector('.sort-option[data-sort="relevance"]').classList.add('selected');
+            selectedSort = 'relevance';
+        });
+
+        sortOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                sortOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedSort = option.getAttribute('data-sort');
+            });
+        });
+
+        applySortBtn.addEventListener('click', () => {
+            sortModal.style.display = 'none';
+            sortOverlay.style.display = 'none';
+            applySort(selectedSort);
+        });
+
+        sortOverlay.addEventListener('click', () => {
+            sortModal.style.display = 'none';
+            sortOverlay.style.display = 'none';
+        });
+
+        function applySort(sortType) {
+            console.log('Applying sort:', sortType);
+            const items = [
+                { name: "Margherita Pizza", restaurant: "Pizza Palace", time: 25, rating: 4.5, price: 10, distance: 2, popularity: 100 },
+                { name: "Cheese Burger", restaurant: "Burger Bonanza", time: 20, rating: 4.2, price: 8, distance: 1.5, popularity: 80 },
+                { name: "Sushi Roll", restaurant: "Sushi Haven", time: 30, rating: 4.8, price: 15, distance: 3, popularity: 120 }
+            ];
+
+            const sortedItems = items.sort((a, b) => {
+                switch (sortType) {
+                    case 'delivery-time-asc': return a.time - b.time;
+                    case 'rating-desc': return b.rating - a.rating;
+                    case 'price-asc': return a.price - b.price;
+                    case 'price-desc': return b.price - a.price;
+                    case 'distance-asc': return a.distance - b.distance;
+                    case 'popularity-desc': return b.popularity - a.popularity;
+                    default: return 0;
+                }
+            });
+
+            const recommendedSection = document.querySelector('.recommended-section');
+            recommendedSection.innerHTML = `
+                <h3>Recommended for You (Sorted by ${sortType.replace('-asc', '').replace('-desc', '')})</h3>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                    ${sortedItems.map(item => `
+                        <div class="col">
+                            <div class="recommended-card neu-card">
+                                <img src="https://via.placeholder.com/120x120?text=${item.name.replace(' ', '+')}" alt="${item.name}">
+                                <div class="recommended-info">
+                                    <h5>${item.name}</h5>
+                                    <p>${item.restaurant}</p>
+                                    <p class="time"><i class="fas fa-clock me-1"></i> Avg. Delivery: ${item.time} mins</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Add event listeners for the search bar inputs
+        window.onload = () => {
+            updateSlider();
+            const locationInput = document.getElementById('locationInput');
+            const searchInput = document.getElementById('searchInput');
+
+            locationInput.addEventListener('input', debouncedSearch);
+            searchInput.addEventListener('input', debouncedSearch);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Treat Express - Order</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #f39c12;
+            --bg-base: #dfe6e9;
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+        }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg-base); 
+            min-height: 100vh; 
+            color: var(--text-dark); 
+            padding: 10px 0; 
+        }
+        .container { max-width: 450px; margin: 0 auto; }
+        .section { 
+            background: var(--bg-base); 
+            border-radius: 16px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light); 
+            position: relative; 
+        }
+        .bold { font-weight: 600; }
+        .gray-text { color: #666; font-size: 12px; }
+        .red-text { color: #ff4d4f; }
+        .green-text { color: #28a745; }
+        .btn-primary { 
+            background: var(--secondary); 
+            border: none; 
+            border-radius: 10px; 
+            padding: 0.6rem 1.2rem; 
+            color: var(--text-dark); 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark); 
+        }
+        .btn-primary:hover { 
+            background: var(--primary); 
+            color: var(--text-light); 
+            box-shadow: 2px 2px 8px var(--neu-shadow-dark); 
+        }
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-secondary { 
+            background: var(--bg-base); 
+            color: var(--text-dark); 
+            border-radius: 10px; 
+            padding: 0.6rem 1.2rem; 
+            font-weight: 600; 
+            box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light); 
+        }
+        .btn-secondary:hover { 
+            background: var(--secondary); 
+            color: var(--text-dark); 
+        }
+        .popup { 
+            display: none; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: var(--bg-base); 
+            padding: 20px; 
+            border-radius: 20px 20px 0 0; 
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15); 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            width: 100%; 
+            transition: all 0.3s ease; 
+            position: relative; /* Ensure relative positioning for child absolute elements */
+        }
+        .popup-content {
+            padding-top: 40px; /* Add padding to avoid overlap with close button */
+        }
+        .close-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; /* Move to top-right corner */
+            transform: none; /* Remove centering transform */
+            background: none; 
+            border: none; 
+            font-size: 24px; 
+            color: var(--text-dark); 
+            cursor: pointer; 
+            padding: 5px; /* Add padding for better click area */
+        }
+        .close-btn:hover {
+            color: var(--primary); /* Add hover effect */
+        }
+        .payment-card { 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            margin: 8px 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            cursor: pointer; 
+            background: var(--bg-base); 
+            box-shadow: 3px 3px 6px var(--neu-shadow-dark), -3px -3px 6px var(--neu-shadow-light); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+        }
+        .payment-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 5px 5px 10px var(--neu-shadow-dark), -5px -5px 10px var(--neu-shadow-light); 
+        }
+        .payment-card i { width: 28px; height: 28px; margin-right: 10px; font-size: 20px; }
+        .payment-card img { width: 28px; height: 28px; margin-right: 10px; object-fit: contain; }
+        .payment-card span { font-size: 14px; font-weight: 500; }
+        .payment-card .red-text { font-size: 12px; font-weight: 600; }
+        .payment-category { 
+            margin: 15px 0 5px; 
+            font-size: 14px; 
+            color: #666; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+        }
+        .footer { 
+            position: sticky; 
+            bottom: 0; 
+            background: var(--bg-base); 
+            padding: 10px 0; 
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1); 
+        }
+        .item-card img { width: 90px; height: 90px; border-radius: 8px; object-fit: cover; }
+        .slide-panel { 
+            max-height: 0; 
+            overflow: hidden; 
+            background: var(--bg-base); /* Explicitly set to match page background */
+            padding: 0 15px; 
+            border-radius: 16px; 
+            box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light); 
+            transition: max-height 0.3s ease, padding 0.3s ease; 
+        }
+        .slide-panel.active { 
+            max-height: 300px; /* Adjust based on content */
+            padding: 15px; 
+        }
+        .chevron-icon { 
+            transition: transform 0.3s ease; 
+        }
+        .section.active .chevron-icon { 
+            transform: rotate(180deg); 
+        }
+        .address-item { 
+            cursor: pointer; 
+            padding: 5px 0; 
+            transition: background 0.2s ease; 
+        }
+        .address-item:hover { 
+            background: var(--secondary); 
+            border-radius: 8px; 
+        }
+        .checkbox-label { display: flex; align-items: center; font-size: 14px; color: #666; }
+        .checkbox-label i { margin-right: 8px; }
+        .form-message { 
+            display: none; 
+            margin-top: 10px; 
+            padding: 8px; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            text-align: center; 
+        }
+        .form-message.success { 
+            display: block; 
+            background: #d4edda; 
+            color: #155724; 
+        }
+        .form-message.error { 
+            display: block; 
+            background: #f8d7da; 
+            color: #721c24; 
+        }
+        @media (min-width: 768px) {
+            .container { max-width: 900px; }
+            .section { padding: 20px; }
+            .gray-text { font-size: 14px; }
+            .bold { font-size: 18px; }
+            .btn-primary, .btn-secondary { padding: 0.8rem 1.5rem; }
+            .popup { width: 800px; left: 50%; transform: translateX(-50%); max-height: 70vh; }
+            .header-section { display: flex; justify-content: space-between; align-items: center; }
+            .item-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: center; }
+            .item-options { display: flex; justify-content: space-between; align-items: center; }
+            .footer { max-width: 900px; margin: 0 auto; }
+            .footer .d-flex { justify-content: space-between; align-items: center; }
+            /* Hide popups for delivery, user details, and payment forms on large screens */
+            #deliveryPopup, #userPopup, #upiPopup, #cardPopup { display: none !important; }
+        }
+        @media (max-width: 767px) {
+            /* Ensure slide panels are not used on mobile */
+            .slide-panel { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back to Restaurant Section -->
+        <div class="section header-section">
+            <div>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-arrow-left me-2" style="font-size: 18px;"></i>
+                    <div>
+                        <span class="bold" th:text="${restaurantName}">Kadher Bhai Biryani</span><br>
+                        <span class="gray-text"><i class="fas fa-map-marker-alt me-1"></i> <span th:text="${userAddress}">10 mins to College B-block, room no 43...</span></span>
+                    </div>
+                </div>
+                <div class="gray-text mt-1" th:text="'Selected address is ' + ${distance} + ' km away from your location'">Selected address is 389.5 km away from your location</div>
+            </div>
+        </div>
+
+        <!-- Delivery Time Section -->
+        <div class="section">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="bold">Enjoy Quick delivery. Your food will arrive in 10 minutes!</span><br>
+                    <span class="green-text"><i class="fas fa-rocket me-1"></i> Delivery in 10 mins</span>
+                </div>
+            </div>
+            <a href="#" class="gray-text d-block mt-2">Want this later? Schedule it</a>
+        </div>
+
+        <!-- Item Card -->
+        <div class="section item-section">
+            <div class="d-flex align-items-center">
+                <img th:src="${itemImage}" alt="Food Item" src="/images/default-food.jpg">
+                <div class="ms-3 flex-grow-1">
+                    <span class="bold" th:text="${itemName}">Chicken Biryani + Brownie Blast</span>
+                    <div class="d-flex align-items-center my-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="decrement()">-</button>
+                        <span id="quantity" th:text="${quantity}" class="mx-2">1</span>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="increment()">+</button>
+                        <span class="bold ms-3" id="price" th:text="'₹' + ${price}">299</span>
+                    </div>
+                    <div class="item-options">
+                        <label class="checkbox-label">
+                            <i class="fas fa-utensils"></i> Don't send cutlery
+                            <input type="checkbox" class="ms-2" style="display: none;">
+                        </label>
+                        <a href="#" class="gray-text" onclick="toggleNote()"><i class="fas fa-sticky-note me-1"></i> Add a note for the restaurant</a>
+                    </div>
+                    <input type="text" id="note" class="form-control mt-2" style="display: none;" placeholder="Special instructions">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <a href="#" class="red-text">+ add items</a>
+                <button class="btn btn-primary btn-sm" onclick="showPopup('confirmationPopup')">Add to Cart</button>
+            </div>
+            <div id="confirmationPopup" class="popup">
+                <button class="close-btn" onclick="hidePopup('confirmationPopup')"><i class="fas fa-times"></i></button>
+                <div class="popup-content">
+                    <p class="mb-3 text-center">Add this item to your cart?</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-primary" onclick="addToCart()">Yes</button>
+                        <button class="btn btn-secondary" onclick="hidePopup('confirmationPopup')">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery At Card -->
+        <div class="section" id="deliverySection">
+            <div class="d-flex justify-content-between align-items-center" onclick="togglePanel('deliverySection', 'deliveryPanel', 'deliveryPopup')">
+                <span class="bold">Delivery at: <span id="deliveryAddress" th:text="${deliveryAddress}">College B-block, room no 43, 1 floor, Mgr boys host...</span></span>
+                <i class="fas fa-chevron-down chevron-icon"></i>
+            </div>
+            <a href="#" class="gray-text d-block mt-2" onclick="toggleInstructions(event)">Add instructions for delivery partner</a>
+            <input type="text" id="instructions" class="form-control mt-2" style="display: none;" placeholder="e.g., Ring the bell twice">
+        </div>
+        <!-- Slide-down panel for large devices -->
+        <div id="deliveryPanel" class="slide-panel">
+            <button class="btn btn-primary w-100 mb-3">+ Add Address</button>
+            <hr>
+            <h4 class="text-center gray-text">-----Saved Addresses-----</h4>
+            <div th:each="address : ${savedAddresses}" class="address-item" th:data-address="${address}" onclick="selectAddress(this)">
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <span th:text="${address}">456 Oak Lane, City</span>
+                    </div>
+                    <div class="gray-text">
+                        <a href="#" class="me-2">Edit</a>
+                        <a href="#">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup for mobile devices -->
+        <div id="deliveryPopup" class="popup">
+            <button class="close-btn" onclick="hidePopup('deliveryPopup')"><i class="fas fa-times"></i></button>
+            <div class="popup-content">
+                <button class="btn btn-primary w-100 mb-3">+ Add Address</button>
+                <hr>
+                <h4 class="text-center gray-text">-----Saved Addresses-----</h4>
+                <div th:each="address : ${savedAddresses}" class="address-item" th:data-address="${address}" onclick="selectAddress(this)">
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <div>
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span th:text="${address}">456 Oak Lane, City</span>
+                        </div>
+                        <div class="gray-text">
+                            <a href="#" class="me-2">Edit</a>
+                            <a href="#">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Details Card -->
+        <div class="section" id="userSection">
+            <div class="d-flex justify-content-between align-items-center" onclick="togglePanel('userSection', 'userPanel', 'userPopup')">
+                <div>
+                    <span class="bold" th:text="${userFullName}">Vinay Alavala</span><br>
+                    <span class="gray-text" th:text="${userPhone}">+91-7995682898</span>
+                </div>
+                <i class="fas fa-chevron-down chevron-icon"></i>
+            </div>
+        </div>
+        <!-- Slide-down panel for large devices -->
+        <div id="userPanel" class="slide-panel">
+            <p class="gray-text mb-3" th:text="${userAddress}">College B-block, room no 43, 1 floor, Mgr boys host...</p>
+            <input type="text" th:value="${userFullName}" class="form-control mb-3" placeholder="Full Name">
+            <input type="text" th:value="${userPhone}" class="form-control mb-3" placeholder="Phone Number">
+            <button class="btn btn-primary w-100">Submit</button>
+        </div>
+        <!-- Popup for mobile devices -->
+        <div id="userPopup" class="popup">
+            <button class="close-btn" onclick="hidePopup('userPopup')"><i class="fas fa-times"></i></button>
+            <div class="popup-content">
+                <p class="gray-text mb-3" th:text="${userAddress}">College B-block, room no 43, 1 floor, Mgr boys host...</p>
+                <input type="text" th:value="${userFullName}" class="form-control mb-3" placeholder="Full Name">
+                <input type="text" th:value="${userPhone}" class="form-control mb-3" placeholder="Phone Number">
+                <button class="btn btn-primary w-100">Submit</button>
+            </div>
+        </div>
+
+        <!-- Coupon Section -->
+        <div class="section">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="bold"><i class="fas fa-tags me-1"></i> Save ₹100 with 'TRYNEW'</span><br>
+                    <a href="#" class="gray-text red-text">View all coupons</a>
+                </div>
+                <button class="btn btn-primary btn-sm">APPLY</button>
+            </div>
+        </div>
+
+        <!-- Total Bill Card -->
+        <div class="section">
+            <div class="d-flex justify-content-between align-items-center" onclick="toggleBillDetails()">
+                <span class="bold">Total Bill: <span th:text="'₹' + ${grandTotal}">350</span></span>
+                <span class="gray-text">Incl. taxes and charges</span>
+            </div>
+            <div id="billDetails" style="display: none; margin-top: 10px;">
+                <p>Item Total: <span th:text="'₹' + ${itemTotal}">299</span></p>
+                <p>GST: <span th:text="'₹' + ${gst}">15</span></p>
+                <p>Restaurant Charges: <span th:text="'₹' + ${restaurantCharges}">20</span></p>
+                <p>Delivery Partner Fee: <span th:text="'₹' + ${deliveryFee}">10</span></p>
+                <p>Platform Fee: <span th:text="'₹' + ${platformFee}">6</span></p>
+                <hr>
+                <p class="bold">Grand Total: <span th:text="'₹' + ${grandTotal}">350</span></p>
+                <p class="bold">To Pay: <span th:text="'₹' + ${grandTotal}" style="color: var(--secondary);">350</span></p>
+                <p class="gray-text red-text" style="font-style: italic;">Non-refundable once ordered</p>
+            </div>
+        </div>
+
+        <!-- Payment Card -->
+        <div class="footer">
+            <div class="d-flex">
+                <div>
+                    <span class="bold"><i class="fas fa-wallet me-1"></i> <span id="paymentMethod" th:text="${paymentMethod}">Pay on delivery</span></span><br>
+                    <a href="#" class="gray-text" onclick="showPopup('paymentPopup')">PAY USING</a>
+                </div>
+                <div>
+                    <button class="btn btn-primary" th:text="'Place Order ₹' + ${grandTotal}">Place Order ₹350</button>
+                </div>
+            </div>
+            <div id="paymentPopup" class="popup">
+                <button class="close-btn" onclick="hidePopup('paymentPopup')"><i class="fas fa-times"></i></button>
+                <div class="popup-content">
+                    <div class="text-center mb-3">
+                        <span class="bold">Bill total: <span th:text="'₹' + ${grandTotal}">350</span></span>
+                    </div>
+
+                    <!-- Recommended Section -->
+                    <div class="payment-category">Recommended</div>
+
+                    <!-- Google Pay UPI -->
+                    <div class="payment-card" id="gpaySection" onclick="togglePanel('gpaySection', 'gpayPanel', 'upiPopup')">
+                        <div class="d-flex align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="Google Pay">
+                            <span>Google Pay UPI</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div id="gpayPanel" class="slide-panel">
+                        <form onsubmit="submitUpiForm(event, 'gpayPanel', 'Google Pay UPI')">
+                            <input type="text" class="form-control mb-3" name="upiId" placeholder="Enter UPI ID (e.g., yourname@okgpay)" required>
+                            <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., Payment for Order)" required>
+                            <button type="submit" class="btn btn-primary w-100">Add UPI ID</button>
+                            <div class="form-message" id="gpayMessage"></div>
+                        </form>
+                    </div>
+
+                    <!-- PhonePe UPI -->
+                    <div class="payment-card" id="phonepeSection" onclick="togglePanel('phonepeSection', 'phonepePanel', 'upiPopup')">
+                        <div class="d-flex align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe">
+                            <span>PhonePe UPI</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div id="phonepePanel" class="slide-panel">
+                        <form onsubmit="submitUpiForm(event, 'phonepePanel', 'PhonePe UPI')">
+                            <input type="text" class="form-control mb-3" name="upiId" placeholder="Enter UPI ID (e.g., yourname@okphonepe)" required>
+                            <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., Payment for Order)" required>
+                            <button type="submit" class="btn btn-primary w-100">Add UPI ID</button>
+                            <div class="form-message" id="phonepeMessage"></div>
+                        </form>
+                    </div>
+
+                    <!-- Pay on Delivery -->
+                    <div class="payment-category">Pay on Delivery</div>
+                    <div class="payment-card" onclick="selectPaymentMethod('Pay on delivery (UPI/Cash)')">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Pay on delivery (UPI/Cash)</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <!-- Cards -->
+                    <div class="payment-category">Cards</div>
+                    <div class="payment-card" id="cardSection" onclick="togglePanel('cardSection', 'cardPanel', 'cardPopup')">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Add credit or debit card</span>
+                        </div>
+                        <span class="red-text">ADD</span>
+                    </div>
+                    <div id="cardPanel" class="slide-panel">
+                        <form onsubmit="submitCardForm(event, 'cardPanel')">
+                            <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., My Visa Card)" required>
+                            <input type="text" class="form-control mb-3" name="nameOnCard" placeholder="Name on Card" required>
+                            <input type="text" class="form-control mb-3" name="cardNumber" placeholder="Card Number" required>
+                            <input type="text" class="form-control mb-3" name="expiryDate" placeholder="Expiry Date (MM/YY)" required>
+                            <button type="submit" class="btn btn-primary w-100">Make Payment</button>
+                            <div class="form-message" id="cardMessage"></div>
+                        </form>
+                    </div>
+
+                    <!-- UPI / Pay by Any UPI App -->
+                    <div class="payment-category">UPI / Pay by Any UPI App</div>
+                    <div class="payment-card" id="upiSection" onclick="togglePanel('upiSection', 'upiPanel', 'upiPopup')">
+                        <div class="d-flex align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/512px-UPI-Logo-vector.svg.png" alt="UPI">
+                            <span>Add new UPI ID</span>
+                        </div>
+                        <span class="red-text">ADD</span>
+                    </div>
+                    <div id="upiPanel" class="slide-panel">
+                        <form onsubmit="submitUpiForm(event, 'upiPanel', 'UPI')">
+                            <input type="text" class="form-control mb-3" name="upiId" placeholder="Enter UPI ID (e.g., yourname@upi)" required>
+                            <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., Payment for Order)" required>
+                            <button type="submit" class="btn btn-primary w-100">Add UPI ID</button>
+                            <div class="form-message" id="upiMessage"></div>
+                        </form>
+                    </div>
+
+                    <!-- Popup for UPI Form (Mobile) -->
+                    <div id="upiPopup" class="popup">
+                        <button class="close-btn" onclick="hidePopup('upiPopup')"><i class="fas fa-times"></i></button>
+                        <div class="popup-content">
+                            <form onsubmit="submitUpiForm(event, 'upiPopup', 'UPI')">
+                                <input type="text" class="form-control mb-3" name="upiId" placeholder="Enter UPI ID (e.g., yourname@upi)" required>
+                                <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., Payment for Order)" required>
+                                <button type="submit" class="btn btn-primary w-100">Add UPI ID</button>
+                                <div class="form-message" id="upiPopupMessage"></div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Popup for Card Form (Mobile) -->
+                    <div id="cardPopup" class="popup">
+                        <button class="close-btn" onclick="hidePopup('cardPopup')"><i class="fas fa-times"></i></button>
+                        <div class="popup-content">
+                            <form onsubmit="submitCardForm(event, 'cardPopup')">
+                                <input type="text" class="form-control mb-3" name="description" placeholder="Description (e.g., My Visa Card)" required>
+                                <input type="text" class="form-control mb-3" name="nameOnCard" placeholder="Name on Card" required>
+                                <input type="text" class="form-control mb-3" name="cardNumber" placeholder="Card Number" required>
+                                <input type="text" class="form-control mb-3" name="expiryDate" placeholder="Expiry Date (MM/YY)" required>
+                                <button type="submit" class="btn btn-primary w-100">Make Payment</button>
+                                <div class="form-message" id="cardPopupMessage"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let quantity = /*[[${quantity}]]*/ 1;
+        let price = parseFloat(/*[[${price}]]*/ 299);
+
+        function increment() { quantity++; updateQuantityAndPrice(); }
+        function decrement() { if (quantity > 1) { quantity--; updateQuantityAndPrice(); } }
+        function updateQuantityAndPrice() {
+            document.getElementById('quantity').innerText = quantity;
+            document.getElementById('price').innerText = '₹' + (price * quantity);
+        }
+        function showPopup(popupId) { 
+            document.getElementById(popupId).style.display = 'block'; 
+        }
+        function hidePopup(popupId) { 
+            document.getElementById(popupId).style.display = 'none'; 
+        }
+        function addToCart() { 
+            window.location.href = '/restaurant'; 
+        }
+        function toggleNote() { 
+            const note = document.getElementById('note');
+            note.style.display = note.style.display === 'none' ? 'block' : 'none'; 
+        }
+        function toggleInstructions(event) { 
+            event.stopPropagation(); 
+            const instructions = document.getElementById('instructions');
+            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none'; 
+        }
+        function toggleBillDetails() { 
+            const billDetails = document.getElementById('billDetails');
+            billDetails.style.display = billDetails.style.display === 'none' ? 'block' : 'none'; 
+        }
+        function togglePanel(sectionId, panelId, popupId) {
+            const section = document.getElementById(sectionId);
+            const panel = document.getElementById(panelId);
+            const isLargeScreen = window.matchMedia("(min-width: 768px)").matches;
+
+            if (isLargeScreen) {
+                // On large screens, toggle the slide panel
+                section.classList.toggle('active');
+                panel.classList.toggle('active');
+            } else {
+                // On mobile, show the popup
+                showPopup(popupId);
+            }
+        }
+        function selectAddress(element) {
+            const address = element.getAttribute('data-address');
+            document.getElementById('deliveryAddress').innerText = address;
+
+            // Close the panel (on large screens) or popup (on mobile)
+            const isLargeScreen = window.matchMedia("(min-width: 768px)").matches;
+            if (isLargeScreen) {
+                document.getElementById('deliverySection').classList.remove('active');
+                document.getElementById('deliveryPanel').classList.remove('active');
+            } else {
+                hidePopup('deliveryPopup');
+            }
+        }
+        function selectPaymentMethod(method) {
+            document.getElementById('paymentMethod').innerText = method;
+            hidePopup('paymentPopup');
+        }
+        function submitUpiForm(event, panelId, method) {
+            event.preventDefault();
+            const form = event.target;
+            const upiId = form.querySelector('input[name="upiId"]').value;
+            const description = form.querySelector('input[name="description"]').value;
+            const messageDiv = document.getElementById(panelId === 'upiPopup' ? 'upiPopupMessage' : `${panelId}Message`);
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Basic validation
+            if (!upiId || !description) {
+                messageDiv.className = 'form-message error';
+                messageDiv.innerText = 'Please fill in all fields.';
+                return;
+            }
+
+            // Disable button during submission
+            submitButton.disabled = true;
+            submitButton.innerText = 'Processing...';
+
+            // Simulate sending data to the server
+            fetch('/add-upi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ upiId, description, method })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.innerText = 'UPI ID added successfully!';
+                    selectPaymentMethod(method);
+                    setTimeout(() => {
+                        if (panelId === 'upiPopup') {
+                            hidePopup('upiPopup');
+                        } else {
+                            document.getElementById(panelId).classList.remove('active');
+                            document.getElementById(panelId.replace('Panel', 'Section')).classList.remove('active');
+                        }
+                    }, 1500);
+                } else {
+                    throw new Error(data.message || 'Failed to add UPI ID');
+                }
+            })
+            .catch(error => {
+                messageDiv.className = 'form-message error';
+                messageDiv.innerText = error.message || 'An error occurred. Please try again.';
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerText = 'Add UPI ID';
+            });
+        }
+        function submitCardForm(event, panelId) {
+            event.preventDefault();
+            const form = event.target;
+            const description = form.querySelector('input[name="description"]').value;
+            const nameOnCard = form.querySelector('input[name="nameOnCard"]').value;
+            const cardNumber = form.querySelector('input[name="cardNumber"]').value;
+            const expiryDate = form.querySelector('input[name="expiryDate"]').value;
+            const messageDiv = document.getElementById(panelId === 'cardPopup' ? 'cardPopupMessage' : 'cardMessage');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Basic validation
+            if (!description || !nameOnCard || !cardNumber || !expiryDate) {
+                messageDiv.className = 'form-message error';
+                messageDiv.innerText = 'Please fill in all fields.';
+                return;
+            }
+
+            // Disable button during submission
+            submitButton.disabled = true;
+            submitButton.innerText = 'Processing...';
+
+            // Simulate sending data to the server
+            fetch('/make-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ description, nameOnCard, cardNumber, expiryDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.className = 'form-message success';
+                    messageDiv.innerText = 'Payment successful!';
+                    selectPaymentMethod('Credit/Debit Card');
+                    setTimeout(() => {
+                        if (panelId === 'cardPopup') {
+                            hidePopup('cardPopup');
+                        } else {
+                            document.getElementById(panelId).classList.remove('active');
+                            document.getElementById('cardSection').classList.remove('active');
+                        }
+                        hidePopup('paymentPopup');
+                    }, 1500);
+                } else {
+                    throw new Error(data.message || 'Payment failed');
+                }
+            })
+            .catch(error => {
+                messageDiv.className = 'form-message error';
+                messageDiv.innerText = error.message || 'An error occurred. Please try again.';
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerText = 'Make Payment';
+            });
+        }
+    </script>
+</body>
+</html>
