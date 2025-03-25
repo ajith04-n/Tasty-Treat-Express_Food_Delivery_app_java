@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Restaurant Order & Payment Management - Tasty Treat Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="logo.jpg" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* CSS Variables from Tasty Treat Express */
+      :root {
+        --primary: #34495e; /* Slate blue */
+        --secondary: #f39c12; /* Vibrant orange */
+        --bg-base: #dfe6e9; /* Light silver */
+        --neu-shadow-light: #ffffff;
+        --neu-shadow-dark: #b2bec3;
+        --text-dark: #2d3436;
+        --text-light: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Reset default styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body and background styling */
+      body {
+        font-family: "Montserrat", sans-serif;
+        background: linear-gradient(135deg, #dfe6e9 0%, #ffffff 100%),
+          url("https://www.transparenttextures.com/patterns/food.png");
+        background-blend-mode: overlay;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        color: var(--text-dark);
+        position: relative;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        z-index: -1;
+      }
+
+      /* Neumorphism for cards */
+      .neu-card {
+        background: var(--bg-base);
+        border-radius: 16px;
+        box-shadow: 8px 8px 16px var(--neu-shadow-dark),
+          -8px -8px 16px var(--neu-shadow-light);
+        transition: all 0.3s ease;
+      }
+
+      .neu-card:hover {
+        box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+          -4px -4px 12px var(--neu-shadow-light);
+      }
+
+      /* Glassmorphism for panels */
+      .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+      }
+
+      /* Main container */
+      .dashboard-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Header styling */
+      header h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      nav {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      nav a {
+        color: var(--secondary);
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      nav a:hover {
+        color: var(--primary);
+        transform: scale(1.05);
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      /* Order container */
+      .order-container {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .order-header {
+        font-size: 1rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .order-header span {
+        margin-left: 0.5rem;
+      }
+
+      /* Table styling */
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 1rem;
+        background: var(--bg-base);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+          -4px -4px 12px var(--neu-shadow-light);
+      }
+
+      th,
+      td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      th {
+        background: var(--primary);
+        color: var(--text-light);
+        font-weight: 600;
+      }
+
+      tr:last-child {
+        border-bottom: none;
+      }
+
+      tr:hover {
+        background: rgba(243, 156, 18, 0.1);
+      }
+
+      /* Order summary */
+      .order-summary {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .order-summary p {
+        margin-bottom: 0.5rem;
+      }
+
+      .order-summary strong {
+        color: var(--primary);
+      }
+
+      /* Status styling */
+      .status-pending {
+        color: var(--secondary);
+        font-weight: 600;
+      }
+
+      .status-paid {
+        color: #28a745;
+        font-weight: 600;
+      }
+
+      .status-cancelled {
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      /* Buttons */
+      button {
+        padding: 0.75rem 1.5rem;
+        background: var(--secondary);
+        border: none;
+        border-radius: 10px;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+          -4px -4px 12px var(--neu-shadow-light);
+        margin: 5px;
+      }
+
+      button:hover {
+        background: var(--primary);
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+      }
+
+      button:disabled {
+        background: var(--neu-shadow-dark);
+        color: var(--text-light);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      /* No orders message */
+      .no-orders {
+        text-align: center;
+        font-size: 1rem;
+        color: var(--text-dark);
+        opacity: 0.8;
+        padding: 1.5rem;
+      }
+
+      /* Footer */
+      footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        background: var(--primary);
+        padding: 1rem;
+        border-radius: 16px;
+      }
+
+      footer p {
+        margin: 0;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .dashboard-container {
+          padding: 1.5rem;
+        }
+
+        header h1 {
+          font-size: 1.5rem;
+        }
+
+        nav a {
+          margin: 0 10px;
+          font-size: 0.8rem;
+        }
+
+        h2 {
+          font-size: 1.25rem;
+        }
+
+        .order-container {
+          padding: 1rem;
+        }
+
+        th,
+        td {
+          font-size: 0.8rem;
+          padding: 0.5rem;
+        }
+
+        button {
+          padding: 0.5rem 1rem;
+          font-size: 0.8rem;
+        }
+
+        .order-header {
+          font-size: 0.9rem;
+        }
+
+        .order-summary {
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        nav a {
+          display: block;
+          margin: 0.5rem 0;
+        }
+
+        table {
+          font-size: 0.75rem;
+        }
+
+        th,
+        td {
+          padding: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container neu-card glass-panel">
+      <header>
+        <h1>Restaurant Dashboard - Order & Payment Management</h1>
+        <nav>
+          <a th:href="@{/dashboard}">Dashboard</a>
+          <a th:href="@{/menu}">Menu Management</a>
+          <a th:href="@{/orders}">Orders</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2>Current Orders</h2>
+
+        <!-- Loop through orders -->
+        <div th:each="order : ${orders}" class="order-container neu-card">
+          <div class="order-header">
+            <strong>Order #<span th:text="${order.id}"></span></strong>
+            <span>
+              - Customer: <span th:text="${order.customerName}"></span
+            ></span>
+            <span> - Placed: <span th:text="${order.orderDate}"></span></span>
+          </div>
+
+          <!-- Order Items Table -->
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="item : ${order.items}">
+                <td th:text="${item.menuItem.name}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="'$' + ${item.menuItem.price}"></td>
+                <td th:text="'$' + ${item.quantity * item.menuItem.price}"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Order Summary -->
+          <div class="order-summary">
+            <p>
+              <strong>Total Amount: </strong>
+              <span th:text="'$' + ${order.totalAmount}"></span>
+            </p>
+            <p>
+              <strong>Payment Status: </strong>
+              <span
+                th:classappend="${order.paymentStatus} == 'PENDING' ? 'status-pending' : 
+                                          ${order.paymentStatus} == 'PAID' ? 'status-paid' : 
+                                          'status-cancelled'"
+                th:text="${order.paymentStatus}"
+              ></span>
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div th:if="${order.paymentStatus} == 'PENDING'">
+            <form
+              th:action="@{/orders/{id}/confirm-payment(id=${order.id})}"
+              method="post"
+              style="display: inline"
+            >
+              <button type="submit">Confirm Payment</button>
+            </form>
+            <form
+              th:action="@{/orders/{id}/cancel(id=${order.id})}"
+              method="post"
+              style="display: inline"
+            >
+              <button type="submit">Cancel Order</button>
+            </form>
+          </div>
+          <div th:if="${order.paymentStatus} == 'PAID'">
+            <button disabled>Payment Confirmed</button>
+          </div>
+        </div>
+
+        <!-- No orders message -->
+        <div th:if="${orders.isEmpty()}" class="no-orders neu-card">
+          <p>No current orders to display.</p>
+        </div>
+      </main>
+
+      <footer class="glass-panel">
+        <p>© 2025 Tasty Treat Express</p>
+      </footer>
+    </div>
+  </body>
+</html>

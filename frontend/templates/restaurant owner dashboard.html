@@ -1,0 +1,3417 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Treat Express - Management</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+       :root {
+    --primary: #34495e;
+    --secondary: #f39c12;
+    --bg-base: #f5f7fa;
+    --text-dark: #2d3436;
+    --text-light: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --success: #28a745;
+    --danger: #dc3545;
+    --border-radius: 12px;
+    --spacing: 1rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg-base);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+/* Mode Toggle Styles */
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.mode-label {
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+.mode-label.offline {
+    color: var(--danger); /* Red for offline */
+}
+
+.mode-label.online {
+    color: var(--success); /* Green for online */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--danger);
+    transition: background-color 0.3s ease;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-light);
+    transition: transform 0.3s ease;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--success);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Adjust label colors based on toggle state */
+input:checked ~ .mode-label.online {
+    color: var(--success);
+}
+
+input:not(:checked) ~ .mode-label.offline {
+    color: var(--danger);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .mode-toggle {
+        font-size: 0.85rem;
+        gap: 0.3rem;
+    }
+
+    .switch {
+        width: 40px;
+        height: 20px;
+    }
+
+    .slider:before {
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+}
+
+@media (max-width: 576px) {
+    .header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .mode-toggle {
+        margin-top: 0.5rem;
+    }
+}
+
+.container-fluid {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 220px;
+    background: var(--primary);
+    padding: var(--spacing);
+    position: fixed;
+    left: 0;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-hidden {
+    transform: translateX(-100%);
+}
+
+.sidebar a {
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.sidebar a:hover {
+    background: var(--secondary);
+    color: var(--text-dark);
+}
+
+.sidebar a.active {
+    background: var(--secondary);
+    color: var(--text-dark);
+}
+
+.sidebar a i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: var(--spacing);
+    overflow-y: auto;
+    background: var(--bg-base);
+    margin-left: 220px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content-expanded {
+    margin-left: 0;
+}
+
+.header {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+    box-shadow: var(--shadow);
+    display: flex;
+    top: 0;
+    position: sticky;
+    z-index: 1000;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.header .logo img {
+    height: 45px;
+    transition: transform 0.3s ease;
+}
+
+.header .logo img:hover {
+    transform: scale(1.05);
+}
+
+.header .search-bar {
+    flex: 1;
+    max-width: 350px;
+}
+
+.header .search-bar input {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--bg-base);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.header .search-bar input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+}
+
+.navbar-toggle {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: var(--spacing);
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.tabs a {
+    text-decoration: none;
+    color: var(--text-dark);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    background: var(--text-light);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tabs a.active {
+    background: var(--secondary);
+    color: var(--text-dark);
+}
+
+.tabs a:hover {
+    background: var(--primary);
+    color: var(--text-light);
+}
+
+.tabs a .badge {
+    background: var(--danger);
+    color: var(--text-light);
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.order-card, .card {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+}
+
+.order-card .order-type {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+}
+
+.order-card .order-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.order-card .order-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.order-card .order-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.order-card .order-actions a {
+    color: var(--primary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--primary);
+    transition: all 0.3s ease;
+}
+
+.order-card .order-actions a:hover {
+    background: var(--primary);
+    color: var(--text-light);
+}
+
+.order-card .order-items .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.order-card .total-bill {
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.order-card .total-bill .status {
+    background: var(--success);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+}
+
+.order-card .customer-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.menu-section {
+    display: none;
+}
+
+.menu-section.active {
+    display: block;
+}
+
+.category-item {
+    padding: 0.75rem;
+    background: var(--bg-base);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover, .category-item.active {
+    background: var(--secondary);
+    color: var(--text-dark);
+}
+
+.inventory-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.out-of-stock-options {
+    background: var(--bg-base);
+    padding: var(--spacing);
+    border-radius: var(--border-radius);
+    margin-top: 0.5rem;
+}
+
+.btn {
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--text-dark);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary);
+    color: var(--text-light);
+}
+
+.modal-content {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: var(--spacing);
+}
+
+.modal-body {
+    padding: var(--spacing);
+}
+
+.modal-footer {
+    border-top: none;
+    padding: var(--spacing);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.75rem;
+    background: var(--bg-base);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2);
+}
+
+#charCount {
+    float: right;
+    font-size: 0.85rem;
+}
+
+.form-check {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    background: var(--bg-base);
+    transition: all 0.3s ease;
+}
+
+.form-check:hover {
+    background: var(--secondary);
+}
+
+.form-check-input:checked + .form-check-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+#addVariantBtn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-section {
+    display: none;
+}
+
+.order-section.active {
+    display: block;
+}
+
+/* Order History Specific Styles */
+.order-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.order-history-header .search-bar {
+    max-width: 300px;
+    flex: 1;
+}
+
+.order-history-header .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.order-history-header .actions a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.order-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.order-history-item:hover {
+    background: var(--bg-base);
+}
+
+.order-history-item .status-delivered {
+    background: var(--success);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.order-history-item .status-rejected {
+    background: var(--danger);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.order-details-modal .modal-body {
+    padding: 0;
+}
+
+.order-details-modal .modal-header {
+    background: var(--bg-base);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
+.order-details-modal .order-info {
+    padding: var(--spacing);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.order-details-modal .timeline {
+    padding: var(--spacing);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.order-details-modal .timeline .progress {
+    height: 10px;
+    background: var(--bg-base);
+    position: relative;
+}
+
+.order-details-modal .timeline .progress-bar {
+    background: var(--success);
+}
+
+.order-details-modal .timeline .steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.order-details-modal .timeline .steps .step {
+    text-align: center;
+    flex: 1;
+    font-size: 0.85rem;
+}
+
+.order-details-modal .items {
+    padding: var(--spacing);
+}
+
+.order-details-modal .items .item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.flatpickr-input {
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    background: var(--bg-base);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.dropdown-menu {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.dropdown-item:hover {
+    background: var(--secondary);
+    color: var(--text-dark);
+}
+
+/* Reporting Section Styles */
+.reporting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.reporting-header .date-range {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.metric-card {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    text-align: center;
+    margin-bottom: var(--spacing);
+}
+
+.metric-card h5 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.metric-card p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chart-container {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.table-container {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    overflow-x: auto;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+/* Payout Section Styles */
+.payout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.payout-header .date-range {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.payout-card {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.payout-card h5 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.payout-card p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.payout-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.payout-item .status-pending {
+    background: var(--secondary);
+    color: var(--text-dark);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.payout-item .status-completed {
+    background: var(--success);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.payout-settings {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+}
+
+/* Offers Section Styles */
+.offers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.offers-header .date-range {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.offer-card {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.offer-card h5 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.offer-card p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.offer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.offer-item .status-active {
+    background: var(--success);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.offer-item .status-expired {
+    background: var(--danger);
+    color: var(--text-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+}
+
+.offer-actions a {
+    color: var(--primary);
+    text-decoration: none;
+    margin-left: 0.5rem;
+}
+
+/* Outlet Info Section Styles */
+.outlet-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.outlet-info-card {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.outlet-info-card h5 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.outlet-info-card p {
+    margin: 0;
+}
+
+.outlet-hours {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+}
+
+.outlet-hours .day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Help Centre Section Styles */
+.help-centre-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+}
+
+.faq-item {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+.faq-item .question {
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.faq-item .answer {
+    display: none;
+    margin-top: 0.5rem;
+}
+
+.faq-item.active .answer {
+    display: block;
+}
+
+.contact-support {
+    background: var(--text-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: var(--spacing);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-visible {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .navbar-toggle {
+        display: block;
+    }
+
+    .header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .header .search-bar {
+        max-width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .tabs a {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .order-card .order-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .order-card .order-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .order-card .order-actions a {
+        flex: 1;
+        text-align: center;
+    }
+
+    .order-card .customer-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .order-history-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-history-header .search-bar {
+        width: 100%;
+    }
+
+    .order-history-header .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .order-history-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-history-item .text-end {
+        width: 100%;
+        text-align: left;
+    }
+
+    .reporting-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reporting-header .date-range {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .metric-card {
+        width: 100%;
+    }
+
+    .payout-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .payout-header .date-range {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .payout-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .payout-item .text-end {
+        width: 100%;
+        text-align: left;
+    }
+
+    .offers-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .offers-header .date-range {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .offer-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .offer-item .offer-actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .outlet-info-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .help-centre-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-content {
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        padding: 0.75rem;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .header .logo img {
+        height: 35px;
+    }
+
+    .tabs a {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .order-card {
+        padding: 0.75rem;
+    }
+
+    .order-card .order-number {
+        font-size: 1.2rem;
+    }
+
+    .metric-card p {
+        font-size: 1.2rem;
+    }
+
+    .payout-card p {
+        font-size: 1.2rem;
+    }
+
+    .offer-card p {
+        font-size: 1.2rem;
+    }
+    
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="navbar-toggle" aria-label="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <img src="logo.jpg" alt="Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+        <div class="mode-toggle">
+            <span class="mode-label offline">Offline</span>
+            <label class="switch">
+                <input type="checkbox" id="modeToggle" aria-label="Toggle between Offline and Online mode">
+                <span class="slider"></span>
+            </label>
+            <span class="mode-label online">Online</span>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <nav class="sidebar">
+            <div>
+                <a href="#" data-section="orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="#" data-section="menu"><i class="fas fa-book"></i> Menu</a>
+                <a href="#" data-section="order-history"><i class="fas fa-history"></i> Order History</a>
+                <a href="#" data-section="reporting"><i class="fas fa-chart-line"></i> Reporting</a>
+                <a href="#" data-section="payout"><i class="fas fa-money-bill"></i> Payout</a>
+                <a href="#" data-section="offers"><i class="fas fa-tag"></i> Offers</a>
+                <a href="#" data-section="outlet-info"><i class="fas fa-store"></i> Outlet Info</a>
+                <a href="#" data-section="help-centre"><i class="fas fa-question-circle"></i> Help Centre</a>
+            </div>
+            <a href="#" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+
+        <div class="main-content">
+            <div id="orders" class="content-section active">
+
+                <div class="tabs">
+                    <a data-tab="preparing" class="active">Preparing <span class="badge">2</span></a>
+                    <a data-tab="ready">Ready <span class="badge">2</span></a>
+                    <a data-tab="picked-up">Picked Up <span class="badge">2</span></a>
+                </div>
+
+                <div id="preparing" class="order-section active">
+                    <h4 class="mb-3">Preparing Orders</h4>
+                    <div class="order-card">
+                        <div class="order-type">TASTY TREAT EXPRESS - DELIVERY</div>
+                        <div class="order-details">
+                            <div>
+                                <div class="order-number">3127</div>
+                                <div class="order-actions">
+                                    <a href="#"><i class="fas fa-ticket-alt"></i> KOT</a>
+                                    <a href="#"><i class="fas fa-shopping-cart"></i> ORDER</a>
+                                </div>
+                            </div>
+                            <div class="delivery-partner">
+                                <img src="https://via.placeholder.com/40x40?text=Chandan" alt="Delivery Partner">
+                                <div class="partner-info">
+                                    <p>Chandan has arrived</p>
+                                    <p>OTP: 9469</p>
+                                    <div class="partner-actions">
+                                        <a href="#">Call</a> | <a href="#">Track</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            <div class="item veg">
+                                <div>
+                                    <i class="fas fa-circle"></i> 4 x Crispy Tawa Fried Litti
+                                    <div class="instructions">No cutlery, tissues, straws</div>
+                                </div>
+                                <span>₹716.00</span>
+                            </div>
+                        </div>
+                        <div class="total-bill">
+                            <span>Total bill</span>
+                            <div>
+                                <span class="status">PAID</span>
+                                <span>₹644.40</span>
+                            </div>
+                        </div>
+                        <div class="customer-details">
+                            <div class="info">
+                                <div>
+                                    <h5>Khatri Ravi</h5>
+                                    <p>10th order | TC Palya, KR Puram (2 km, 7 mins)</p>
+                                    <p>Placed: 47 mins ago</p>
+                                </div>
+                                <a href="#" class="call-icon"><i class="fas fa-phone-alt"></i></a>
+                            </div>
+                            <div class="actions">
+                                <a href="#"><i class="fas fa-clock"></i> Timeline</a>
+                                <button class="btn btn-outline-primary need-more-time"><i class="fas fa-hourglass-half"></i> More Time</button>
+                                <button class="btn btn-primary order-ready">Order Ready</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ready" class="order-section">
+                    <h4 class="mb-3">Ready Orders</h4>
+                    <div class="order-card">
+                        <div class="order-type">TASTY TREAT EXPRESS - DELIVERY</div>
+                        <div class="order-details">
+                            <div>
+                                <div class="order-number">174404 0301</div>
+                                <div class="order-actions">
+                                    <a href="#"><i class="fas fa-ticket-alt"></i> KOT</a>
+                                    <a href="#"><i class="fas fa-shopping-cart"></i> ORDER</a>
+                                </div>
+                            </div>
+                            <div class="delivery-partner">
+                                <img src="https://via.placeholder.com/40x40?text=Priya" alt="Delivery Partner">
+                                <div class="partner-info">
+                                    <p>Priya has arrived</p>
+                                    <p>OTP: 1234</p>
+                                    <div class="partner-actions">
+                                        <a href="#">Call</a> | <a href="#">Track</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            <div class="item veg">
+                                <div><i class="fas fa-circle"></i> 2 x Veg Biryani</div>
+                                <span>₹300</span>
+                            </div>
+                        </div>
+                        <div class="total-bill">
+                            <span>Total bill</span>
+                            <div>
+                                <span class="status">PAID</span>
+                                <span>₹650</span>
+                            </div>
+                        </div>
+                        <div class="customer-details">
+                            <div class="info">
+                                <div>
+                                    <h5>Anita</h5>
+                                    <p>5th order | Sector 29, Gurgaon (2 km, 7 mins)</p>
+                                    <p>Placed: 11:45</p>
+                                </div>
+                                <a href="#" class="call-icon"><i class="fas fa-phone-alt"></i></a>
+                            </div>
+                            <div class="actions">
+                                <a href="#"><i class="fas fa-clock"></i> Timeline</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="picked-up" class="order-section">
+                    <h4 class="mb-3">Picked Up Orders</h4>
+                    <div class="order-card">
+                        <div class="order-type">TASTY TREAT EXPRESS - DELIVERY</div>
+                        <div class="order-details">
+                            <div>
+                                <div class="order-number">174404 0255</div>
+                                <div class="order-actions">
+                                    <a href="#"><i class="fas fa-ticket-alt"></i> KOT</a>
+                                    <a href="#"><i class="fas fa-shopping-cart"></i> ORDER</a>
+                                </div>
+                            </div>
+                            <div class="delivery-partner">
+                                <img src="https://via.placeholder.com/40x40?text=Amit" alt="Delivery Partner">
+                                <div class="partner-info">
+                                    <p>Amit has picked up</p>
+                                    <div class="partner-actions">
+                                        <a href="#">Call</a>
+                                        <p>Delivering in 12 mins</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            <div class="item veg">
+                                <div><i class="fas fa-circle"></i> 1 x Margherita Pizza</div>
+                                <span>₹500</span>
+                            </div>
+                        </div>
+                        <div class="total-bill">
+                            <span>Total bill</span>
+                            <div>
+                                <span class="status">PAID</span>
+                                <span>₹1050</span>
+                            </div>
+                        </div>
+                        <div class="customer-details">
+                            <div class="info">
+                                <div>
+                                    <h5>Neha</h5>
+                                    <p>4th order | Sector 56, Gurgaon (8 km, 17 mins)</p>
+                                    <p>Placed: 11:20</p>
+                                </div>
+                                <a href="#" class="call-icon"><i class="fas fa-phone-alt"></i></a>
+                            </div>
+                            <div class="actions">
+                                <a href="#"><i class="fas fa-clock"></i> Timeline</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="menu" class="content-section">
+
+                <div class="tabs">
+                    <a data-tab="manage-editor" class="active">Manage Editor</a>
+                    <a data-tab="manage-inventory">Manage Inventory</a>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="search-bar w-50 position-relative">
+                        <input type="text" class="form-control" placeholder="Search items...">
+                        <i class="fas fa-search position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%);"></i>
+                    </div>
+                    <button class="btn btn-success">Submit Changes</button>
+                </div>
+
+                <div id="manage-editor" class="menu-section active">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                    <i class="fas fa-plus"></i> Add Category
+                                </button>
+                                <div class="category-list">
+                                    <div class="category-item" data-item="pizza">Pizza (3)</div>
+                                    <div class="category-item" data-item="burger">Burger (2)</div>
+                                    <div class="category-item" data-item="drinks">Drinks (4)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card item-details">
+                                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                    <i class="fas fa-plus"></i> Item
+                                </button>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="https://via.placeholder.com/100" alt="Item Image" class="rounded">
+                                    <div>
+                                        <h4 id="item-name">Select an item</h4>
+                                        <p id="item-price">Price: -</p>
+                                        <p id="item-customizable">Customizable: -</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="manage-inventory" class="menu-section">
+                    <div class="card">
+                        <div class="inventory-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Pizza</span>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input stock-toggle" type="checkbox" checked data-item="pizza">
+                                    <label class="form-check-label">In Stock</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="inventory-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Burger</span>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input stock-toggle" type="checkbox" data-item="burger">
+                                    <label class="form-check-label">Out of Stock</label>
+                                </div>
+                            </div>
+                            <div class="out-of-stock-options" style="display: none;">
+                                <p>When will this be back in stock?</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="burger-stock" id="burger-2hours">
+                                    <label class="form-check-label">2 hours</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="burger-stock" id="burger-4hours">
+                                    <label class="form-check-label">4 hours</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="burger-stock" id="burger-nextday">
+                                    <label class="form-check-label">Next business day</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="burger-stock" id="burger-manual">
+                                    <label class="form-check-label">I'll turn it on myself</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="order-history" class="content-section">
+                <div class="order-history-header">
+                    <h4>Order History</h4>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="search-bar">
+                            <input type="text" class="form-control" placeholder="Enter full order ID to search">
+                        </div>
+                        <div class="actions">
+                            <div class="date-range">
+                                <input type="text" id="dateRangePicker" class="flatpickr-input" placeholder="Select date range">
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-toggle" href="#" role="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-filter"></i> Filter
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All</a></li>
+                                    <li><a class="dropdown-item filter-option" href="#" data-filter="delivered">Delivered</a></li>
+                                    <li><a class="dropdown-item filter-option" href="#" data-filter="rejected">Rejected</a></li>
+                                </ul>
+                            </div>
+                            <a href="#" id="downloadCSV"><i class="fas fa-download"></i> Download CSV</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-history-list">
+                    <div class="order-history-item" data-order-id="6317231376" data-status="delivered" data-date="2024-11-02" data-bs-toggle="modal" data-bs-target="#orderDetailsModal1">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <strong>ID: 6317231376</strong>
+                            <p>1 x Litti Chokha with Ghee Dip, 1 x Potha<br>By T Santosh Kumar</p>
+                            <p>9:22 PM | 2 November</p>
+                        </div>
+                        <div class="text-end">
+                            ₹948.00
+                            <p>Customer rating: ⭐⭐⭐⭐⭐</p>
+                        </div>
+                    </div>
+                    <div class="order-history-item" data-order-id="6327605839" data-status="rejected" data-date="2024-11-02" data-bs-toggle="modal" data-bs-target="#orderDetailsModal2">
+                        <div>
+                            <span class="status-rejected">REJECTED</span>
+                            <strong>ID: 6327605839</strong>
+                            <p>1 x Potha<br>By T Santosh Kumar</p>
+                            <p>9:19 PM | 2 November</p>
+                            <p class="text-danger">Rejected by customer</p>
+                        </div>
+                        <div class="text-end">
+                            ₹109.00
+                        </div>
+                    </div>
+                    <div class="order-history-item" data-order-id="6317231375" data-status="delivered" data-date="2024-11-01">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <strong>ID: 6317231375</strong>
+                            <p>1 x Litti Chokha with Ghee Dip<br>By T Santosh Kumar</p>
+                            <p>10:34 PM | 1 November</p>
+                        </div>
+                        <div class="text-end">
+                            ₹159.00
+                        </div>
+                    </div>
+                    <!-- New Order 1 -->
+                    <div class="order-history-item" data-order-id="6317231380" data-status="delivered" data-date="2024-11-03" data-bs-toggle="modal" data-bs-target="#orderDetailsModal3">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <strong>ID: 6317231380</strong>
+                            <p>2 x Veg Biryani, 1 x Thums Up [250 ml]<br>By Priya Sharma</p>
+                            <p>6:15 PM | 3 November</p>
+                        </div>
+                        <div class="text-end">
+                            ₹650.00
+                            <p>Customer rating: ⭐⭐⭐⭐</p>
+                        </div>
+                    </div>
+                    <!-- New Order 2 -->
+                    <div class="order-history-item" data-order-id="6317231381" data-status="delivered" data-date="2024-11-04" data-bs-toggle="modal" data-bs-target="#orderDetailsModal4">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <strong>ID: 6317231381</strong>
+                            <p>1 x Margherita Pizza, 1 x Garlic Bread<br>By Rohan Gupta</p>
+                            <p>1:30 PM | 4 November</p>
+                        </div>
+                        <div class="text-end">
+                            ₹750.00
+                            <p>Customer rating: ⭐⭐⭐⭐⭐</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reporting" class="content-section">
+                <div class="reporting-header">
+                    <h4>Reporting</h4>
+                    <div class="date-range">
+                        <input type="text" id="reportingDateRangePicker" class="flatpickr-input" placeholder="Select date range">
+                        <a href="#" id="downloadReportCSV"><i class="fas fa-download"></i> Download Report</a>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <h5>Total Orders</h5>
+                            <p id="totalOrders">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <h5>Total Revenue</h5>
+                            <p id="totalRevenue">₹0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <h5>Average Order Value</h5>
+                            <p id="avgOrderValue">₹0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <h5>Average Rating</h5>
+                            <p id="avgRating">0 ⭐</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5>Order Status Breakdown</h5>
+                            <canvas id="orderStatusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5>Revenue Over Time</h5>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <h5>Top Selling Items</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Quantity Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topSellingItems">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="payout" class="content-section">
+                <div class="payout-header">
+                    <h4>Payout</h4>
+                    <div class="date-range">
+                        <input type="text" id="payoutDateRangePicker" class="flatpickr-input" placeholder="Select date range">
+                        <a href="#" id="downloadPayoutCSV"><i class="fas fa-download"></i> Download Payout Report</a>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="payout-card">
+                            <h5>Total Payouts</h5>
+                            <p id="totalPayouts">₹0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="payout-card">
+                            <h5>Pending Payouts</h5>
+                            <p id="pendingPayouts">₹0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="payout-card">
+                            <h5>Completed Payouts</h5>
+                            <p id="completedPayouts">₹0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="payout-history mb-4">
+                    <h5>Payout History</h5>
+                    <div id="payoutList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div class="payout-settings">
+                    <h5>Payout Settings</h5>
+                    <div class="mb-3">
+                        <label for="bankAccount" class="form-label">Bank Account</label>
+                        <input type="text" class="form-control" id="bankAccount" value="XXXX-XXXX-XXXX-1234" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payoutFrequency" class="form-label">Payout Frequency</label>
+                        <select class="form-control" id="payoutFrequency">
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Biweekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="savePayoutSettings">Save Settings</button>
+                </div>
+            </div>
+
+            <div id="offers" class="content-section">
+                <div class="offers-header">
+                    <h4>Offers</h4>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOfferModal">
+                            <i class="fas fa-plus"></i> Create Offer
+                        </button>
+                        <div class="date-range">
+                            <input type="text" id="offersDateRangePicker" class="flatpickr-input" placeholder="Select date range">
+                        </div>
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" role="button" id="offerFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter"></i> Filter
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="offerFilterDropdown">
+                                <li><a class="dropdown-item offer-filter-option" href="#" data-filter="all">All</a></li>
+                                <li><a class="dropdown-item offer-filter-option" href="#" data-filter="active">Active</a></li>
+                                <li><a class="dropdown-item offer-filter-option" href="#" data-filter="expired">Expired</a></li>
+                            </ul>
+                        </div>
+                        <a href="#" id="downloadOffersCSV"><i class="fas fa-download"></i> Download CSV</a>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="offer-card">
+                            <h5>Total Offers</h5>
+                            <p id="totalOffers">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="offer-card">
+                            <h5>Active Offers</h5>
+                            <p id="activeOffers">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="offer-card">
+                            <h5>Expired Offers</h5>
+                            <p id="expiredOffers">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="offers-list">
+                    <h5>Offer List</h5>
+                    <div id="offerList">
+                        <div class="offer-item" data-offer-id="OFFER001" data-status="active" data-start-date="2025-03-01" data-end-date="2025-03-31">
+                            <div>
+                                <span class="status-active">ACTIVE</span>
+                                <strong>ID: OFFER001</strong>
+                                <p>20% Off on Orders Above ₹500</p>
+                                <p>Valid: 1 Mar 2025 - 31 Mar 2025</p>
+                            </div>
+                            <div class="offer-actions">
+                                <a href="#" class="edit-offer" data-bs-toggle="modal" data-bs-target="#editOfferModal">Edit</a>
+                                <a href="#" class="delete-offer">Delete</a>
+                            </div>
+                        </div>
+                        <div class="offer-item" data-offer-id="OFFER002" data-status="expired" data-start-date="2025-02-01" data-end-date="2025-02-28">
+                            <div>
+                                <span class="status-expired">EXPIRED</span>
+                                <strong>ID: OFFER002</strong>
+                                <p>Buy 1 Get 1 Free on Pizzas</p>
+                                <p>Valid: 1 Feb 2025 - 28 Feb 2025</p>
+                            </div>
+                            <div class="offer-actions">
+                                <a href="#" class="delete-offer">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="outlet-info" class="content-section">
+                <div class="outlet-info-header">
+                    <h4>Outlet Info</h4>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editOutletModal">
+                        <i class="fas fa-edit"></i> Edit Details
+                    </button>
+                </div>
+                <div class="outlet-info-card">
+                    <h5>Outlet Details</h5>
+                    <p><strong>Name:</strong> Tasty Treat Express</p>
+                    <p><strong>Address:</strong> 123 Food Street, TC Palya, KR Puram, Bangalore</p>
+                    <p><strong>Contact:</strong> +91 98765 43210</p>
+                    <p><strong>Email:</strong> contact@tastytreat.com</p>
+                    <p><strong>Owner:</strong> Ravi Khatri</p>
+                </div>
+                <div class="outlet-hours">
+                    <h5>Operating Hours</h5>
+                    <div class="day">
+                        <span>Monday</span>
+                        <span>10:00 AM - 10:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Tuesday</span>
+                        <span>10:00 AM - 10:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Wednesday</span>
+                        <span>10:00 AM - 10:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Thursday</span>
+                        <span>10:00 AM - 10:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Friday</span>
+                        <span>10:00 AM - 11:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Saturday</span>
+                        <span>10:00 AM - 11:00 PM</span>
+                    </div>
+                    <div class="day">
+                        <span>Sunday</span>
+                        <span>11:00 AM - 9:00 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="help-centre" class="content-section">
+                <div class="help-centre-header">
+                    <h4>Help Centre</h4>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactSupportModal">
+                        <i class="fas fa-envelope"></i> Contact Support
+                    </button>
+                </div>
+                <div class="faq-list">
+                    <h5>Frequently Asked Questions</h5>
+                    <div class="faq-item">
+                        <div class="question">How do I update my outlet's operating hours?</div>
+                        <div class="answer">
+                            You can update your operating hours in the "Outlet Info" section. Click on "Edit Details" and modify the hours as needed.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="question">What should I do if a customer rejects an order?</div>
+                        <div class="answer">
+                            If a customer rejects an order, you can view the details in the "Order History" section. Contact the customer to understand the reason and resolve the issue. You can also reach out to support for assistance.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="question">How can I create a new offer?</div>
+                        <div class="answer">
+                            Go to the "Offers" section and click on "Create Offer". Fill in the details such as offer title, discount value, and validity period, then save the offer.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="newOrderModal" tabindex="-1" aria-labelledby="newOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newOrderModalLabel">New Order Received</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info">
+                        <p><strong>Order ID:</strong> 174404 0310</p>
+                        <p><strong>Time:</strong> 12:30 PM</p>
+                        <p><strong>Customer:</strong> Rohan's 1st order</p>
+                    </div>
+                    <div class="item-list">
+                        <h6>Items:</h6>
+                        <div class="item">
+                            <span>2 x Veg Spring Rolls</span>
+                            <span>₹240</span>
+                        </div>
+                        <div class="item">
+                            <span>1 x Chicken Fried Rice</span>
+                            <span>₹300</span>
+                        </div>
+                    </div>
+                    <div class="billing-details">
+                        <p><span>Taxes:</span> <span>₹54</span></p>
+                        <p><span>Discount:</span> <span>-₹50</span></p>
+                        <p><strong>Total Bill:</strong> <strong>₹544</strong></p>
+                    </div>
+                    <div class="prep-time">
+                        <h6>Set Preparation Time</h6>
+                        <div class="prep-time-controls d-flex align-items-center gap-2">
+                            <button id="decrementTime" class="btn btn-outline-primary">-</button>
+                            <span id="prepTime">15 mins</span>
+                            <button id="incrementTime" class="btn btn-outline-primary">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="rejectOrder">Reject</button>
+                    <span class="timer" id="orderTimer">5:00</span>
+                    <button type="button" class="btn btn-success" id="acceptOrder">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="category-step-1">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="e.g. Dessert" maxlength="50">
+                        </div>
+                        <button class="btn btn-primary float-end" id="categoryNextBtn" disabled>Next</button>
+                    </div>
+                    <div id="category-step-2" style="display: none;">
+                        <div class="mb-3">
+                            <label for="subCategoryName" class="form-label">Subcategory Name</label>
+                            <input type="text" class="form-control" id="subCategoryName" placeholder="e.g. Ice Cream" maxlength="50">
+                        </div>
+                        <button class="btn btn-primary float-end" id="categorySaveBtn" disabled>Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemModalLabel">Basic Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="itemName" maxlength="70">
+                        <small class="form-text text-muted" id="charCount">0/70 characters</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemDescription" class="form-label">Item Description</label>
+                        <textarea class="form-control" id="itemDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Food Type</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="foodType" id="veg" value="veg">
+                                <label class="form-check-label" for="veg">Veg</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="foodType" id="nonveg" value="nonveg">
+                                <label class="form-check-label" for="nonveg">Non-Veg</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="foodType" id="egg" value="egg">
+                                <label class="form-check-label" for="egg">Egg</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Item Photos</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="itemPhotos" accept="image/*" multiple>
+                            <label class="input-group-text" for="itemPhotos"><i class="fas fa-camera"></i></label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="basePrice" class="form-label">Base Price</label>
+                        <input type="number" class="form-control" id="basePrice" min="0" step="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label for="packagingCharges" class="form-label">Packaging Charges</label>
+                        <input type="number" class="form-control" id="packagingCharges" min="0" step="0.01">
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <span>Variants</span>
+                            <button class="btn btn-outline-primary" id="addVariantBtn"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                    <button type="button" class="btn btn-primary" id="saveItemBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addVariantModal" tabindex="-1" aria-labelledby="addVariantModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addVariantModalLabel">Add Variant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Variant Type</label>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-outline-primary" id="addSizeBtn">Add Size</button>
+                            <button class="btn btn-outline-primary disabled" id="addCustomBtn">Add Customization</button>
+                        </div>
+                    </div>
+                    <div id="sizeOptions" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Sizes & Pricing</label>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="smallSize">
+                                        <label class="form-check-label" for="smallSize">Small</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" id="smallPrice" placeholder="Price" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="mediumSize">
+                                        <label class="form-check-label" for="mediumSize">Medium</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" id="mediumPrice" placeholder="Price" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="largeSize">
+                                        <label class="form-check-label" for="largeSize">Large</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" id="largePrice" placeholder="Price" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                    <button type="button" class="btn btn-primary" id="saveVariantBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade order-details-modal" id="orderDetailsModal1" tabindex="-1" aria-labelledby="orderDetailsModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel1">ID: 6317231376</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <p>9:22 PM | 2 November</p>
+                            <p>1 order by T Santosh Kumar</p>
+                            <p>Customer rating: ⭐⭐⭐⭐⭐</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">Help</a>
+                    </div>
+                    <div class="timeline">
+                        <h6>ORDER TIMELINE</h6>
+                        <p class="text-end">Delivered in 45 minutes</p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <div class="steps">
+                            <div class="step">
+                                <p>9:22 PM</p>
+                                <p>Placed</p>
+                            </div>
+                            <div class="step">
+                                <p>9:23 PM</p>
+                                <p>Accepted</p>
+                            </div>
+                            <div class="step">
+                                <p>9:48 PM</p>
+                                <p>Delivery partner arrived</p>
+                            </div>
+                            <div class="step">
+                                <p>9:50 PM</p>
+                                <p>Picked up</p>
+                            </div>
+                            <div class="step">
+                                <p>10:06 PM</p>
+                                <p>Delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="items">
+                        <h6>ORDER DETAILS</h6>
+                        <div class="item">
+                            <span>1 x Litti Chokha with Ghee Dip</span>
+                            <span>₹159</span>
+                        </div>
+                        <div class="item">
+                            <span>Choose Your Beverage: Thums Up Soft Beverage [250 ml]</span>
+                            <span>₹0</span>
+                        </div>
+                        <div class="item">
+                            <span>1 x Potha</span>
+                            <span>₹789</span>
+                        </div>
+                        <div class="item text-end">
+                            <strong>Total: ₹948</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade order-details-modal" id="orderDetailsModal2" tabindex="-1" aria-labelledby="orderDetailsModalLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel2">ID: 6327605839</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="status-rejected">REJECTED</span>
+                            <p>9:19 PM | 2 November</p>
+                            <p>1 order by T Santosh Kumar</p>
+                            <p class="text-danger">Rejected by customer</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">Help</a>
+                    </div>
+                    <div class="timeline">
+                        <h6>ORDER TIMELINE</h6>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"></div>
+                        </div>
+                        <div class="steps">
+                            <div class="step">
+                                <p>9:19 PM</p>
+                                <p>Placed</p>
+                            </div>
+                            <div class="step">
+                                <p>-</p>
+                                <p>Accepted</p>
+                            </div>
+                            <div class="step">
+                                <p>-</p>
+                                <p>Delivery partner arrived</p>
+                            </div>
+                            <div class="step">
+                                <p>-</p>
+                                <p>Picked up</p>
+                            </div>
+                            <div class="step">
+                                <p>-</p>
+                                <p>Delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="items">
+                        <h6>ORDER DETAILS</h6>
+                        <div class="item">
+                            <span>1 x Potha</span>
+                            <span>₹109</span>
+                        </div>
+                        <div class="item text-end">
+                            <strong>Total: ₹109</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Order 1 -->
+    <div class="modal fade order-details-modal" id="orderDetailsModal3" tabindex="-1" aria-labelledby="orderDetailsModalLabel3" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel3">ID: 6317231380</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <p>6:15 PM | 3 November</p>
+                            <p>1 order by Priya Sharma</p>
+                            <p>Customer rating: ⭐⭐⭐⭐</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">Help</a>
+                    </div>
+                    <div class="timeline">
+                        <h6>ORDER TIMELINE</h6>
+                        <p class="text-end">Delivered in 30 minutes</p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <div class="steps">
+                            <div class="step">
+                                <p>6:15 PM</p>
+                                <p>Placed</p>
+                            </div>
+                            <div class="step">
+                                <p>6:16 PM</p>
+                                <p>Accepted</p>
+                            </div>
+                            <div class="step">
+                                <p>6:30 PM</p>
+                                <p>Delivery partner arrived</p>
+                            </div>
+                            <div class="step">
+                                <p>6:35 PM</p>
+                                <p>Picked up</p>
+                            </div>
+                            <div class="step">
+                                <p>6:45 PM</p>
+                                <p>Delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="items">
+                        <h6>ORDER DETAILS</h6>
+                        <div class="item">
+                            <span>2 x Veg Biryani</span>
+                            <span>₹600</span>
+                        </div>
+                        <div class="item">
+                            <span>1 x Thums Up [250 ml]</span>
+                            <span>₹50</span>
+                        </div>
+                        <div class="item text-end">
+                            <strong>Total: ₹650</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Order 2 -->
+    <div class="modal fade order-details-modal" id="orderDetailsModal4" tabindex="-1" aria-labelledby="orderDetailsModalLabel4" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel4">ID: 6317231381</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="status-delivered">DELIVERED</span>
+                            <p>1:30 PM | 4 November</p>
+                            <p>1 order by Rohan Gupta</p>
+                            <p>Customer rating: ⭐⭐⭐⭐⭐</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-primary">Help</a>
+                    </div>
+                    <div class="timeline">
+                        <h6>ORDER TIMELINE</h6>
+                        <p class="text-end">Delivered in 40 minutes</p>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <div class="steps">
+                            <div class="step">
+                                <p>1:30 PM</p>
+                                <p>Placed</p>
+                            </div>
+                            <div class="step">
+                                <p>1:32 PM</p>
+                                <p>Accepted</p>
+                            </div>
+                            <div class="step">
+                                <p>1:50 PM</p>
+                                <p>Delivery partner arrived</p>
+                            </div>
+                            <div class="step">
+                                <p>1:55 PM</p>
+                                <p>Picked up</p>
+                            </div>
+                            <div class="step">
+                                <p>2:10 PM</p>
+                                <p>Delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="items">
+                        <h6>ORDER DETAILS</h6>
+                        <div class="item">
+                            <span>1 x Margherita Pizza</span>
+                            <span>₹500</span>
+                        </div>
+                        <div class="item">                            <span>1 x Garlic Bread</span>
+                            <span>₹250</span>
+                        </div>
+                        <div class="item text-end">
+                            <strong>Total: ₹750</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createOfferModal" tabindex="-1" aria-labelledby="createOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createOfferModalLabel">Create Offer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="offerTitle" class="form-label">Offer Title</label>
+                        <input type="text" class="form-control" id="offerTitle" placeholder="e.g. 20% Off on Orders Above ₹500">
+                    </div>
+                    <div class="mb-3">
+                        <label for="offerDescription" class="form-label">Offer Description</label>
+                        <textarea class="form-control" id="offerDescription" rows="3" placeholder="e.g. Get 20% off on your next order! Valid for a limited time only!"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="offerType" class="form-label">Offer Type</label>
+                        <select class="form-control" id="offerType">
+                            <option value="percentage">Percentage Discount</option>
+                            <option value="flat">Flat Discount</option>
+                            <option value="bogo">Buy One Get One</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="discountValue" class="form-label">Discount Value</label>
+                        <input type="number" class="form-control" id="discountValue" placeholder="e.g. 20 for 20% or ₹100 for flat discount" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="minOrderValue" class="form-label">Minimum Order Value</label>
+                        <input type="number" class="form-control" id="minOrderValue" placeholder="e.g. 500" min="0">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="offerStartDate" class="form-label">Start Date</label>
+                            <input type="text" class="form-control flatpickr-input" id="offerStartDate" placeholder="Select start date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="offerEndDate" class="form-label">End Date</label>
+                            <input type="text" class="form-control flatpickr-input" id="offerEndDate" placeholder="Select end date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveOfferBtn">Save Offer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editOfferModal" tabindex="-1" aria-labelledby="editOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOfferModalLabel">Edit Offer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editOfferTitle" class="form-label">Offer Title</label>
+                        <input type="text" class="form-control" id="editOfferTitle" placeholder="e.g. 20% Off on Orders Above ₹500">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOfferDescription" class="form-label">Offer Description</label>
+                        <textarea class="form-control" id="editOfferDescription" rows="3" placeholder="e.g. Get 20% off on your next order! Valid for a limited time only!"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDiscountValue" class="form-label">Discount Value</label>
+                        <input type="number" class="form-control" id="editDiscountValue" placeholder="e.g. 20 for 20% or ₹100 for flat discount" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMinOrderValue" class="form-label">Minimum Order Value</label>
+                        <input type="number" class="form-control" id="editMinOrderValue" placeholder="e.g. 500" min="0">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editOfferStartDate" class="form-label">Start Date</label>
+                            <input type="text" class="form-control flatpickr-input" id="editOfferStartDate" placeholder="Select start date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editOfferEndDate" class="form-label">End Date</label>
+                            <input type="text" class="form-control flatpickr-input" id="editOfferEndDate" placeholder="Select end date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="updateOfferBtn">Update Offer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editOutletModal" tabindex="-1" aria-labelledby="editOutletModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOutletModalLabel">Edit Outlet Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="outletName" class="form-label">Outlet Name</label>
+                        <input type="text" class="form-control" id="outletName" value="Tasty Treat Express">
+                    </div>
+                    <div class="mb-3">
+                        <label for="outletAddress" class="form-label">Address</label>
+                        <textarea class="form-control" id="outletAddress" rows="3">123 Food Street, TC Palya, KR Puram, Bangalore</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outletContact" class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" id="outletContact" value="+91 98765 43210">
+                    </div>
+                    <div class="mb-3">
+                        <label for="outletEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="outletEmail" value="contact@tastytreat.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="outletOwner" class="form-label">Owner Name</label>
+                        <input type="text" class="form-control" id="outletOwner" value="Ravi Khatri">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Operating Hours</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="mondayHours" class="form-label">Monday</label>
+                                <input type="text" class="form-control" id="mondayHours" value="10:00 AM - 10:00 PM">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tuesdayHours" class="form-label">Tuesday</label>
+                                <input type="text" class="form-control" id="tuesdayHours" value="10:00 AM - 10:00 PM">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="wednesdayHours" class="form-label">Wednesday</label>
+                                <input type="text" class="form-control" id="wednesdayHours" value="10:00 AM - 10:00 PM">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label for="thursdayHours" class="form-label">Thursday</label>
+                                <input type="text" class="form-control" id="thursdayHours" value="10:00 AM - 10:00 PM">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="fridayHours" class="form-label">Friday</label>
+                                <input type="text" class="form-control" id="fridayHours" value="10:00 AM - 11:00 PM">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="saturdayHours" class="form-label">Saturday</label>
+                                <input type="text" class="form-control" id="saturdayHours" value="10:00 AM - 11:00 PM">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label for="sundayHours" class="form-label">Sunday</label>
+                                <input type="text" class="form-control" id="sundayHours" value="11:00 AM - 9:00 PM">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveOutletBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="contactSupportModal" tabindex="-1" aria-labelledby="contactSupportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactSupportModalLabel">Contact Support</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="supportSubject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="supportSubject" placeholder="e.g. Issue with Order #1234">
+                    </div>
+                    <div class="mb-3">
+                        <label for="supportMessage" class="form-label">Message</label>
+                        <textarea class="form-control" id="supportMessage" rows="5" placeholder="Describe your issue or query..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="supportAttachment" class="form-label">Attach File (Optional)</label>
+                        <input type="file" class="form-control" id="supportAttachment">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitSupportBtn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar Navigation
+            const sidebarLinks = document.querySelectorAll('.sidebar a[data-section]');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    contentSections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(section).classList.add('active');
+                });
+            });
+
+            // Order Tabs
+            const orderTabs = document.querySelectorAll('.tabs a[data-tab]');
+            const orderSections = document.querySelectorAll('.order-section');
+
+            orderTabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+
+                    orderTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    orderSections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Menu Tabs
+            const menuTabs = document.querySelectorAll('#menu .tabs a[data-tab]');
+            const menuSections = document.querySelectorAll('.menu-section');
+
+            menuTabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+
+                    menuTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    menuSections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Category Selection
+            const categoryItems = document.querySelectorAll('.category-item');
+            const itemDetails = document.querySelector('.item-details');
+
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const category = this.getAttribute('data-item');
+                    document.getElementById('item-name').textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    document.getElementById('item-price').textContent = 'Price: ₹500';
+                    document.getElementById('item-customizable').textContent = 'Customizable: Yes';
+                });
+            });
+
+            // Inventory Stock Toggle
+            const stockToggles = document.querySelectorAll('.stock-toggle');
+            stockToggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const item = this.getAttribute('data-item');
+                    const outOfStockOptions = this.closest('.inventory-item').querySelector('.out-of-stock-options');
+                    const label = this.nextElementSibling;
+
+                    if (this.checked) {
+                        label.textContent = 'In Stock';
+                        outOfStockOptions.style.display = 'none';
+                    } else {
+                        label.textContent = 'Out of Stock';
+                        outOfStockOptions.style.display = 'block';
+                    }
+                });
+            });
+
+            // Add Category Modal
+            const categoryNameInput = document.getElementById('categoryName');
+            const categoryNextBtn = document.getElementById('categoryNextBtn');
+            const categoryStep1 = document.getElementById('category-step-1');
+            const categoryStep2 = document.getElementById('category-step-2');
+            const subCategoryNameInput = document.getElementById('subCategoryName');
+            const categorySaveBtn = document.getElementById('categorySaveBtn');
+
+            categoryNameInput.addEventListener('input', function() {
+                categoryNextBtn.disabled = this.value.trim() === '';
+            });
+
+            categoryNextBtn.addEventListener('click', function() {
+                categoryStep1.style.display = 'none';
+                categoryStep2.style.display = 'block';
+            });
+
+            subCategoryNameInput.addEventListener('input', function() {
+                categorySaveBtn.disabled = this.value.trim() === '';
+            });
+
+            categorySaveBtn.addEventListener('click', function() {
+                const categoryName = categoryNameInput.value.trim();
+                const subCategoryName = subCategoryNameInput.value.trim();
+                if (categoryName && subCategoryName) {
+                    const newCategory = document.createElement('div');
+                    newCategory.className = 'category-item';
+                    newCategory.setAttribute('data-item', subCategoryName.toLowerCase());
+                    newCategory.textContent = `${categoryName} - ${subCategoryName} (0)`;
+                    document.querySelector('.category-list').appendChild(newCategory);
+                    bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+                    categoryNameInput.value = '';
+                    subCategoryNameInput.value = '';
+                    categoryStep1.style.display = 'block';
+                    categoryStep2.style.display = 'none';
+                    categoryNextBtn.disabled = true;
+                    categorySaveBtn.disabled = true;
+                }
+            });
+
+            // Add Item Modal
+            const itemNameInput = document.getElementById('itemName');
+            const charCount = document.getElementById('charCount');
+            const addItemModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+
+            itemNameInput.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = `${length}/70 characters`;
+            });
+
+            document.getElementById('saveItemBtn').addEventListener('click', function() {
+                addItemModal.hide();
+            });
+
+            // Add Variant Modal
+            const addVariantModal = new bootstrap.Modal(document.getElementById('addVariantModal'));
+            const addSizeBtn = document.getElementById('addSizeBtn');
+            const sizeOptions = document.getElementById('sizeOptions');
+
+            document.getElementById('addVariantBtn').addEventListener('click', function() {
+                addVariantModal.show();
+            });
+
+            addSizeBtn.addEventListener('click', function() {
+                sizeOptions.style.display = 'block';
+            });
+
+            document.getElementById('saveVariantBtn').addEventListener('click', function() {
+                addVariantModal.hide();
+            });
+
+            // New Order Modal Timer
+            const newOrderModal = new bootstrap.Modal(document.getElementById('newOrderModal'));
+            const orderTimer = document.getElementById('orderTimer');
+            let timeLeft = 300; // 5 minutes in seconds
+
+            function startTimer() {
+                const timerInterval = setInterval(() => {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    orderTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    timeLeft--;
+
+                    if (timeLeft < 0) {
+                        clearInterval(timerInterval);
+                        newOrderModal.hide();
+                        timeLeft = 300;
+                        orderTimer.textContent = '5:00';
+                    }
+                }, 1000);
+            }
+
+            document.getElementById('acceptOrder').addEventListener('click', () => {
+                alert('Order accepted!');
+                newOrderModal.hide();
+                timeLeft = 300;
+                orderTimer.textContent = '5:00';
+            });
+
+            document.getElementById('rejectOrder').addEventListener('click', () => {
+                alert('Order rejected!');
+                newOrderModal.hide();
+                timeLeft = 300;
+                orderTimer.textContent = '5:00';
+            });
+
+            document.getElementById('incrementTime').addEventListener('click', () => {
+                let prepTime = parseInt(document.getElementById('prepTime').textContent);
+                prepTime++;
+                document.getElementById('prepTime').textContent = `${prepTime} mins`;
+            });
+
+            document.getElementById('decrementTime').addEventListener('click', () => {
+                let prepTime = parseInt(document.getElementById('prepTime').textContent);
+                if (prepTime > 1) {
+                    prepTime--;
+                    document.getElementById('prepTime').textContent = `${prepTime} mins`;
+                }
+            });
+
+            // Simulate new order
+            setTimeout(() => {
+                newOrderModal.show();
+                startTimer();
+            }, 5000);
+
+            // Order History Date Range Picker
+            flatpickr("#dateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        filterOrderHistory();
+                    }
+                }
+            });
+
+            // Order History Filtering
+            const filterOptions = document.querySelectorAll('.filter-option');
+            let currentFilter = 'all';
+
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentFilter = this.getAttribute('data-filter');
+                    filterOrderHistory();
+                });
+            });
+
+            function filterOrderHistory() {
+                const dateRange = document.getElementById('dateRangePicker').value.split(' to ');
+                const startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+                const endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+                const orderItems = document.querySelectorAll('.order-history-item');
+
+                orderItems.forEach(item => {
+                    const itemDate = new Date(item.getAttribute('data-date'));
+                    const itemStatus = item.getAttribute('data-status');
+                    let dateMatch = true;
+                    let statusMatch = true;
+
+                    if (startDate && endDate) {
+                        dateMatch = itemDate >= startDate && itemDate <= endDate;
+                    }
+
+                    if (currentFilter !== 'all') {
+                        statusMatch = itemStatus === currentFilter;
+                    }
+
+                    item.style.display = dateMatch && statusMatch ? 'flex' : 'none';
+                });
+            }
+
+            // Download CSV for Order History
+            document.getElementById('downloadCSV').addEventListener('click', function(e) {
+                e.preventDefault();
+                const orderItems = document.querySelectorAll('.order-history-item');
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Order ID,Status,Items,Customer,Time,Date,Total\n";
+
+                orderItems.forEach(item => {
+                    if (item.style.display !== 'none') {
+                        const orderId = item.querySelector('strong').textContent.replace('ID: ', '');
+                        const status = item.querySelector('span').textContent;
+                        const items = item.querySelector('p:nth-child(3)').textContent;
+                        const customer = item.querySelector('p:nth-child(3)').textContent.split('By ')[1];
+                        const time = item.querySelector('p:nth-child(4)').textContent.split(' | ')[0];
+                        const date = item.querySelector('p:nth-child(4)').textContent.split(' | ')[1];
+                        const total = item.querySelector('.text-end').childNodes[0].textContent.trim();
+                        csvContent += `${orderId},${status},"${items}",${customer},${time},${date},${total}\n`;
+                    }
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'order_history.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Reporting Section
+            const reportingDateRangePicker = flatpickr("#reportingDateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        updateReportingMetrics();
+                        updateCharts();
+                    }
+                }
+            });
+
+            function updateReportingMetrics() {
+                const dateRange = document.getElementById('reportingDateRangePicker').value.split(' to ');
+                const startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+                const endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+                const orderItems = document.querySelectorAll('.order-history-item');
+
+                let totalOrders = 6;
+                let totalRevenue = 5000;
+                let totalRating = 45;
+                let ratingCount = 10;
+                const topItems = {"Chicken Biriyani": {quantity: 4, revenue: 1600}};
+
+                orderItems.forEach(item => {
+                    const itemDate = new Date(item.getAttribute('data-date'));
+                    if (startDate && endDate && itemDate >= startDate && itemDate <= endDate) {
+                        totalOrders++;
+                        const revenue = parseFloat(item.querySelector('.text-end').childNodes[0].textContent.replace('₹', ''));
+                        totalRevenue += revenue;
+
+                        const rating = item.querySelector('.text-end p')?.textContent?.match(/⭐/g)?.length || 0;
+                        if (rating > 0) {
+                            totalRating += rating;
+                            ratingCount++;
+                        }
+
+                        const items = item.querySelector('p:nth-child(3)').textContent.split(', ');
+                        items.forEach(i => {
+                            const itemName = i.split(' x ')[1].split('<br>')[0];
+                            const quantity = parseInt(i.split(' x ')[0]);
+                            if (topItems[itemName]) {
+                                topItems[itemName].quantity += quantity;
+                                topItems[itemName].revenue += revenue / items.length;
+                            } else {
+                                topItems[itemName] = { quantity, revenue: revenue / items.length };
+                            }
+                        });
+                    }
+                });
+
+                document.getElementById('totalOrders').textContent = totalOrders;
+                document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toFixed(2)}`;
+                document.getElementById('avgOrderValue').textContent = totalOrders ? `₹${(totalRevenue / totalOrders).toFixed(2)}` : '₹0';
+                document.getElementById('avgRating').textContent = ratingCount ? `${(totalRating / ratingCount).toFixed(1)} ⭐` : '0 ⭐';
+
+                const topSellingItems = document.getElementById('topSellingItems');
+                topSellingItems.innerHTML = '';
+                Object.entries(topItems).sort((a, b) => b[1].quantity - a[1].quantity).slice(0, 5).forEach(([name, data]) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${name}</td><td>${data.quantity}</td><td>₹${data.revenue.toFixed(2)}</td>`;
+                    topSellingItems.appendChild(row);
+                });
+            }
+
+            // Charts for Reporting
+            const orderStatusChart = new Chart(document.getElementById('orderStatusChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Delivered', 'Rejected'],
+                    datasets: [{
+                        data: [4, 2],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+
+            const revenueChart = new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [],
+                        borderColor: '#34495e',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Revenue (₹)' } }
+                    }
+                }
+            });
+
+            function updateCharts() {
+                const dateRange = document.getElementById('reportingDateRangePicker').value.split(' to ');
+                const startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+                const endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+                const orderItems = document.querySelectorAll('.order-history-item');
+
+                let deliveredCount = 4;
+                let rejectedCount = 2;
+                const revenueData = {};
+                const dates = [];
+
+                orderItems.forEach(item => {
+                    const itemDate = new Date(item.getAttribute('data-date'));
+                    if (startDate && endDate && itemDate >= startDate && itemDate <= endDate) {
+                        const status = item.getAttribute('data-status');
+                        if (status === 'delivered') deliveredCount++;
+                        if (status === 'rejected') rejectedCount++;
+
+                        const dateStr = itemDate.toISOString().split('T')[0];
+                        const revenue = parseFloat(item.querySelector('.text-end').childNodes[0].textContent.replace('₹', ''));
+                        if (revenueData[dateStr]) {
+                            revenueData[dateStr] += revenue;
+                        } else {
+                            revenueData[dateStr] = revenue;
+                            dates.push(dateStr);
+                        }
+                    }
+                });
+
+                orderStatusChart.data.datasets[0].data = [deliveredCount, rejectedCount];
+                orderStatusChart.update();
+
+                dates.sort();
+                revenueChart.data.labels = dates;
+                revenueChart.data.datasets[0].data = dates.map(date => revenueData[date]);
+                revenueChart.update();
+            }
+
+            // Download Report CSV
+            document.getElementById('downloadReportCSV').addEventListener('click', function(e) {
+                e.preventDefault();
+                const totalOrders = document.getElementById('totalOrders').textContent;
+                const totalRevenue = document.getElementById('totalRevenue').textContent;
+                const avgOrderValue = document.getElementById('avgOrderValue').textContent;
+                const avgRating = document.getElementById('avgRating').textContent;
+
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Metric,Value\n";
+                csvContent += `Total Orders,${totalOrders}\n`;
+                csvContent += `Total Revenue,${totalRevenue}\n`;
+                csvContent += `Average Order Value,${avgOrderValue}\n`;
+                csvContent += `Average Rating,${avgRating}\n`;
+                csvContent += "\nTop Selling Items\n";
+                csvContent += "Item Name,Quantity Sold,Revenue\n";
+
+                const topSellingItems = document.querySelectorAll('#topSellingItems tr');
+                topSellingItems.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    csvContent += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent}\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'report.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Payout Section
+            const payoutDateRangePicker = flatpickr("#payoutDateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        updatePayoutMetrics();
+                    }
+                }
+            });
+
+            function updatePayoutMetrics() {
+                const dateRange = document.getElementById('payoutDateRangePicker').value.split(' to ');
+                const startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+                const endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+
+                // Sample payout data
+                const payouts = [
+                    { id: 'PAY001', amount: 5000, status: 'completed', date: '2025-03-01' },
+                    { id: 'PAY002', amount: 3000, status: 'pending', date: '2025-03-15' },
+                    { id: 'PAY003', amount: 7000, status: 'completed', date: '2025-02-01' }
+                ];
+
+                let totalPayouts = 0;
+                let pendingPayouts = 0;
+                let completedPayouts = 0;
+                const payoutList = document.getElementById('payoutList');
+                payoutList.innerHTML = '';
+
+                payouts.forEach(payout => {
+                    const payoutDate = new Date(payout.date);
+                    if (startDate && endDate && payoutDate >= startDate && payoutDate <= endDate) {
+                        totalPayouts += payout.amount;
+                        if (payout.status === 'pending') pendingPayouts += payout.amount;
+                        if (payout.status === 'completed') completedPayouts += payout.amount;
+
+                        const payoutItem = document.createElement('div');
+                        payoutItem.className = 'payout-item';
+                        payoutItem.innerHTML = `
+                            <div>
+                                <span class="status-${payout.status}">${payout.status.toUpperCase()}</span>
+                                <strong>ID: ${payout.id}</strong>
+                                <p>Date: ${payout.date}</p>
+                            </div>
+                            <div class="text-end">
+                                ₹${payout.amount.toFixed(2)}
+                            </div>
+                        `;
+                        payoutList.appendChild(payoutItem);
+                    }
+                });
+
+                document.getElementById('totalPayouts').textContent = `₹${totalPayouts.toFixed(2)}`;
+                document.getElementById('pendingPayouts').textContent = `₹${pendingPayouts.toFixed(2)}`;
+                document.getElementById('completedPayouts').textContent = `₹${completedPayouts.toFixed(2)}`;
+            }
+
+            // Save Payout Settings
+            document.getElementById('savePayoutSettings').addEventListener('click', function() {
+                alert('Payout settings saved successfully!');
+            });
+
+            // Download Payout CSV
+            document.getElementById('downloadPayoutCSV').addEventListener('click', function(e) {
+                e.preventDefault();
+                const payoutItems = document.querySelectorAll('.payout-item');
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Payout ID,Status,Date,Amount\n";
+
+                payoutItems.forEach(item => {
+                    const id = item.querySelector('strong').textContent.replace('ID: ', '');
+                    const status = item.querySelector('span').textContent;
+                    const date = item.querySelector('p').textContent.replace('Date: ', '');
+                    const amount = item.querySelector('.text-end').textContent;
+                    csvContent += `${id},${status},${date},${amount}\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'payout_report.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Offers Section
+            const offersDateRangePicker = flatpickr("#offersDateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        filterOffers();
+                    }
+                }
+            });
+
+            // Initialize Flatpickr for offer modals
+            flatpickr("#offerStartDate", { dateFormat: "Y-m-d" });
+            flatpickr("#offerEndDate", { dateFormat: "Y-m-d" });
+            flatpickr("#editOfferStartDate", { dateFormat: "Y-m-d" });
+            flatpickr("#editOfferEndDate", { dateFormat: "Y-m-d" });
+
+            // Update Offer Metrics
+            function updateOfferMetrics() {
+                const offerItems = document.querySelectorAll('.offer-item');
+                let totalOffers = 0;
+                let activeOffers = 0;
+                let expiredOffers = 0;
+
+                offerItems.forEach(item => {
+                    if (item.style.display !== 'none') {
+                        totalOffers++;
+                        const status = item.getAttribute('data-status');
+                        if (status === 'active') activeOffers++;
+                        if (status === 'expired') expiredOffers++;
+                    }
+                });
+
+                document.getElementById('totalOffers').textContent = totalOffers;
+                document.getElementById('activeOffers').textContent = activeOffers;
+                document.getElementById('expiredOffers').textContent = expiredOffers;
+            }
+
+            // Offer Filtering
+            const offerFilterOptions = document.querySelectorAll('.offer-filter-option');
+            let currentOfferFilter = 'all';
+
+            offerFilterOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentOfferFilter = this.getAttribute('data-filter');
+                    filterOffers();
+                });
+            });
+
+            function filterOffers() {
+                const dateRange = document.getElementById('offersDateRangePicker').value.split(' to ');
+                const startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+                const endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+                const offerItems = document.querySelectorAll('.offer-item');
+
+                offerItems.forEach(item => {
+                    const itemStartDate = new Date(item.getAttribute('data-start-date'));
+                    const itemEndDate = new Date(item.getAttribute('data-end-date'));
+                    const itemStatus = item.getAttribute('data-status');
+                    let dateMatch = true;
+                    let statusMatch = true;
+
+                    if (startDate && endDate) {
+                        dateMatch = (itemStartDate <= endDate && itemEndDate >= startDate);
+                    }
+
+                    if (currentOfferFilter !== 'all') {
+                        statusMatch = itemStatus === currentOfferFilter;
+                    }
+
+                    item.style.display = dateMatch && statusMatch ? 'flex' : 'none';
+                });
+
+                updateOfferMetrics();
+            }
+
+            // Create New Offer
+            const createOfferModal = new bootstrap.Modal(document.getElementById('createOfferModal'));
+            document.getElementById('saveOfferBtn').addEventListener('click', function() {
+                const offerTitle = document.getElementById('offerTitle').value;
+                const offerDescription = document.getElementById('offerDescription').value;
+                const offerType = document.getElementById('offerType').value;
+                const discountValue = document.getElementById('discountValue').value;
+                const minOrderValue = document.getElementById('minOrderValue').value;
+                const startDate = document.getElementById('offerStartDate').value;
+                const endDate = document.getElementById('offerEndDate').value;
+
+                if (offerTitle && startDate && endDate) {
+                    const newOfferId = `OFFER${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+                    const today = new Date();
+                    const endDateObj = new Date(endDate);
+                    const status = endDateObj >= today ? 'active' : 'expired';
+
+                    const newOffer = document.createElement('div');
+                    newOffer.className = 'offer-item';
+                    newOffer.setAttribute('data-offer-id', newOfferId);
+                    newOffer.setAttribute('data-status', status);
+                    newOffer.setAttribute('data-start-date', startDate);
+                    newOffer.setAttribute('data-end-date', endDate);
+                    newOffer.innerHTML = `
+                        <div>
+                            <span class="status-${status}">${status.toUpperCase()}</span>
+                            <strong>ID: ${newOfferId}</strong>
+                            <p>${offerTitle}</p>
+                            <p>Valid: ${startDate} - ${endDate}</p>
+                        </div>
+                        <div class="offer-actions">
+                            ${status === 'active' ? '<a href="#" class="edit-offer" data-bs-toggle="modal" data-bs-target="#editOfferModal">Edit</a>' : ''}
+                            <a href="#" class="delete-offer">Delete</a>
+                        </div>
+                    `;
+                    document.getElementById('offerList').appendChild(newOffer);
+                    createOfferModal.hide();
+
+                    // Reset form
+                    document.getElementById('offerTitle').value = '';
+                    document.getElementById('offerDescription').value = '';
+                    document.getElementById('discountValue').value = '';
+                    document.getElementById('minOrderValue').value = '';
+                    document.getElementById('offerStartDate').value = '';
+                    document.getElementById('offerEndDate').value = '';
+
+                    // Reattach event listeners for new elements
+                    attachOfferEventListeners();
+                    filterOffers();
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            // Edit Offer
+            const editOfferModal = new bootstrap.Modal(document.getElementById('editOfferModal'));
+            let currentEditOffer = null;
+
+            function attachOfferEventListeners() {
+                document.querySelectorAll('.edit-offer').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentEditOffer = this.closest('.offer-item');
+                        const offerId = currentEditOffer.getAttribute('data-offer-id');
+                        const title = currentEditOffer.querySelector('p:nth-child(3)').textContent;
+                        const startDate = currentEditOffer.getAttribute('data-start-date');
+                        const endDate = currentEditOffer.getAttribute('data-end-date');
+
+                        document.getElementById('editOfferTitle').value = title;
+                        document.getElementById('editOfferDescription').value = `Get ${title.toLowerCase()}! Valid for a limited time only!`;
+                        document.getElementById('editDiscountValue').value = title.match(/\d+/)[0];
+                        document.getElementById('editMinOrderValue').value = title.match(/₹\d+/)[0].replace('₹', '');
+                        document.getElementById('editOfferStartDate').value = startDate;
+                        document.getElementById('editOfferEndDate').value = endDate;
+                    });
+                });
+
+                document.querySelectorAll('.delete-offer').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (confirm('Are you sure you want to delete this offer?')) {
+                            this.closest('.offer-item').remove();
+                            filterOffers();
+                        }
+                    });
+                });
+            }
+
+            attachOfferEventListeners();
+
+            document.getElementById('updateOfferBtn').addEventListener('click', function() {
+                const offerTitle = document.getElementById('editOfferTitle').value;
+                const startDate = document.getElementById('editOfferStartDate').value;
+                const endDate = document.getElementById('editOfferEndDate').value;
+
+                if (offerTitle && startDate && endDate && currentEditOffer) {
+                    const today = new Date();
+                    const endDateObj = new Date(endDate);
+                    const status = endDateObj >= today ? 'active' : 'expired';
+
+                    currentEditOffer.setAttribute('data-status', status);
+                    currentEditOffer.setAttribute('data-start-date', startDate);
+                    currentEditOffer.setAttribute('data-end-date', endDate);
+                    currentEditOffer.querySelector('span').className = `status-${status}`;
+                    currentEditOffer.querySelector('span').textContent = status.toUpperCase();
+                    currentEditOffer.querySelector('p:nth-child(3)').textContent = offerTitle;
+                    currentEditOffer.querySelector('p:nth-child(4)').textContent = `Valid: ${startDate} - ${endDate}`;
+                    currentEditOffer.querySelector('.offer-actions').innerHTML = `
+                        ${status === 'active' ? '<a href="#" class="edit-offer" data-bs-toggle="modal" data-bs-target="#editOfferModal">Edit</a>' : ''}
+                        <a href="#" class="delete-offer">Delete</a>
+                    `;
+
+                    editOfferModal.hide();
+                    attachOfferEventListeners();
+                    filterOffers();
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            // Download Offers CSV
+            document.getElementById('downloadOffersCSV').addEventListener('click', function(e) {
+                e.preventDefault();
+                const offerItems = document.querySelectorAll('.offer-item');
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Offer ID,Status,Title,Valid From,Valid To\n";
+
+                offerItems.forEach(item => {
+                    if (item.style.display !== 'none') {
+                        const offerId = item.querySelector('strong').textContent.replace('ID: ', '');
+                        const status = item.querySelector('span').textContent;
+                        const title = item.querySelector('p:nth-child(3)').textContent;
+                        const validFrom = item.getAttribute('data-start-date');
+                        const validTo = item.getAttribute('data-end-date');
+                        csvContent += `${offerId},${status},"${title}",${validFrom},${validTo}\n`;
+                    }
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'offers_report.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Outlet Info Section
+            const editOutletModal = new bootstrap.Modal(document.getElementById('editOutletModal'));
+            document.getElementById('saveOutletBtn').addEventListener('click', function() {
+                const outletName = document.getElementById('outletName').value;
+                const outletAddress = document.getElementById('outletAddress').value;
+                const outletContact = document.getElementById('outletContact').value;
+                const outletEmail = document.getElementById('outletEmail').value;
+                const outletOwner = document.getElementById('outletOwner').value;
+                const mondayHours = document.getElementById('mondayHours').value;
+                const tuesdayHours = document.getElementById('tuesdayHours').value;
+                const wednesdayHours = document.getElementById('wednesdayHours').value;
+                const thursdayHours = document.getElementById('thursdayHours').value;
+                const fridayHours = document.getElementById('fridayHours').value;
+                const saturdayHours = document.getElementById('saturdayHours').value;
+                const sundayHours = document.getElementById('sundayHours').value;
+
+                if (outletName && outletAddress && outletContact && outletEmail && outletOwner) {
+                    const outletInfoCard = document.querySelector('.outlet-info-card');
+                    outletInfoCard.innerHTML = `
+                        <h5>Outlet Details</h5>
+                        <p><strong>Name:</strong> ${outletName}</p>
+                        <p><strong>Address:</strong> ${outletAddress}</p>
+                        <p><strong>Contact:</strong> ${outletContact}</p>
+                        <p><strong>Email:</strong> ${outletEmail}</p>
+                        <p><strong>Owner:</strong> ${outletOwner}</p>
+                    `;
+
+                    const outletHours = document.querySelector('.outlet-hours');
+                    outletHours.innerHTML = `
+                        <h5>Operating Hours</h5>
+                        <div class="day">
+                            <span>Monday</span>
+                            <span>${mondayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Tuesday</span>
+                            <span>${tuesdayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Wednesday</span>
+                            <span>${wednesdayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Thursday</span>
+                            <span>${thursdayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Friday</span>
+                            <span>${fridayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Saturday</span>
+                            <span>${saturdayHours}</span>
+                        </div>
+                        <div class="day">
+                            <span>Sunday</span>
+                            <span>${sundayHours}</span>
+                        </div>
+                    `;
+
+                    editOutletModal.hide();
+                    alert('Outlet details updated successfully!');
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            // Help Centre Section
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                item.querySelector('.question').addEventListener('click', function() {
+                    const isActive = item.classList.contains('active');
+                    faqItems.forEach(i => i.classList.remove('active'));
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            const contactSupportModal = new bootstrap.Modal(document.getElementById('contactSupportModal'));
+            document.getElementById('submitSupportBtn').addEventListener('click', function() {
+                const subject = document.getElementById('supportSubject').value;
+                const message = document.getElementById('supportMessage').value;
+
+                if (subject && message) {
+                    alert('Support request submitted successfully! Our team will get back to you soon.');
+                    contactSupportModal.hide();
+                    document.getElementById('supportSubject').value = '';
+                    document.getElementById('supportMessage').value = '';
+                    document.getElementById('supportAttachment').value = '';
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar Toggle for Mobile
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const sidebarLinks = document.querySelectorAll('.sidebar a[data-section]');
+
+    navbarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('sidebar-visible');
+        mainContent.classList.toggle('main-content-expanded');
+    });
+
+    // Close sidebar when a link is clicked on mobile
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('sidebar-visible');
+                mainContent.classList.remove('main-content-expanded');
+            }
+        });
+    });
+
+    // Sidebar Navigation
+    const contentSections = document.querySelectorAll('.content-section');
+
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const section = this.getAttribute('data-section');
+
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+
+            contentSections.forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+        });
+    });
+
+
+
+    // Rest of your existing JavaScript code...
+});
+
+
+// Mode Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const modeToggle = document.getElementById('modeToggle');
+    
+    modeToggle.addEventListener('change', function() {
+        const isOnline = this.checked;
+        console.log(isOnline ? 'Switched to Online mode' : 'Switched to Offline mode');
+        // Add additional logic here, e.g., update UI, enable/disable features, etc.
+    });
+});
+
+            // Initial updates
+            updateReportingMetrics();
+            updateCharts();
+            updatePayoutMetrics();
+            filterOffers();
+        });
+    </script>
+</body>
+</html>

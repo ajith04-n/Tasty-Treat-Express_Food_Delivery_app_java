@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Treat Express - Reviews</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #f39c12;  
+            --bg-base: #dfe6e9;   
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-base);
+            color: var(--text-dark);
+        }
+
+        .neu-card {
+            background: var(--bg-base);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--neu-shadow-dark),
+                       -8px -8px 16px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .neu-card:hover {
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                       -4px -4px 12px var(--neu-shadow-light);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .navbar {
+            padding: 1.5rem 2rem;
+            background: var(--primary);
+            margin: 1rem 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: rotate(5deg);
+        }
+
+        .navbar .search-bar input {
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-base);
+            box-shadow: inset 3px 3px 6px var(--neu-shadow-dark),
+                       inset -3px -3px 6px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .navbar .search-bar input:focus {
+            box-shadow: inset 2px 2px 4px var(--neu-shadow-dark);
+            outline: none;
+        }
+
+        .navbar .dropdown-toggle {
+            color: var(--text-light);
+            padding: 0.6rem 1.2rem;
+            text-decoration: none;
+        }
+
+        .navbar .dropdown-menu {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            border-radius: 10px;
+        }
+
+        .navbar .dropdown-item {
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .navbar .dropdown-item:hover {
+            background: var(--secondary);
+            color: var(--text-dark);
+        }
+
+        .sidebar {
+            padding: 1.5rem;
+            background: var(--primary);
+        }
+
+        .sidebar h5 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background: rgba(243, 156, 18, 0.2);
+            transform: translateX(5px);
+        }
+
+        .sidebar a.active {
+            background: var(--secondary);
+            color: var(--text-dark);
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-header {
+            padding: 20px;
+            background: var(--bg-base);
+            margin-bottom: 2rem;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 0;
+            background: none;
+            box-shadow: none;
+        }
+
+        .profile-info img {
+            width: clamp(80px, 10vw, 100px);
+            height: clamp(80px, 10vw, 100px);
+            border-radius: 50%;
+            border: 4px solid var(--secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-info img:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-info h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stats div {
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stats .neu-card {
+            min-width: 80px;
+        }
+
+        .stats strong {
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+
+        .review-card {
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .review-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .review-info h5 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .review-date {
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .rating {
+            color: var(--secondary);
+            margin: 5px 0;
+        }
+
+        .rating i {
+            margin-right: 2px;
+        }
+
+        .review-photos {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .review-photos img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .review-photos img:hover {
+            transform: scale(1.05);
+        }
+
+        .review-text {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .review-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .review-actions .btn {
+            background: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .review-actions .btn:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+            transform: translateY(-2px);
+        }
+
+        .add-review-btn {
+            background: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .add-review-btn:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            padding: 2rem;
+            background: var(--primary);
+            margin: 0 1rem 1rem;
+            text-align: center;
+        }
+
+        .footer h6 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer a {
+            color: var(--text-light);
+            padding: 0.5rem 0;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--secondary);
+            padding-left: 0.75rem;
+        }
+
+        .footer .social-links i {
+            font-size: 1.2rem;
+            margin: 0 10px;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links i:hover {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 991px) {
+            .sidebar {
+                margin: 0 1rem;
+                border-radius: 16px;
+            }
+            .profile-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-info img {
+                margin: 0 auto 10px;
+            }
+            .profile-info .btn {
+                margin-top: 10px;
+            }
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 1rem;
+                margin: 1rem 0 0;
+            }
+            .footer {
+                padding: 1.5rem;
+                margin: 0 0 1rem;
+            }
+            .footer .col-md-2, .footer .col-md-4 {
+                margin-bottom: 20px;
+            }
+            .review-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .review-header img {
+                margin-bottom: 10px;
+            }
+            .review-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .add-review-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar glass-panel">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 w-100">
+            <a class="navbar-brand" href="/">
+                <img src="logo.jpg" alt="Tasty Treat Express Logo">
+            </a>
+            <div class="search-bar">
+                <input type="text" class="form-control" placeholder="Search for restaurant, cuisine or a dish">
+            </div>
+            <div class="dropdown">
+                <a class="dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    <img src="https://via.placeholder.com/30x30" class="rounded-circle me-1" alt="Profile">
+                    <span th:text="${user.firstName}">User-Name</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Edit Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="profile-header neu-card">
+        <div class="profile-info">
+            <img src="logo.jpg" alt="Profile Picture">
+            <div>
+                <h2 th:text="${user.fullName}">User-Full-Name</h2>
+                <div class="stats">
+                    <div class="neu-card">
+                        <strong th:text="${user.reviewsCount}">1</strong><br>Reviews
+                    </div>
+                    <div class="neu-card">
+                        <strong th:text="${user.photosCount}">2</strong><br>Photos
+                    </div>
+                    <div class="neu-card">
+                        <strong th:text="${user.followersCount}">0</strong><br>Followers
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary ms-auto">Edit Profile</a>
+        </div>
+    </div>
+
+    <div class="container-fluid flex-grow-1 py-4">
+        <div class="row">
+            <div class="col-12 col-md-3 sidebar glass-panel">
+                <h5>ACTIVITY</h5>
+                <a href="/users/profile/reviews" class="active"><i class="fas fa-star"></i> Reviews</a>
+                <a href="/users/profile/photos"><i class="fas fa-camera"></i> Photos</a>
+                <a href="/users/profile/followers"><i class="fas fa-users"></i> Followers</a>
+                <a href="/users/profile/recently-viewed"><i class="fas fa-eye"></i> Recently Viewed</a>
+                <h5 class="mt-4">ONLINE ORDERING</h5>
+                <a href="/users/profile/addresses"><i class="fas fa-map-marker-alt"></i> My Addresses</a>
+                <h5 class="mt-4">PAYMENTS</h5>
+                <a href="/users/profile/manage-cards"><i class="fas fa-credit-card"></i> Manage Cards</a>
+                <h5 class="mt-4">TABLE BOOKING</h5>
+            </div>
+
+            <div class="col-12 col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="text-center text-md-start m-0" style="color: var(--primary); font-weight: 600;">Reviews</h3>
+                    <a href="/users/profile/select-restaurant" class="add-review-btn">Add Another Review</a>
+                </div>
+                <div class="review-card neu-card">
+                    <div class="review-header">
+                        <img src="https://via.placeholder.com/40x40" alt="Reviewer Avatar">
+                        <div class="review-info">
+                            <h5 th:text="${user.firstName + ' ' + user.lastName}">John Doe</h5>
+                            <div class="review-date">Reviewed on March 15, 2025</div>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span> (4/5) - Dining Experience</span>
+                    </div>
+                    <div class="review-text">
+                        The food at Bella Italia was absolutely fantastic! The pasta was perfectly cooked, and the sauce had just the right amount of spice. Service was prompt and friendly. The only slight downside was that it got a bit noisy during peak hours, but overall a great dining experience.
+                    </div>
+                    <div class="review-photos">
+                        <img src="https://via.placeholder.com/100x100?text=Pasta" alt="Pasta Dish">
+                        <img src="https://via.placeholder.com/100x100?text=Restaurant" alt="Restaurant Interior">
+                    </div>
+                    <div class="review-actions">
+                        <button class="btn">Edit Review</button>
+                        <button class="btn">Delete Review</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer glass-panel">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 col-md-2">
+                    <h6>ABOUT TASTY TREAT EXPRESS</h6>
+                    <a href="#">Who We Are</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Work With Us</a>
+                    <a href="#">Investor Relations</a>
+                    <a href="#">Report Fraud</a>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>TASTY TREAT EXPRESS</h6>
+                    <a href="#">Tasty Treat Express</a>
+                    <a href="#">Blinkit</a>
+                    <a href="#">District</a>
+                    <a href="#">Feeding India</a>
+                    <a href="#">Hyperpure</a>
+                    <a href="#">Zomaland</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>FOR RESTAURANTS</h6>
+                    <a href="#">Partner With Us</a>
+                    <a href="#">Apps For You</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>LEARN MORE</h6>
+                    <a href="#">Privacy</a>
+                    <a href="#">Security</a>
+                    <a href="#">Terms</a>
+                </div>
+                <div class="col-12 col-md-4">
+                    <h6>SOCIAL LINKS</h6>
+                    <div class="social-links d-flex justify-content-center justify-content-md-start gap-3">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

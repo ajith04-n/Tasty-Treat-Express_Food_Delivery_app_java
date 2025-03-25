@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Restaurant</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+</head>
+
+<link rel="stylesheet" 
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container">
+    <a class="navbar-brand" href="#">
+        <div class="logo">TastyTreatExpress.</div>
+    </a>
+    <ul class="navbar-nav">
+        <li class="nav-item"></li>
+            <a class="nav-link" href="#"><i class="bi bi-house-door"></i> Home</a>
+        </li>
+        <li class="nav-item"></li>
+            <a class="nav-link" href="#"><i class="bi bi-list"></i> View Orders</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-arrow-clockwise"></i> Update Status</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-bag"></i> Place Order</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-question-circle"></i> Help</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-person"></i> Sign In</a>
+        </li>
+    </ul>
+    </div>
+    </div>
+    </nav>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+        
+        </body>
+    <style>
+        body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        background: #f0f0f0;
+        color: #333;
+        min-height: 100vh;
+    }
+    .logo {
+        font-size: 28px;
+        font-weight: 700;
+        color: #D50000;
+        align-items: left;
+        cursor: pointer;
+    }
+    
+    .nav-item {
+        margin-right: 20px;
+    }
+    
+    .nav-link {
+        font-weight: bold;
+        color: #D50000;
+        transition: color 0.3s ease;
+    }
+    .nav-link:hover {
+        color: #000000;
+    }
+    
+    .hero {
+        text-align: center;
+        color: #fff;
+        padding: 50px 20px; /* Reduced padding */
+        position: relative;
+    }
+    
+    .hero h1 {
+        font-size: 64px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        animation: heroTextSlideIn 1.2s ease-out;
+        margin-bottom: 30px;
+        background: #D50000;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .hero h6 {
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        animation: heroTextSlideIn 1.2s ease-out;
+        margin-bottom: 30px;
+        background: linear-gradient(45deg, #1100ff, #ff0000);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* Form Section */
+    .form-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 30px;
+        width: 90%;
+        max-width: 600px;
+        margin: 20px auto; /* Reduced margin */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 1.5s ease-out;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .form-container label {
+        font-weight: bold;
+    }
+    
+    .form-container input, .form-container select, .form-container textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .form-container input:focus, .form-container select:focus, .form-container textarea:focus {
+        border-color: #ff5722;
+        box-shadow: 0 0 8px rgba(255, 87, 34, 0.7);
+    }
+    
+    button[type="submit"] {
+        padding: 15px 30px;
+        background-color: #D50000;
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        margin-top: 20px;
+    }
+    
+    button[type="submit"]:hover {
+        background-color: #d50000a1;
+        transform: scale(1.05);
+    }
+    
+    /* Loading Spinner */
+    .loading {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    
+    .loading.show {
+        display: flex;
+    }
+    
+    .spinner {
+        border: 4px solid #6c2f2f4d;
+        border-top: 4px solid #ff5722;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
+    @keyframes heroTextSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    </style>
+</head>
+<body>    
+    <section class="hero">
+        <h1>Order Details</h1>
+        <h6>Please review your order details below and confirm.</h6>
+    </section>
+
+    
+    <div class="form-container">
+        <p>Item: <span th:text="${menuItemName}">Item Name</span></p>
+        <p>Price: <span th:text="'$' + ${price}">$0.00</span></p>
+        <form action="/orders/placeOrder" method="post">
+            <input type="hidden" name="menuItemId" th:value="${menuItemId}">
+            <input type="hidden" name="menuItemName" th:value="${menuItemName}">
+            <input type="hidden" name="price" th:value="${price}">
+            <label for="paymentMethod">Payment Method:</label>
+            <select name="paymentMethod" required>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="UPI">UPI</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+            </select><br>
+            <button type="submit">Confirm Order</button>
+            <button type="submit">Cancel</button>
+        </form>
+    </div>
+
+</body>
+</html>
