@@ -27,14 +27,12 @@ public class Restaurant {
 	@GeneratedValue(strategy = GenerationType.UUID) 
 	private String restaurantId;
 
-	@NotNull(message = "Restaurant name cannot be null")
-    @NotEmpty(message = "Restaurant name cannot be empty")
+	
     @Size(min = 3, max = 100, message = "Restaurant name must be between 3 and 100 characters")
 	@Column(name = "restaurant_name", nullable = false, length = 100) 
 	private String name;
 
-	@NotNull(message = "Restaurant address cannot be null")
-    @NotEmpty(message = "Restaurant address cannot be empty")
+	
     @Size(min = 10, max = 250, message = "Restaurant address must be between 10 and 250 characters")
 	@Column(name = "restaurant_address", nullable = false, length = 250) 
 	private String address;
@@ -43,41 +41,42 @@ public class Restaurant {
 	@Column(name = "restaurant_description", length = 500) 
 	private String description;
 
-	@NotNull(message = "Email cannot be null")
-	@NotEmpty(message = "Email cannot be empty")
+	
 	@Email(message = "Email should be valid")
 	@Size(max = 100, message = "Email must not exceed 100 characters")
 	@Column(name = "email", nullable = false, unique = true, length = 100)
 	private String email; 
 
-	@NotNull(message = "Password cannot be null")
-    @NotEmpty(message = "Password cannot be empty")
+	
     @Size(min = 6, message = "Password must be at least 6 characters long")
 	@Column(name = "password", length = 100)
 	//@JsonIgnore()
 	private String password;
 
-	 @NotNull(message = "Phone number cannot be null")
-	 @NotEmpty(message = "Phone number cannot be empty")
+	 
 	 @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
 	 @Column(name = "phone_number", nullable = false, length = 10) 
 	 private String phoneNumber;
 
-	 // mappedBy - used in the parent entity
+	 												// mappedBy - used in the parent entity
 	 @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	 @JsonManagedReference("menuItemRestaurantReference") // It's typically used on the "one" side of a @OneToMany relationship to avoid infinite loops between related entities.
-	 private List<MenuItem> menu = new ArrayList<>();
+	// @JsonManagedReference("menuItemRestaurantReference") // It's typically used on the "one" side of a @OneToMany relationship to avoid infinite loops between related entities.
+	@JsonIgnoreProperties("restaurant")
+	private List<MenuItem> menu = new ArrayList<>();
 
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL,orphanRemoval = true)
-	@JsonManagedReference("orderRestaurantReference") 
+	// @JsonManagedReference("orderRestaurantReference") 
+	@JsonIgnoreProperties("restaurant")
 	private List<Order> orders = new ArrayList<>();
 
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference("feedbackRestaurantReference")
+	//@JsonManagedReference("feedbackRestaurantReference")
+	@JsonIgnoreProperties("restaurant")
 	private List<Feedback> feedbacks = new ArrayList<>();
 
 	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference("restaurantReportReference")
+	//@JsonManagedReference("restaurantReportReference")
+	@JsonIgnoreProperties("restaurant")
 	private List<Report> reports = new ArrayList<>();
 
 	private String location;
@@ -169,12 +168,12 @@ public class Restaurant {
 		this.phoneNumber= phoneNum;
 		}
 	public Restaurant(
-			@NotNull(message = "Restaurant name cannot be null") @NotEmpty(message = "Restaurant name cannot be empty") @Size(min = 3, max = 100, message = "Restaurant name must be between 3 and 100 characters") String name,
-			@NotNull(message = "Restaurant address cannot be null") @NotEmpty(message = "Restaurant address cannot be empty") @Size(min = 10, max = 250, message = "Restaurant address must be between 10 and 250 characters") String address,
-			@Size(max = 500, message = "Description must not exceed 500 characters") String description,
-			@NotNull(message = "Email cannot be null") @NotEmpty(message = "Email cannot be empty") @Email(message = "Email should be valid") @Size(max = 100, message = "Email must not exceed 100 characters") String email,
-			@NotNull(message = "Password cannot be null") @NotEmpty(message = "Password cannot be empty") @Size(min = 6, message = "Password must be at least 6 characters long") String password,
-			@NotNull(message = "Phone number cannot be null") @NotEmpty(message = "Phone number cannot be empty") @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits") String phoneNumber,
+			 String name,
+			 String address,
+			 String description,
+			 String email,
+		     String password,
+			 String phoneNumber,
 			List<MenuItem> menu) {
 		super();
 		this.name = name;

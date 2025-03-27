@@ -14,13 +14,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FeedbackRepo extends JpaRepository<Feedback, Long> {
-    // // Feedback given by a specific user
-    // List<Feedback> findByUser(User user);
+public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
    
-    boolean existsByUserAndOrder(User user, Order order);
+    boolean existsByUserAndOrders(User user, Order order);
    
-    List<Feedback> findByOrder(Order order);
+    List<Feedback> findByOrders(Order order);
    
     List<Feedback> findByRating(Float rating);
    
@@ -41,7 +39,7 @@ public interface FeedbackRepo extends JpaRepository<Feedback, Long> {
     List<Feedback> findPositiveFeedbackForMenuItem(@Param("menuItem") MenuItem menuItem, @Param("rating") Float rating);
 
 
-    List<Feedback> findByOrderOrderId(Long orderId);
+    List<Feedback> findByOrdersOrderId(Long orderId);
 
     List<Feedback> findByRestaurantRestaurantId(String restaurantId);
 

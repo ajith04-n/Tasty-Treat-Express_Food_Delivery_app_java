@@ -5,7 +5,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.UserRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;

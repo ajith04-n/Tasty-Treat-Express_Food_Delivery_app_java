@@ -8,7 +8,10 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 
 public interface OrderService {
-    public Order placeOrder(Long customerId, String restaurantId, List<MenuItem> menuItems, String deliveryAddress, String paymentMethod);
+    //public Order placeOrder(Long customerId, String restaurantId, List<MenuItem> menuItems, String deliveryAddress, String paymentMethod);
+    public Order placeOrder(Long customerId, String restaurantId, Order orderObj);
+    
+    
     public Order getOrderById(Long orderId);
     public List<Order> getOrdersByRestaurant(String restaurantId);
     public List<Order> getOrdersByCustomer(Long customerId);

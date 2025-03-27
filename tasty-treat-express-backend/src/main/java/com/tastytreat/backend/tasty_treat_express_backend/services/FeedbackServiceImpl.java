@@ -16,7 +16,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
@@ -26,7 +26,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.repositories.UserRepos
 public class FeedbackServiceImpl implements FeedbackService {
 
     @Autowired
-    private FeedbackRepo feedbackRepository;
+    private FeedbackRepository feedbackRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -49,9 +49,9 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
-        User user = order.getCustomer();
+        User user = order.getUser();
 
-        feedback.setOrder(order);
+        feedback.setOrders(order);
         feedback.setRestaurant(restaurant);
         feedback.setUser(user);
         feedback.setFeedbackDate(LocalDateTime.now());
@@ -64,10 +64,10 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
         MenuItem menuItem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new RuntimeException("MenuItem not found with ID: " + menuItemId));
-        User user = order.getCustomer();
+        User user = order.getUser();
 
-        feedback.setOrder(order);
-        feedback.setMenuItem(menuItem);
+        feedback.setOrders(order);
+        feedback.setMenuItems(menuItem);
         feedback.setUser(user);
         feedback.setFeedbackDate(LocalDateTime.now());
         return feedbackRepository.save(feedback);
@@ -94,7 +94,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public List<Feedback> getFeedbackForOrder(Long orderId) {
-        return feedbackRepository.findByOrderOrderId(orderId);
+        return feedbackRepository.findByOrdersOrderId(orderId);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     public void notifyRestaurantOnLowRating(Feedback feedback) {
-        if (feedback.getRating() <= 2) { 
+        if (feedback.getRating() <= 2) {
             String message = "Your restaurant received a low rating of " + feedback.getRating() +
                     ". Please check the feedback and improve your services.";
             emailService.sendSimpleMessage(feedback.getRestaurant().getEmail(), "Low Rating Alert", message);
@@ -177,7 +177,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     public void thankUserForPositiveFeedback(Feedback feedback) {
-        if (feedback.getRating() >= 4) { 
+        if (feedback.getRating() >= 4) {
             String message = "Thank you for your positive feedback! Your satisfaction means a lot to us.";
             emailService.sendSimpleMessage(feedback.getUser().getEmail(), "Thank You for Your Feedback", message);
         }
@@ -185,10 +185,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     public List<Feedback> getPersonalizedFeedbackDashboard(Long userId) {
         return feedbackRepository.findByUser_Id(userId).stream()
-                .sorted(Comparator.comparing(Feedback::getFeedbackDate).reversed()) 
+                .sorted(Comparator.comparing(Feedback::getFeedbackDate).reversed())
                 .collect(Collectors.toList());
     }
-
-
 
 }

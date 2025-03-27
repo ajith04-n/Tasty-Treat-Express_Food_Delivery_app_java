@@ -15,7 +15,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 public interface OrderRepository extends JpaRepository<Order,Long> {
 	List<Order> findByRestaurantRestaurantId(String restaurantId);
 
-	List<Order> findByCustomer_Id(Long userId);// refer to the customer field (since it's the name of our User field in Order), and use the "id" property of the User entity. 
+	List<Order> findByUser_Id(Long userId);// refer to the customer field (since it's the name of our User field in Order), and use the "id" property of the User entity. 
 
     List<Order> findByStatus(String status);
 

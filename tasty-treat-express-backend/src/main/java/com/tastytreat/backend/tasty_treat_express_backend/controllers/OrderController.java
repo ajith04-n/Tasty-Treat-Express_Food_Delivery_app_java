@@ -17,14 +17,13 @@ public class OrderController {
     private OrderService orderService;
 
     // Place an order
-    @PostMapping("/placeOrder")
-    public ResponseEntity<Order> placeOrder(@RequestParam Long customerId,
-            @RequestParam String restaurantId,
-            @RequestBody List<MenuItem> menuItems,
-            @RequestParam String deliveryAddress,
-            @RequestParam String paymentMethod) {
+    @PostMapping("/placeOrder/{userId}/{restaurantId}")  
+    public ResponseEntity<Order> placeOrder(
+    		@PathVariable Long userId,
+    		@PathVariable String restaurantId, 
+            @RequestBody Order orderobj) {
         try {
-            Order order = orderService.placeOrder(customerId, restaurantId, menuItems, deliveryAddress, paymentMethod);
+            Order order = orderService.placeOrder(userId, restaurantId,orderobj);
             return ResponseEntity.status(HttpStatus.CREATED).body(order);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

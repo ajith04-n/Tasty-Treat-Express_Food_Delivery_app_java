@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tbl_feedback")
@@ -18,25 +19,28 @@ public class Feedback {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-    @JsonBackReference("feedbackUserReference")
+    // @JsonBackReference("feedbackUserReference")
+    @JsonIgnoreProperties("feedbacks")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "orderId", nullable = false)
-    @JsonBackReference("feedbackOrderReference")
-    private Order order;
+    // @JsonBackReference("feedbackOrderReference")
+    @JsonIgnoreProperties("feedbacks")
+    private Order orders;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId", nullable = false)
-    @JsonBackReference("feedbackRestaurantReference")
+    // @JsonBackReference("feedbackRestaurantReference")
+    @JsonIgnoreProperties("feedbacks")
     private Restaurant restaurant;
 
     @ManyToOne
     @JoinColumn(name = "menu_item_id", referencedColumnName = "menu_id", nullable = true)
-    @JsonBackReference("feedbackMenuItemReference")
+    // @JsonBackReference("feedbackMenuItemReference")
+    @JsonIgnoreProperties("feedbacks")
     private MenuItem menuItem;
 
-    
     private int rating;
 
     @Column(length = 500)
@@ -66,12 +70,12 @@ public class Feedback {
         this.user = user;
     }
 
-    public Order getOrder() {
-        return order;
+    public Order getOrders() {
+        return orders;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrders(Order order) {
+        this.orders = order;
     }
 
     public Restaurant getRestaurant() {
@@ -82,11 +86,11 @@ public class Feedback {
         this.restaurant = restaurant;
     }
 
-    public MenuItem getMenuItem() {
+    public MenuItem getMenuItems() {
         return menuItem;
     }
 
-    public void setMenuItem(MenuItem menuItem) {
+    public void setMenuItems(MenuItem menuItem) {
         this.menuItem = menuItem;
     }
 
@@ -132,7 +136,7 @@ public class Feedback {
 
     public Feedback(User user, Order order, Restaurant restaurant, MenuItem menuItem, int rating, String comments) {
         this.user = user;
-        this.order = order;
+        this.orders = order;
         this.restaurant = restaurant;
         this.menuItem = menuItem;
         this.rating = rating;
@@ -146,7 +150,7 @@ public class Feedback {
             String comments, LocalDateTime feedbackDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.feedbackId = feedbackId;
         this.user = user;
-        this.order = order;
+        this.orders = order;
         this.restaurant = restaurant;
         this.menuItem = menuItem;
         this.rating = rating;
@@ -155,18 +159,16 @@ public class Feedback {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    
+
     public Feedback(Long feedbackId, int rating, String comments, Order order, Restaurant restaurant, MenuItem menuItem,
             User user) {
         this.feedbackId = feedbackId;
         this.rating = rating;
         this.comments = comments;
-        this.order = order;
+        this.orders = order;
         this.restaurant = restaurant;
         this.menuItem = menuItem;
         this.user = user;
     }
-
-    
 
 }

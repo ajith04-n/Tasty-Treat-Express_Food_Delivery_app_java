@@ -19,51 +19,50 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tbl_orders")
-//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "orderId")
+// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+// property = "orderId")
 
 public class Order {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	 @JsonProperty("id")
+	@JsonProperty("id")
 	private Long orderId;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
-	@JsonBackReference("orderUserReference")
-	private User customer;
+	//@JsonBackReference("orderUserReference")
+	@JsonIgnoreProperties("orders")
+	private User user;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId")
-	@JsonBackReference("orderRestaurantReference")
+	//@JsonBackReference("orderRestaurantReference")
+	@JsonIgnoreProperties("orders")
 	private Restaurant restaurant;
-/*
+
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinTable(name = "menu_order_map", joinColumns = @JoinColumn(name = "order_id", 
-	referencedColumnName = "orderId"), inverseJoinColumns = @JoinColumn(name = "menu_id", referencedColumnName = "menu_id"))
-	//@JsonManagedReference("order-menu")
-	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "orderId")
-	@JsonIgnoreProperties()
+	@JoinTable(name = "menu_order_map", joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "orderId"), inverseJoinColumns = @JoinColumn(name = "menu_id", referencedColumnName = "menu_id"))
+	// @JsonManagedReference("order-menu")
+	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+	@JsonIgnoreProperties("orders")
 	private List<MenuItem> menuItems;
-*/
-	
-	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL,orphanRemoval = true)
-	//@JsonManagedReference("orderMenuReference") 
-	private List<MenuItem> menuItems;
-	
+
+
 	// Add One-to-Many relationship with Feedback
-	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("orders")
 	private List<Feedback> feedbacks = new ArrayList<>();
 
 	private Double totalAmount;
 
-	private String status; // Pending, Confirmed, Preparing, Delivered
+	private String status; 
 
 	private String deliveryAddress;
 
-	private String paymentStatus; // Paid, Pending
+	private String paymentStatus; 
 
-	private String paymentMethod; // Credit Card, Cash on Delivery
+	private String paymentMethod; 
 
 	private LocalDateTime orderDate;
 
@@ -85,23 +84,17 @@ public class Order {
 	// @JoinColumn(name = "driver_id", referencedColumnName = "driverId")
 	// private Driver driver;
 
-	
 	public String getTransactionId() {
 		return transactionId;
 	}
-
 
 	public void setTransactionId(String transactionId) {
 		this.transactionId = transactionId;
 	}
 
-
-
 	public Double getCurrentLatitude() {
 		return currentLatitude;
 	}
-
-
 
 	public String getStatus() {
 		return status;
@@ -155,12 +148,12 @@ public class Order {
 		this.orderId = orderId;
 	}
 
-	public User getCustomer() {
-		return customer;
+	public User getUser() {
+		return user;
 	}
 
-	public void setCustomer(User customer) {
-		this.customer = customer;
+	public void setUser(User customer) {
+		this.user = customer;
 	}
 
 	public Restaurant getRestaurant() {
@@ -236,20 +229,12 @@ public class Order {
 		this.deliveryTime = deliveryTime;
 	}
 
-	@Override
-	public String toString() {
-		return "Order [orderId=" + orderId + ", customer=" + customer + ", restaurant=" + restaurant + ", menuItems="
-				+ menuItems + ", totalAmount=" + totalAmount + ", status=" + status + ", deliveryAddress="
-				+ deliveryAddress + ", paymentStatus=" + paymentStatus + ", paymentMethod=" + paymentMethod
-				+ ", orderDate=" + orderDate + ", deliveryTime=" + deliveryTime + "]";
-	}
-
 	public Order(User customer, Restaurant restaurant, List<MenuItem> menuItems, Double totalAmount,
 			String status,
 			String deliveryAddress, String paymentStatus, String paymentMethod, LocalDateTime orderDate,
 			LocalDateTime deliveryTime) {
 		super();
-		this.customer = customer;
+		this.user = customer;
 		this.restaurant = restaurant;
 		this.menuItems = menuItems;
 		this.totalAmount = totalAmount;
@@ -259,6 +244,11 @@ public class Order {
 		this.paymentMethod = paymentMethod;
 		this.orderDate = orderDate;
 		this.deliveryTime = deliveryTime;
+	}
+	
+	public Order(List<MenuItem> menuItems,String paymentMethod) {
+		this.menuItems=menuItems;
+		this.paymentMethod=paymentMethod;
 	}
 
 	public Order() {
