@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,31 +48,60 @@ public class FeedbackServiceImpl implements FeedbackService {
     public Feedback addFeedback(Long orderId, String restaurantId, Feedback feedback) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
+
         User user = order.getUser();
 
-        feedback.setOrders(order);
-        feedback.setRestaurant(restaurant);
-        feedback.setUser(user);
-        feedback.setFeedbackDate(LocalDateTime.now());
-        return feedbackRepository.save(feedback);
+        // Check if feedback already exists for this user and restaurant for the given order
+        Feedback existingFeedback = feedbackRepository.findByUserAndOrdersAndRestaurant(user, order, restaurant);
+
+        if (existingFeedback != null) {
+            existingFeedback.setRating(feedback.getRating());
+            existingFeedback.setComments(feedback.getComments());
+            existingFeedback.setFeedbackDate(LocalDateTime.now()); 
+            return feedbackRepository.save(existingFeedback); 
+        } else {
+            
+            feedback.setOrders(order);
+            feedback.setRestaurant(restaurant);
+            feedback.setUser(user);
+            feedback.setFeedbackDate(LocalDateTime.now()); 
+            return feedbackRepository.save(feedback); 
+        }
     }
+
 
     @Override
     public Feedback addMenuItemFeedback(Long orderId, Long menuItemId, Feedback feedback) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
         MenuItem menuItem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new RuntimeException("MenuItem not found with ID: " + menuItemId));
+
         User user = order.getUser();
 
-        feedback.setOrders(order);
-        feedback.setMenuItems(menuItem);
-        feedback.setUser(user);
-        feedback.setFeedbackDate(LocalDateTime.now());
-        return feedbackRepository.save(feedback);
+        // Check if feedback already exists for this user, order, and menu item
+        Feedback existingFeedback = feedbackRepository.findByUserAndOrdersAndMenuItem(user, order, menuItem);
+
+        if (existingFeedback != null) {
+            existingFeedback.setRating(feedback.getRating());
+            existingFeedback.setComments(feedback.getComments());
+            existingFeedback.setFeedbackDate(LocalDateTime.now()); 
+            return feedbackRepository.save(existingFeedback); 
+        } else {
+            Optional<Restaurant> restaurant = restaurantRepository.findById(order.getRestaurant().getRestaurantId()); 
+            feedback.setOrders(order);
+            feedback.setMenuItems(menuItem);
+            feedback.setUser(user);
+            feedback.setFeedbackDate(LocalDateTime.now()); 
+            feedback.setRestaurant(restaurant.get());
+            return feedbackRepository.save(feedback); 
+        }
     }
+
 
     @Override
     public Feedback updateFeedback(Long feedbackId, Feedback feedback) {

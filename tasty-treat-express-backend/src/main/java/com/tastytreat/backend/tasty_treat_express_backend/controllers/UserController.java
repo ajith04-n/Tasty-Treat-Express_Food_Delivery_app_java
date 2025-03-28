@@ -2,6 +2,7 @@ package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.tastyTreatExpress.DTO.UserDTO;
+import com.tastyTreatExpress.DTO.UserMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 import com.tastytreat.backend.tasty_treat_express_backend.services.UserService;
@@ -23,8 +26,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    
-    @PostMapping(value="/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    // Register a user
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
         if (userService.existsByEmail(user.getEmail())) {
             return new ResponseEntity<>("User with this email already exists!", HttpStatus.BAD_REQUEST);
@@ -33,7 +36,7 @@ public class UserController {
         return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
     }
 
-    
+    // Login endpoint
     @PostMapping("/login")
     public ResponseEntity<String> authenticateUser(
             @RequestParam String email,
@@ -48,40 +51,52 @@ public class UserController {
         return new ResponseEntity<>("Invalid email or password!", HttpStatus.UNAUTHORIZED);
     }
 
-    
+    // Logout 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return new ResponseEntity<>("Logged out successfully!", HttpStatus.NO_CONTENT);
     }
 
-    // Fetch all users
+ // Fetch all users and return as DTOs
     @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
 
-    // Fetch user by ID
+  
+        List<UserDTO> userDTOs = users.stream()
+                                      .map(UserMapper::toUserDTO)
+                                      .collect(Collectors.toList());
+        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+    }
+    
+    
+
+ // Fetch user by ID and return as DTO
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable long userId) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+
+        UserDTO userDTO = UserMapper.toUserDTO(user);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
+    
+    
 
     // Update user details
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserDTO> updateUser(
             @PathVariable long userId,
             @Valid @RequestBody User user) {
         if (userId != user.getId()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User updatedUser = userService.updateUser(user);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        UserDTO updatedUserDTO = UserMapper.toUserDTO(updatedUser);
+        return new ResponseEntity<>(updatedUserDTO, HttpStatus.OK);
     }
 
     // Update user address

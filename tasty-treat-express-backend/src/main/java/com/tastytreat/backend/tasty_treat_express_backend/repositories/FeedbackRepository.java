@@ -58,5 +58,9 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.menuItem.id = :menuItemId")
     Double calculateAverageRatingForMenuItem(@Param("menuItemId") Long menuItemId);
+    
+    
+    Feedback findByUserAndOrdersAndRestaurant(User user, Order order, Restaurant restaurant); // for existing user feedback
+    Feedback findByUserAndOrdersAndMenuItem(User user, Order order, MenuItem menuItem);
 }
 

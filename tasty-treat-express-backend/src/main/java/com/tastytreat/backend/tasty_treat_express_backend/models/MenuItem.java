@@ -257,5 +257,13 @@ public class MenuItem {
 	public MenuItem() {
 		super();
 	}
+	
+	public MenuItem(Long menuId, String name, Double price) {
+	    this.menuId = menuId;
+	    this.name = name;
+	    this.price = price;
+	}
+
+	
 
 }

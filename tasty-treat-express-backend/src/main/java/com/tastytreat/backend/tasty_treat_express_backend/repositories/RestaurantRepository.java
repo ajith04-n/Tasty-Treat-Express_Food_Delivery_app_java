@@ -1,6 +1,7 @@
 package com.tastytreat.backend.tasty_treat_express_backend.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +14,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant,String>{
     boolean existsByEmail(String email);
     
     List<Restaurant> findByLocation(String location);
+  
+    
     
 }

@@ -54,9 +54,12 @@ public class OrderServiceImpl implements OrderService {
             MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
                     .orElseThrow(() -> new RuntimeException("MenuItem not found"));
 
-            // Log the check
             logger.info("Checking stock for {}: Requested: {}, Available: {}", dbMenuItem.getName(),
                     menuItem.getQuantity(), dbMenuItem.getQuantity());
+            
+                if (menuItem.getQuantity() == null) {
+                    menuItem.setQuantity(1);
+                }
 
             if (dbMenuItem.getQuantity() < menuItem.getQuantity()) {
                 logger.error("Out of stock for {}: Requested: {}, Available: {}", dbMenuItem.getName(),
@@ -79,7 +82,16 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         order.setStatus("Pending");
 
-        order.setPaymentStatus("Pending");
+        String paymentMethod = orderObj.getPaymentMethod();
+        if (paymentMethod != null && !paymentMethod.equals("Cash-On-Delivery")) {
+           
+        	order.setPaymentStatus("Paid");
+            order.setTransactionId(UUID.randomUUID().toString()); // temporaryly added
+        } else {
+        	order.setPaymentStatus("Pending");
+        }
+        
+        order.setDeliveryAddress(orderObj.getDeliveryAddress());
         order.setOrderDate(LocalDateTime.now());
         order.setDeliveryTime(LocalDateTime.now().plusHours(2));
 
