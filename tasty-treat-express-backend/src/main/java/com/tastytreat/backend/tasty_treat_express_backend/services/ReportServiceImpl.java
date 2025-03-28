@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.ReportRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
@@ -47,7 +48,7 @@ public class ReportServiceImpl implements ReportService {
     private OrderRepository orderRepository;
 
     @Autowired
-    private FeedbackRepo feedbackRepository;
+    private FeedbackRepository feedbackRepository;
 
     @Autowired
     private RestaurantRepository restaurantRepository;
@@ -74,10 +75,10 @@ public class ReportServiceImpl implements ReportService {
         double averageOrderValue = totalOrders > 0 ? totalOrderValue / totalOrders : 0;
 
         // Customer data
-        Set<Long> uniqueCustomers = orders.stream().map(order -> order.getCustomer().getId())
+        Set<Long> uniqueCustomers = orders.stream().map(order -> order.getUser().getId())
                 .collect(Collectors.toSet());
         int newCustomers = (int) orders.stream()
-                .filter(order -> order.getCustomer().getCreatedAt().toLocalDate().isAfter(startDate)).count();
+                .filter(order -> order.getUser().getCreatedAt().toLocalDate().isAfter(startDate)).count();
         double repeatCustomerRate = uniqueCustomers.isEmpty() ? 0
                 : (double) (uniqueCustomers.size() - newCustomers) / uniqueCustomers.size() * 100;
 
@@ -145,7 +146,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Map<String, Object> generateUserOrderSummaryReport(long userId) {
 
-        List<Order> userOrders = orderRepository.findByCustomer_Id(userId);
+        List<Order> userOrders = orderRepository.findByUser_Id(userId);
 
         Map<String, Object> response = new HashMap<>();
         if (userOrders.isEmpty()) {
@@ -188,7 +189,7 @@ public class ReportServiceImpl implements ReportService {
         response.put("orders", userOrders);
 
         // Save to the database
-        User user = userOrders.get(0).getCustomer();
+        User user = userOrders.get(0).getUser();
         Report report = new Report();
         report.setUser(user);
         report.setTotalOrders(totalOrders);
@@ -205,11 +206,10 @@ public class ReportServiceImpl implements ReportService {
         return response;
     }
 
-    
-
-   
-     @Override
+    @Override
     public Report generateReport(ReportRequest request, String reportType) {
+    	
+        
         LocalDateTime start = request.getStartDate().atStartOfDay();
         LocalDateTime end = request.getEndDate().atTime(23, 59, 59);
 
@@ -221,10 +221,13 @@ public class ReportServiceImpl implements ReportService {
                 orderRepository.countByStatusAndOrderDateBetween("PENDING", start, end).intValue(),
                 orderRepository.countByStatusAndOrderDateBetween("CANCELLED", start, end).intValue(),
                 orders.stream().mapToDouble(Order::getTotalAmount).sum(),
-                findMostOrderedItem(orders)
-        );
+                findMostOrderedItem(orders));
 
         Report report = new Report();
+        
+        Restaurant restaurant = restaurantRepository.findById(reportType)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        report.setRestaurant(restaurant);
         report.setStartDate(request.getStartDate());
         report.setEndDate(request.getEndDate());
         report.setGeneratedAt(LocalDateTime.now());
@@ -240,7 +243,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> getReportsByCriteria(LocalDate startDate, LocalDate endDate, String reportType, int page, int size) {
+    public List<Report> getReportsByCriteria(LocalDate startDate, LocalDate endDate, String reportType, int page,
+            int size) {
         Pageable pageable = PageRequest.of(page, size);
         return reportRepository.findByStartDateBetweenAndReportType(startDate, endDate, reportType, pageable);
     }
@@ -291,7 +295,7 @@ public class ReportServiceImpl implements ReportService {
         ReportRequest request = new ReportRequest(today.minusWeeks(1), today);
         saveReport(request, "WEEKLY");
     }
- 
+
     @Override
     public void generateMonthlyReports() {
         LocalDate today = LocalDate.now();
@@ -328,14 +332,95 @@ public class ReportServiceImpl implements ReportService {
         }
         return csvBuilder.toString();
     }
+    
 
     @Override
-    public void sendReportByEmail(String recipientEmail, String subject, String message, byte[] attachmentData, String fileName) {
-       emailService.sendReportByEmail(recipientEmail, subject, message, attachmentData, fileName);
+    public void sendReportByEmail(String recipientEmail, String subject, String message, byte[] attachmentData,
+            String fileName) {
+        emailService.sendReportByEmail(recipientEmail, subject, message, attachmentData, fileName);
     }
 
 
-    
+
+    public Report updateReport2(Long reportId, Report updatedReportData) {
+        // Fetch the existing report from the database
+        Report existingReport = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report with ID " + reportId + " not found."));
+
+        // Update the fields in the existing report with the new data
+        if (updatedReportData.getStartDate() != null) {
+            existingReport.setStartDate(updatedReportData.getStartDate());
+        }
+        if (updatedReportData.getEndDate() != null) {
+            existingReport.setEndDate(updatedReportData.getEndDate());
+        }
+        if (updatedReportData.getTotalOrders() != null) {
+            existingReport.setTotalOrders(updatedReportData.getTotalOrders());
+        }
+        if (updatedReportData.getCompletedOrders() != null) {
+            existingReport.setCompletedOrders(updatedReportData.getCompletedOrders());
+        }
+        if (updatedReportData.getPendingOrders() != null) {
+            existingReport.setPendingOrders(updatedReportData.getPendingOrders());
+        }
+        if (updatedReportData.getCancelledOrders() != null) {
+            existingReport.setCancelledOrders(updatedReportData.getCancelledOrders());
+        }
+        if (updatedReportData.getTotalOrderValue() != null) {
+            existingReport.setTotalOrderValue(updatedReportData.getTotalOrderValue());
+        }
+        if (updatedReportData.getAverageOrderValue() != null) {
+            existingReport.setAverageOrderValue(updatedReportData.getAverageOrderValue());
+        }
+        if (updatedReportData.getLatestOrderDate() != null) {
+            existingReport.setLatestOrderDate(updatedReportData.getLatestOrderDate());
+        }
+        if (updatedReportData.getUniqueCustomers() != null) {
+            existingReport.setUniqueCustomers(updatedReportData.getUniqueCustomers());
+        }
+        if (updatedReportData.getRepeatCustomerRate() != null) {
+            existingReport.setRepeatCustomerRate(updatedReportData.getRepeatCustomerRate());
+        }
+        if (updatedReportData.getNewCustomers() != null) {
+            existingReport.setNewCustomers(updatedReportData.getNewCustomers());
+        }
+        if (updatedReportData.getAverageFeedbackRating() != null) {
+            existingReport.setAverageFeedbackRating(updatedReportData.getAverageFeedbackRating());
+        }
+        if (updatedReportData.getPositiveFeedbackCount() != null) {
+            existingReport.setPositiveFeedbackCount(updatedReportData.getPositiveFeedbackCount());
+        }
+        if (updatedReportData.getNegativeFeedbackCount() != null) {
+            existingReport.setNegativeFeedbackCount(updatedReportData.getNegativeFeedbackCount());
+        }
+        if (updatedReportData.getBestSellingItem() != null) {
+            existingReport.setBestSellingItem(updatedReportData.getBestSellingItem());
+        }
+        if (updatedReportData.getAverageDeliveryTime() != null) {
+            existingReport.setAverageDeliveryTime(updatedReportData.getAverageDeliveryTime());
+        }
+        if (updatedReportData.getEstimatedDeliveryTime() != null) {
+            existingReport.setEstimatedDeliveryTime(updatedReportData.getEstimatedDeliveryTime());
+        }
+        if (updatedReportData.getDelayRate() != null) {
+            existingReport.setDelayRate(updatedReportData.getDelayRate());
+        }
+        if (updatedReportData.getOutOfStockCount() != null) {
+            existingReport.setOutOfStockCount(updatedReportData.getOutOfStockCount());
+        }
+
+        // Update relationships if necessary (e.g., User or Restaurant)
+        if (updatedReportData.getUser() != null) {
+            existingReport.setUser(updatedReportData.getUser());
+        }
+        if (updatedReportData.getRestaurant() != null) {
+            existingReport.setRestaurant(updatedReportData.getRestaurant());
+        }
+
+        // Save the updated report back to the database
+        return reportRepository.save(existingReport);
+    }
+
     @Override
     public Map<String, Object> generateOrderTrendReport(LocalDate startDate, LocalDate endDate) {
         // TODO Auto-generated method stub

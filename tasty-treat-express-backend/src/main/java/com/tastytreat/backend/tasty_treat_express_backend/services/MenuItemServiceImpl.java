@@ -12,7 +12,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
 
 @Service
@@ -25,7 +25,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     private RestaurantRepository restaurantRepository;
 
     @Autowired
-    private FeedbackRepo feedbackRepository;
+    private FeedbackRepository feedbackRepository;
 
     @Override
     public MenuItem addMenuItem(String restaurantId, MenuItem menuItem) {

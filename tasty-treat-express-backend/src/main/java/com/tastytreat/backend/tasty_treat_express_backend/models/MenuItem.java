@@ -35,7 +35,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "tbl_menu")
 public class MenuItem {
@@ -44,15 +43,12 @@ public class MenuItem {
 	@Column(name = "menu_id")
 	private Long menuId;
 
-	@NotNull(message = "Name cannot be null")
-	@NotEmpty(message = "Name cannot be empty")
 	@Size(min = 1, max = 100, message = "Name should be between 1 and 100 characters")
 	private String name;
 
 	@Size(max = 255, message = "Description cannot exceed 255 characters")
 	private String description;
 
-	@NotNull(message = "Price cannot be null")
 	@DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero")
 	private Double price;
 
@@ -61,14 +57,13 @@ public class MenuItem {
 
 	private String imageUrl;
 
-	@NotNull(message = "Quantity cannot be null")
 	@Min(value = 0, message = "Quantity cannot be negative")
 	private Integer quantity;
 
 	private Boolean isAvailable = true;
 
 	@Pattern(regexp = "^(Popular|Regular|LowDemand)$", message = "Status must be one of Popular, Regular, or LowDemand")
-	private String status; 
+	private String status;
 
 	@CreationTimestamp
 	private LocalDateTime createdAt;
@@ -85,32 +80,24 @@ public class MenuItem {
 													// foreign key points to.
 			nullable = false // It specifies whether the foreign key column can accept NULL values.
 	)
-	@JsonBackReference("menuItemRestaurantReference") // It's typically used on the "many" side of a @OneToMany
-														// relationship to avoid infinite loops between related
-														// entities.
+	// @JsonBackReference("menuItemRestaurantReference") // It's typically used on
+	// the "many" side of a @OneToMany
+	// relationship to avoid infinite loops between related
+	@JsonIgnoreProperties("menu") // entities.
 	private Restaurant restaurant;
 
-	
-	/*
 	@ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE })
-    // @JsonBackReference("order-menu")
-	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-	@JsonIgnoreProperties()
+	// @JsonBackReference("order-menu")
+	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+	// property = "id")
+	@JsonIgnoreProperties("menuItems")
 	private List<Order> orders;
 
-	*/
-	
-	@ManyToOne(cascade = CascadeType.ALL) 
-	@JoinColumn(name = "order_id", referencedColumnName = "orderId")
-	//@JsonBackReference("orderMenuReference")
-	private Order orders;
-	
 	// Add relationship with Feedback
 	@OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("menuItem")
 	private List<Feedback> feedbacks = new ArrayList<>();
-
-	
 
 	public Long getId() {
 		return menuId;
@@ -119,7 +106,6 @@ public class MenuItem {
 	public void setId(Long id) {
 		this.menuId = id;
 	}
-	
 
 	public Long getMenuId() {
 		return menuId;
@@ -144,25 +130,16 @@ public class MenuItem {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-/*
+
+	public Restaurant getRestaurant() {
+		return restaurant;
+	}
+
 	public List<Order> getOrders() {
 		return orders;
 	}
 
 	public void setOrders(List<Order> orders) {
-		this.orders = orders;
-	}
-*/
-	
-	public Restaurant getRestaurant() {
-		return restaurant;
-	}
-
-	public Order getOrders() {
-		return orders;
-	}
-
-	public void setOrders(Order orders) {
 		this.orders = orders;
 	}
 
@@ -244,19 +221,12 @@ public class MenuItem {
 		this.feedbacks = feedbacks;
 	}
 
-	@Override
-	public String toString() {
-		return "MenuItem [id=" + menuId + ", name=" + name + ", description=" + description + ", price=" + price
-				+ ", category=" + category + ", imageUrl=" + imageUrl + ", quantity=" + quantity + ", isAvailable="
-				+ isAvailable + ", status=" + status + "]";
-	}
-
 	public MenuItem(
-			@NotNull(message = "Name cannot be null") @NotEmpty(message = "Name cannot be empty") @Size(min = 1, max = 100, message = "Name should be between 1 and 100 characters") String name,
-			@Size(max = 255, message = "Description cannot exceed 255 characters") String description,
-			@NotNull(message = "Price cannot be null") @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero") Double price,
-			@Size(max = 50, message = "Category cannot exceed 50 characters") String category, String imageUrl,
-			@NotNull(message = "Quantity cannot be null") @Min(value = 0, message = "Quantity cannot be negative") Integer quantity) {
+			String name,
+			String description,
+			Double price,
+			String category, String imageUrl,
+			Integer quantity) {
 
 		this.name = name;
 		this.description = description;
@@ -267,11 +237,11 @@ public class MenuItem {
 	}
 
 	public MenuItem(
-			@NotNull(message = "Name cannot be null") @NotEmpty(message = "Name cannot be empty") @Size(min = 1, max = 100, message = "Name should be between 1 and 100 characters") String name,
+			@Size(min = 1, max = 100, message = "Name should be between 1 and 100 characters") String name,
 			@Size(max = 255, message = "Description cannot exceed 255 characters") String description,
-			@NotNull(message = "Price cannot be null") @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero") Double price,
-			@Size(max = 50, message = "Category cannot exceed 50 characters") String category, String imageUrl,
-			@NotNull(message = "Quantity cannot be null") @Min(value = 0, message = "Quantity cannot be negative") Integer quantity,
+			Double price,
+			String category, String imageUrl,
+			@Min(value = 0, message = "Quantity cannot be negative") Integer quantity,
 			Boolean isAvailable, Restaurant restaurant) {
 		super();
 		this.name = name;
@@ -287,5 +257,13 @@ public class MenuItem {
 	public MenuItem() {
 		super();
 	}
+	
+	public MenuItem(Long menuId, String name, Double price) {
+	    this.menuId = menuId;
+	    this.name = name;
+	    this.price = price;
+	}
+
+	
 
 }

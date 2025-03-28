@@ -1,13 +1,19 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.tastyTreatExpress.DTO.OrderDTO;
+import com.tastyTreatExpress.DTO.OrderMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.services.OrderService;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -17,26 +23,28 @@ public class OrderController {
     private OrderService orderService;
 
     // Place an order
-    @PostMapping("/placeOrder")
-    public ResponseEntity<Order> placeOrder(@RequestParam Long customerId,
-            @RequestParam String restaurantId,
-            @RequestBody List<MenuItem> menuItems,
-            @RequestParam String deliveryAddress,
-            @RequestParam String paymentMethod) {
+    @PostMapping("/placeOrder/{userId}/{restaurantId}")
+    public ResponseEntity<OrderDTO> placeOrder(
+            @PathVariable Long userId,
+            @PathVariable String restaurantId,
+            @RequestBody Order orderobj) {
         try {
-            Order order = orderService.placeOrder(customerId, restaurantId, menuItems, deliveryAddress, paymentMethod);
-            return ResponseEntity.status(HttpStatus.CREATED).body(order);
+            Order placedOrder = orderService.placeOrder(userId, restaurantId, orderobj);
+            OrderDTO placedOrderDTO = OrderMapper.toOrderDTO(placedOrder);
+            return ResponseEntity.status(HttpStatus.CREATED).body(placedOrderDTO);
         } catch (RuntimeException e) {
+        	 System.out.println(e.getMessage().toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     // Retrieve order by ID
     @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
         try {
             Order order = orderService.getOrderById(orderId);
-            return ResponseEntity.ok(order);
+            OrderDTO orderDTO = OrderMapper.toOrderDTO(order);
+            return ResponseEntity.ok(orderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -44,10 +52,13 @@ public class OrderController {
 
     // Get orders by restaurant ID
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<List<Order>> getOrdersByRestaurant(@PathVariable String restaurantId) {
+    public ResponseEntity<List<OrderDTO>> getOrdersByRestaurant(@PathVariable String restaurantId) {
         try {
             List<Order> orders = orderService.getOrdersByRestaurant(restaurantId);
-            return ResponseEntity.ok(orders);
+            List<OrderDTO> orderDTOs = orders.stream()
+                    .map(OrderMapper::toOrderDTO)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(orderDTOs);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -55,10 +66,13 @@ public class OrderController {
 
     // Get orders by customer ID
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Order>> getOrdersByCustomer(@PathVariable Long customerId) {
+    public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@PathVariable Long customerId) {
         try {
             List<Order> orders = orderService.getOrdersByCustomer(customerId);
-            return ResponseEntity.ok(orders);
+            List<OrderDTO> orderDTOs = orders.stream()
+                    .map(OrderMapper::toOrderDTO)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(orderDTOs);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -66,10 +80,11 @@ public class OrderController {
 
     // Update order status
     @PutMapping("/updateStatus/{orderId}")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
         try {
             Order updatedOrder = orderService.updateOrderStatus(orderId, status);
-            return ResponseEntity.ok(updatedOrder);
+            OrderDTO updatedOrderDTO = OrderMapper.toOrderDTO(updatedOrder);
+            return ResponseEntity.ok(updatedOrderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -77,12 +92,13 @@ public class OrderController {
 
     // Update delivery time for an order
     @PutMapping("/updateDeliveryTime/{orderId}")
-    public ResponseEntity<Order> updateOrderDeliveryTime(@PathVariable Long orderId,
+    public ResponseEntity<OrderDTO> updateOrderDeliveryTime(@PathVariable Long orderId,
             @RequestParam String deliveryTime) {
         try {
             LocalDateTime updatedDeliveryTime = LocalDateTime.parse(deliveryTime);
             Order updatedOrder = orderService.updateOrderDeliveryTime(orderId, updatedDeliveryTime);
-            return ResponseEntity.ok(updatedOrder);
+            OrderDTO updatedOrderDTO = OrderMapper.toOrderDTO(updatedOrder);
+            return ResponseEntity.ok(updatedOrderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -134,10 +150,11 @@ public class OrderController {
 
     // Apply a discount to an order
     @PutMapping("/discount/{orderId}")
-    public ResponseEntity<Order> applyDiscount(@PathVariable Long orderId, @RequestParam String couponCode) {
+    public ResponseEntity<OrderDTO> applyDiscount(@PathVariable Long orderId, @RequestParam String couponCode) {
         try {
             Order discountedOrder = orderService.applyDiscount(orderId, couponCode);
-            return ResponseEntity.ok(discountedOrder);
+            OrderDTO discountedOrderDTO = OrderMapper.toOrderDTO(discountedOrder);
+            return ResponseEntity.ok(discountedOrderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -145,10 +162,11 @@ public class OrderController {
 
     // Reorder an existing order
     @PostMapping("/reorder/{orderId}")
-    public ResponseEntity<Order> reorder(@PathVariable Long orderId) {
+    public ResponseEntity<OrderDTO> reorder(@PathVariable Long orderId) {
         try {
             Order reorderedOrder = orderService.reorder(orderId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(reorderedOrder);
+            OrderDTO reorderedOrderDTO = OrderMapper.toOrderDTO(reorderedOrder);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reorderedOrderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -186,7 +204,8 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-    // notify customer if order is late
+
+    // Notify customer if order is late
     @PostMapping("/notify-late-customer/{orderId}")
     public ResponseEntity<String> notifyCustomerIfLate(@PathVariable Long orderId) {
         try {
@@ -196,7 +215,8 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error notifying customer.");
         }
     }
-    // notify restaurant if order is late
+
+    // Notify restaurant if order is late
     @PostMapping("/notify-late-restaurant/{orderId}")
     public ResponseEntity<String> notifyRestaurantIfLate(@PathVariable Long orderId) {
         try {

@@ -1,12 +1,15 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.tastyTreatExpress.DTO.RestaurantDTO;
+import com.tastyTreatExpress.DTO.RestaurantMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
@@ -24,9 +27,10 @@ public class RestaurantController {
 
 	// Add a restaurant
 	@PostMapping("/register")
-	public ResponseEntity<Restaurant> saveRestaurant(@Valid @RequestBody Restaurant restaurant) {
+	public ResponseEntity<RestaurantDTO> saveRestaurant(@Valid @RequestBody Restaurant restaurant) {
 		Restaurant savedRestaurant = restaurantService.saveRestaurant(restaurant);
-		return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
+		RestaurantDTO savedRestaurantDTO = RestaurantMapper.toRestaurantDTO(savedRestaurant);
+		return new ResponseEntity<>(savedRestaurantDTO, HttpStatus.CREATED);
 	}
 
 	// Authenticate a restaurant
@@ -49,17 +53,21 @@ public class RestaurantController {
 
 	// Get all restaurants
 	@GetMapping
-	public ResponseEntity<List<Restaurant>> findAll() {
+	public ResponseEntity<List<RestaurantDTO>> findAll() {
 		List<Restaurant> restaurants = restaurantService.findAll();
-		return new ResponseEntity<>(restaurants, HttpStatus.OK);
+		List<RestaurantDTO> restaurantDTOs = restaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(restaurantDTOs, HttpStatus.OK);
 	}
 
 	// Get a restaurant by ID
 	@GetMapping("/{restaurantId}")
-	public ResponseEntity<Restaurant> getRestaurantById(@PathVariable String restaurantId) {
+	public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId) {
 		Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
 		if (restaurant != null) {
-			return new ResponseEntity<>(restaurant, HttpStatus.OK);
+			RestaurantDTO restaurantDTO = RestaurantMapper.toRestaurantDTO(restaurant);
+			return new ResponseEntity<>(restaurantDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -67,11 +75,12 @@ public class RestaurantController {
 
 	// Update restaurant details
 	@PutMapping("/{restaurantId}")
-	public ResponseEntity<Restaurant> updateRestaurant(@PathVariable String restaurantId,
+	public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
 			@Valid @RequestBody Restaurant restaurant) {
 		restaurant.setRestaurantId(restaurantId);
 		Restaurant updatedRestaurant = restaurantService.updateRestaurant(restaurant);
-		return new ResponseEntity<>(updatedRestaurant, HttpStatus.OK);
+		RestaurantDTO updatedRestaurantDTO = RestaurantMapper.toRestaurantDTO(updatedRestaurant);
+		return new ResponseEntity<>(updatedRestaurantDTO, HttpStatus.OK);
 	}
 
 	// Delete a restaurant
@@ -120,25 +129,31 @@ public class RestaurantController {
 
 	// Find restaurants by location
 	@GetMapping("/search/location")
-	public ResponseEntity<List<Restaurant>> findRestaurantsByLocation(@RequestParam String location) {
+	public ResponseEntity<List<RestaurantDTO>> findRestaurantsByLocation(@RequestParam String location) {
 		List<Restaurant> restaurants = restaurantService.findRestaurantsByLocation(location);
-		return new ResponseEntity<>(restaurants, HttpStatus.OK);
+		List<RestaurantDTO> restaurantDTOs = restaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(restaurantDTOs, HttpStatus.OK);
 	}
 
 	// Find restaurants nearby
 	@GetMapping("/search/nearby")
-	public ResponseEntity<List<Restaurant>> findRestaurantsNearby(
+	public ResponseEntity<List<RestaurantDTO>> findRestaurantsNearby(
 			@RequestParam double latitude,
 			@RequestParam double longitude,
 			@RequestParam double radiusKm) {
 		List<Restaurant> nearbyRestaurants = restaurantService.findRestaurantsNearby(latitude, longitude, radiusKm);
-		return new ResponseEntity<>(nearbyRestaurants, HttpStatus.OK);
+		List<RestaurantDTO> nearbyRestaurantDTOs = nearbyRestaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(nearbyRestaurantDTOs, HttpStatus.OK);
 	}
 
+	// Get reports for a restaurant
 	@GetMapping("/{restaurantId}/reports")
-    public ResponseEntity<List<Report>> getReportsByRestaurant(@PathVariable String restaurantId) {
-        List<Report> reports = restaurantService.getRestaurantReport(restaurantId);
-        return new ResponseEntity<>(reports, HttpStatus.OK);
-    }
-
+	public ResponseEntity<List<Report>> getReportsByRestaurant(@PathVariable String restaurantId) {
+		List<Report> reports = restaurantService.getRestaurantReport(restaurantId);
+		return new ResponseEntity<>(reports, HttpStatus.OK);
+	}
 }

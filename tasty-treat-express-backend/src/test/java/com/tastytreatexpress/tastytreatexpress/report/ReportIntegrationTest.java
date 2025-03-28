@@ -18,7 +18,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.ReportRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.UserRepository;
@@ -34,7 +34,7 @@ public class ReportIntegrationTest {
     private OrderRepository orderRepository;
 
     @Autowired
-    private FeedbackRepo feedbackRepository;
+    private FeedbackRepository feedbackRepository;
 
     @Autowired
     private ReportRepository reportRepository;
@@ -50,8 +50,8 @@ public class ReportIntegrationTest {
     @BeforeEach
     public void setup() {
         // Create Mock User
-        
-        mockUser =  new User("test@example.com", "Test User", "password", "123 Test St", "1234567890");
+
+        mockUser = new User("test@example.com", "Test User", "password", "123 Test St", "1234567890");
         mockUser.setId(1L);
         userRepository.save(mockUser);
 
@@ -73,8 +73,8 @@ public class ReportIntegrationTest {
 
         // Add Feedback
         Feedback feedback = new Feedback();
-        feedback.setOrder(mockOrder);
-        feedback.setMenuItem(mockMenuItem);
+        feedback.setOrders(mockOrder);
+        feedback.setMenuItems(mockMenuItem);
         feedback.setRating(5);
         feedback.setComments("Amazing pizza!");
         feedback.setUser(mockUser);
@@ -83,23 +83,23 @@ public class ReportIntegrationTest {
     }
 
     @Test
-public void testGenerateDailyReport() {
-    LocalDate today = LocalDate.now();
+    public void testGenerateDailyReport() {
+        LocalDate today = LocalDate.now();
 
-    // Call the generateDailyReports method
-    reportService.generateDailyReports();
+        // Call the generateDailyReports method
+        reportService.generateDailyReports();
 
-    // Fetch generated report
-    List<Report> reports = reportRepository.findByReportType("DAILY");
+        // Fetch generated report
+        List<Report> reports = reportRepository.findByReportType("DAILY");
 
-    // Validate report
-    Assertions.assertFalse(reports.isEmpty());
-    Report dailyReport = reports.get(0);
+        // Validate report
+        Assertions.assertFalse(reports.isEmpty());
+        Report dailyReport = reports.get(0);
 
-    Assertions.assertEquals("DAILY", dailyReport.getReportType());
-    Assertions.assertEquals(1, dailyReport.getTotalOrders());
-    Assertions.assertEquals(12.99, dailyReport.getTotalOrderValue());
-    Assertions.assertEquals("Pizza", dailyReport.getBestSellingItem());
-}
+        Assertions.assertEquals("DAILY", dailyReport.getReportType());
+        Assertions.assertEquals(1, dailyReport.getTotalOrders());
+        Assertions.assertEquals(12.99, dailyReport.getTotalOrderValue());
+        Assertions.assertEquals("Pizza", dailyReport.getBestSellingItem());
+    }
 
 }

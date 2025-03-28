@@ -3,17 +3,17 @@ package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.tastytreat.backend.tasty_treat_express_backend.exceptions.BadRequestException;
-import com.tastytreat.backend.tasty_treat_express_backend.exceptions.FeedbackNotFoundException;
+import com.tastyTreatExpress.DTO.FeedbackDTO;
+import com.tastyTreatExpress.DTO.FeedbackMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.services.FeedbackService;
-
 
 @RestController
 @RequestMapping("/api/feedbacks")
@@ -24,27 +24,30 @@ public class FeedbackController {
 
     // Add feedback for a restaurant
     @PostMapping("/{orderId}/{restaurantId}")
-    public ResponseEntity<Feedback> addFeedback(
+    public ResponseEntity<FeedbackDTO> addFeedback(
             @PathVariable Long orderId,
             @PathVariable String restaurantId,
             @RequestBody Feedback feedback) {
         try {
             Feedback addedFeedback = feedbackService.addFeedback(orderId, restaurantId, feedback);
-            return ResponseEntity.status(HttpStatus.CREATED).body(addedFeedback);
+            FeedbackDTO feedbackDTO = FeedbackMapper.toFeedbackDTO(addedFeedback);
+            return ResponseEntity.status(HttpStatus.CREATED).body(feedbackDTO);
         } catch (RuntimeException e) {
-            throw new BadRequestException("Failed to add feedback: " + e.getMessage());
+        	System.out.println("Err"+ e.getMessage().toString() );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     // Add feedback for a menu item
     @PostMapping("/{orderId}/menu-item/{menuItemId}")
-    public ResponseEntity<Feedback> addMenuItemFeedback(
+    public ResponseEntity<FeedbackDTO> addMenuItemFeedback(
             @PathVariable Long orderId,
             @PathVariable Long menuItemId,
             @RequestBody Feedback feedback) {
         try {
             Feedback addedFeedback = feedbackService.addMenuItemFeedback(orderId, menuItemId, feedback);
-            return ResponseEntity.status(HttpStatus.CREATED).body(addedFeedback);
+            FeedbackDTO feedbackDTO = FeedbackMapper.toFeedbackDTO(addedFeedback);
+            return ResponseEntity.status(HttpStatus.CREATED).body(feedbackDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -52,14 +55,15 @@ public class FeedbackController {
 
     // Update feedback
     @PutMapping("/{feedbackId}")
-    public ResponseEntity<Feedback> updateFeedback(
+    public ResponseEntity<FeedbackDTO> updateFeedback(
             @PathVariable Long feedbackId,
             @RequestBody Feedback feedback) {
         try {
             Feedback updatedFeedback = feedbackService.updateFeedback(feedbackId, feedback);
-            return ResponseEntity.ok(updatedFeedback);
+            FeedbackDTO feedbackDTO = FeedbackMapper.toFeedbackDTO(updatedFeedback);
+            return ResponseEntity.ok(feedbackDTO);
         } catch (RuntimeException e) {
-            throw new FeedbackNotFoundException("Feedback with ID " + feedbackId + " not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
@@ -70,42 +74,48 @@ public class FeedbackController {
             feedbackService.deleteFeedback(feedbackId);
             return ResponseEntity.ok("Feedback deleted successfully.");
         } catch (RuntimeException e) {
-            throw new FeedbackNotFoundException("Feedback with ID " + feedbackId + " not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Feedback not found.");
         }
     }
 
     // Get feedback for an order
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<Feedback>> getFeedbackForOrder(@PathVariable Long orderId) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackForOrder(@PathVariable Long orderId) {
         List<Feedback> feedbacks = feedbackService.getFeedbackForOrder(orderId);
-        if (feedbacks == null || feedbacks.isEmpty()) {
-            throw new FeedbackNotFoundException("No feedback found for order ID " + orderId);
-        }
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Get feedback for a restaurant
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<List<Feedback>> getFeedbackForRestaurant(@PathVariable String restaurantId) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackForRestaurant(@PathVariable String restaurantId) {
         List<Feedback> feedbacks = feedbackService.getFeedbackForRestaurant(restaurantId);
-        if (feedbacks == null || feedbacks.isEmpty()) {
-            throw new FeedbackNotFoundException("No feedback found for restaurant ID " + restaurantId);
-        }
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
-    
+
     // Get feedback for a menu item
     @GetMapping("/menu-item/{menuItemId}")
-    public ResponseEntity<List<Feedback>> getFeedbackForMenuItem(@PathVariable Long menuItemId) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackForMenuItem(@PathVariable Long menuItemId) {
         List<Feedback> feedbacks = feedbackService.getFeedbackForMenuItem(menuItemId);
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Get feedback for a user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Feedback>> getFeedbackForUser(@PathVariable Long userId) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackForUser(@PathVariable Long userId) {
         List<Feedback> feedbacks = feedbackService.getFeedbackForUser(userId);
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Get average rating for a restaurant
@@ -124,51 +134,48 @@ public class FeedbackController {
 
     // Get top feedbacks for a restaurant
     @GetMapping("/restaurant/{restaurantId}/top-feedbacks")
-    public ResponseEntity<List<Feedback>> getTopFeedbacksForRestaurant(
+    public ResponseEntity<List<FeedbackDTO>> getTopFeedbacksForRestaurant(
             @PathVariable String restaurantId,
             @RequestParam int limit) {
         List<Feedback> topFeedbacks = feedbackService.getTopFeedbacksForRestaurant(restaurantId, limit);
-        return ResponseEntity.ok(topFeedbacks);
+        List<FeedbackDTO> feedbackDTOs = topFeedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Filter feedback by rating threshold
     @GetMapping("/filter-by-rating")
-    public ResponseEntity<List<Feedback>> getFeedbackByRatingThreshold(@RequestParam int minRating) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackByRatingThreshold(@RequestParam int minRating) {
         List<Feedback> feedbacks = feedbackService.getFeedbackByRatingThreshold(minRating);
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Filter feedback within date range
     @GetMapping("/filter-by-date")
-    public ResponseEntity<List<Feedback>> getFeedbackWithinDateRange(
+    public ResponseEntity<List<FeedbackDTO>> getFeedbackWithinDateRange(
             @RequestParam String startDate,
             @RequestParam String endDate) {
         LocalDateTime start = LocalDateTime.parse(startDate);
         LocalDateTime end = LocalDateTime.parse(endDate);
         List<Feedback> feedbacks = feedbackService.getFeedbackWithinDateRange(start, end);
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Search feedback by keyword
     @GetMapping("/search")
-    public ResponseEntity<List<Feedback>> searchFeedbackByKeyword(@RequestParam String keyword) {
+    public ResponseEntity<List<FeedbackDTO>> searchFeedbackByKeyword(@RequestParam String keyword) {
         List<Feedback> feedbacks = feedbackService.searchFeedbackByKeyword(keyword);
-        return ResponseEntity.ok(feedbacks);
-    }
-
-    // Get feedback summary for a restaurant
-    @GetMapping("/restaurant/{restaurantId}/summary")
-    public ResponseEntity<Map<String, Object>> getFeedbackSummaryForRestaurant(@PathVariable String restaurantId) {
-        Map<String, Object> summary = feedbackService.getFeedbackSummaryForRestaurant(restaurantId);
-        return ResponseEntity.ok(summary);
-    }
-
-
-    // Get personalized feedback dashboard for user
-    @GetMapping("/dashboard/user/{userId}")
-    public ResponseEntity<List<Feedback>> getPersonalizedFeedbackDashboard(@PathVariable Long userId) {
-        List<Feedback> feedbacks = feedbackService.getPersonalizedFeedbackDashboard(userId);
-        return ResponseEntity.ok(feedbacks);
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(feedbackDTOs);
     }
 
     // Notify restaurant on low rating
@@ -184,5 +191,4 @@ public class FeedbackController {
         feedbackService.thankUserForPositiveFeedback(feedback);
         return ResponseEntity.ok("Thank you message sent to user.");
     }
-
 }

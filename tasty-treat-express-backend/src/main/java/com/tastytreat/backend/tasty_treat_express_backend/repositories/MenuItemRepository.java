@@ -10,6 +10,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
+    
     List<MenuItem> findByCategory(String category);
     List<MenuItem> findByRestaurantRestaurantId(String restaurantId);
     

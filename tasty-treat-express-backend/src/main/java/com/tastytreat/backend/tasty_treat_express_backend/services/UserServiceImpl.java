@@ -21,7 +21,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.ReportRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
 
 @Service
 public class UserServiceImpl implements UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -39,14 +39,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ReportRepository reportRepository;
     @Autowired
-    private FeedbackRepo feedbackRepo;
+    private FeedbackRepository feedbackRepo;
     @Autowired
     private RestaurantRepository restaurantRepository;
-    
+
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-   
     // 1. authenticate user
     public boolean authenticateUser(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -57,39 +56,32 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-   
     public User findUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
-        System.out.println("User found by email: " + user); 
+        System.out.println("User found by email: " + user);
         return user.get();
     }
 
-    
     public User saveUser(@Valid User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
-	public boolean existsByEmail(String email) {
-		return userRepository.existsByEmail(email);
-	}
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
+    public User getUserById(long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 
-	public List<User> findAll() {
-		return userRepository.findAll();
-	}
-
-
-	public User getUserById(long userId) {
-		return userRepository.findById(userId).orElse(null);
-	}
-
-
-	public User updateUser(@Valid User user) {
-		return userRepository.save(user); 
-	}
-
+    public User updateUser(@Valid User user) {
+        return userRepository.save(user);
+    }
 
     public void updateUserAddress(long userId, String newAddress) {
         if (!userRepository.existsById(userId)) {
@@ -115,8 +107,6 @@ public class UserServiceImpl implements UserService {
         logger.info("Updated password for User ID: {}", userId);
     }
 
-    
-
     public void deleteUser(long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found with ID: " + id);
@@ -126,8 +116,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-     public Map<String, Object> generateUserOrderSummaryReport(long userId) {
-        List<Order> userOrders = orderRepository.findByCustomer_Id(userId);
+    public Map<String, Object> generateUserOrderSummaryReport(long userId) {
+        List<Order> userOrders = orderRepository.findByUser_Id(userId);
 
         if (userOrders.isEmpty()) {
             Map<String, Object> report = new HashMap<>();
@@ -138,7 +128,7 @@ public class UserServiceImpl implements UserService {
             report.put("totalRevenue", 0.0);
             report.put("latestOrderDate", null);
             report.put("averageOrderValue", 0.0);
-            report.put("orders", Collections.emptyList()); 
+            report.put("orders", Collections.emptyList());
             return report;
         }
         int totalOrders = userOrders.size();
@@ -170,19 +160,18 @@ public class UserServiceImpl implements UserService {
         response.put("totalRevenue", totalRevenue);
         response.put("latestOrderDate", latestOrderDate);
         response.put("averageOrderValue", averageOrderValue);
-        response.put("orders", userOrders); 
+        response.put("orders", userOrders);
 
-       
-        User user = userOrders.get(0).getCustomer();
+        User user = userOrders.get(0).getUser();
         List<Report> existingReport = reportRepository.findByUserId(userId);
         if (existingReport.isEmpty()) {
-           // Report report = new Report(user, totalOrders, totalRevenue, latestOrderDate);
-           Report report = new Report();
-                report.setUser(user);
-                report.setTotalOrders(totalOrders);
-                report.setTotalOrderValue(totalRevenue);
-                report.setCreatedAt(latestOrderDate); 
-                report.setAverageOrderValue(averageOrderValue);
+            // Report report = new Report(user, totalOrders, totalRevenue, latestOrderDate);
+            Report report = new Report();
+            report.setUser(user);
+            report.setTotalOrders(totalOrders);
+            report.setTotalOrderValue(totalRevenue);
+            report.setCreatedAt(latestOrderDate);
+            report.setAverageOrderValue(averageOrderValue);
             reportRepository.save(report);
         }
 
@@ -196,7 +185,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
-        
+
         feedback.setUser(user);
         feedback.setRestaurant(restaurant);
         Feedback savedFeedback = feedbackRepo.save(feedback);
@@ -208,8 +197,7 @@ public class UserServiceImpl implements UserService {
     public List<Feedback> getUserFeedback(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        return user.getFeedbacks(); 
+        return user.getFeedbacks();
     }
-
 
 }
