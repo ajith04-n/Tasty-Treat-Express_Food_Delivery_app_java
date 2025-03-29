@@ -173,4 +173,9 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurant.getReports();
         }
 
+    @Override
+    public boolean existsById(String restaurantId) {
+        return restaurantRepository.existsById(restaurantId);
+    }
+
 }

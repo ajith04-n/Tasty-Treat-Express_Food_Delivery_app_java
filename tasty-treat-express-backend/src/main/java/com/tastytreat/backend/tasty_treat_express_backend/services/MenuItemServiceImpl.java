@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
@@ -70,7 +71,22 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public MenuItem updateMenuItem(MenuItem menuItem) {
         if (menuItemRepository.existsById(menuItem.getId())) {
-            return menuItemRepository.save(menuItem);
+            MenuItem existingMenuItem = menuItemRepository.findById(menuItem.getId())
+                    .orElseThrow(() -> new ReportNotFoundException("MenuItem not found with id " + menuItem.getId()));
+
+            if (menuItem.getName() != null && !menuItem.getName().isEmpty()) {
+                existingMenuItem.setName(menuItem.getName());
+            }
+            if (menuItem.getPrice() >= 0) {
+                existingMenuItem.setPrice(menuItem.getPrice());
+            }
+            if (menuItem.getQuantity() >= 0) {
+                existingMenuItem.setQuantity(menuItem.getQuantity());
+            }
+            if (menuItem.getDescription() != null && !menuItem.getDescription().isEmpty()) {
+                existingMenuItem.setDescription(menuItem.getDescription());
+            }
+            return menuItemRepository.save(existingMenuItem);
         } else {
             throw new RuntimeException("MenuItem not found with id " + menuItem.getId());
         }
@@ -210,6 +226,21 @@ public class MenuItemServiceImpl implements MenuItemService {
 
             menuItemRepository.save(menuItem);
         }
+    }
+
+    @Override
+    public boolean existsByNameAndRestaurantId(String name, String restaurantId) {
+        return menuItemRepository.existsByNameAndRestaurant_RestaurantId(name, restaurantId);
+    }
+
+    @Override
+    public boolean existsById(long id) {
+        return menuItemRepository.existsById(id);
+    }
+
+    @Override
+    public boolean existsByRestaurantId(String restaurantId) {
+        return restaurantRepository.existsById(restaurantId);
     }
 
 }

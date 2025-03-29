@@ -41,5 +41,11 @@ public interface MenuItemService {
 
     void adjustMenuStatusBasedOnOrderCount();
 
-	MenuItem updateMenuItemQnty(MenuItem menuItem, int quantity); 
+	MenuItem updateMenuItemQnty(MenuItem menuItem, int quantity);
+
+    boolean existsByNameAndRestaurantId(String name, String restaurantId);
+
+    boolean existsById(long id);
+
+    boolean existsByRestaurantId(String restaurantId); 
 }

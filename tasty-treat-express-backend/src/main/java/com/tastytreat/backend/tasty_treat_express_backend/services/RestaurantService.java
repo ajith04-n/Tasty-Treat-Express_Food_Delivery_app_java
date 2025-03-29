@@ -32,6 +32,7 @@ public interface RestaurantService {
 	public List<Feedback> addFeedback(String restaurantId, Feedback feedback);
 	public List<MenuItem> addMenuItem(String restaurantId, MenuItem menuItem);
 	public List<Restaurant> findRestaurantsNearby(double userLat, double userLon, double radiusKm);
+    public boolean existsById(String restaurantId);
 
 
 	

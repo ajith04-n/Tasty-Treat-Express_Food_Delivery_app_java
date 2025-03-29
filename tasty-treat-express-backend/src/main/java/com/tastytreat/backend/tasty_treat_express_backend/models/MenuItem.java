@@ -71,7 +71,7 @@ public class MenuItem {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinColumn( // we use @JoinColumn to define or customize foreign key columns in the child
 					// entity.
 			name = "restaurant_id", // The name of the column in the current entity (child table) that stores the
@@ -86,8 +86,8 @@ public class MenuItem {
 	@JsonIgnoreProperties("menu") // entities.
 	private Restaurant restaurant;
 
-	@ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,
-			CascadeType.MERGE })
+	// @ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST,	CascadeType.MERGE })
+	@ManyToMany(mappedBy = "menuItems")
 	// @JsonBackReference("order-menu")
 	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
 	// property = "id")
@@ -95,7 +95,7 @@ public class MenuItem {
 	private List<Order> orders;
 
 	// Add relationship with Feedback
-	@OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonIgnoreProperties("menuItem")
 	private List<Feedback> feedbacks = new ArrayList<>();
 

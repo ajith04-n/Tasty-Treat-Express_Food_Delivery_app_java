@@ -24,6 +24,7 @@ public interface UserService {
 	 public Map<String,Object> generateUserOrderSummaryReport(long userId);
 	public Feedback addFeedback(long userId, String restaurantId, Feedback feedback);
     public List<Feedback> getUserFeedback(long userId);
+	public boolean existsById(Long userId);
 	 
 }
 

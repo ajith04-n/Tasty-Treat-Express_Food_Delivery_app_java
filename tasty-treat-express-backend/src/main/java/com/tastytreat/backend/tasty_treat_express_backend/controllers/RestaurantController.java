@@ -8,8 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.tastyTreatExpress.DTO.MenuItemDTO;
+import com.tastyTreatExpress.DTO.MenuItemMapper;
 import com.tastyTreatExpress.DTO.RestaurantDTO;
 import com.tastyTreatExpress.DTO.RestaurantMapper;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.EmailAlreadyExistsException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
@@ -28,9 +32,13 @@ public class RestaurantController {
 	// Add a restaurant
 	@PostMapping("/register")
 	public ResponseEntity<RestaurantDTO> saveRestaurant(@Valid @RequestBody Restaurant restaurant) {
-		Restaurant savedRestaurant = restaurantService.saveRestaurant(restaurant);
-		RestaurantDTO savedRestaurantDTO = RestaurantMapper.toRestaurantDTO(savedRestaurant);
-		return new ResponseEntity<>(savedRestaurantDTO, HttpStatus.CREATED);
+		if (restaurantService.existsByEmail(restaurant.getEmail())) {
+			throw new EmailAlreadyExistsException("Email is already registered.");
+		} else {
+			Restaurant savedRestaurant = restaurantService.saveRestaurant(restaurant);
+			RestaurantDTO savedRestaurantDTO = RestaurantMapper.toRestaurantDTO(savedRestaurant);
+			return new ResponseEntity<>(savedRestaurantDTO, HttpStatus.CREATED);
+		}
 	}
 
 	// Authenticate a restaurant
@@ -69,7 +77,8 @@ public class RestaurantController {
 			RestaurantDTO restaurantDTO = RestaurantMapper.toRestaurantDTO(restaurant);
 			return new ResponseEntity<>(restaurantDTO, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			throw new ReportNotFoundException("Restaurant doesnt exist with the given Id.");
+			//return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -99,10 +108,16 @@ public class RestaurantController {
 
 	// Add a menu item to a restaurant
 	@PostMapping("/{restaurantId}/menu")
-	public ResponseEntity<List<MenuItem>> addMenuItem(@PathVariable String restaurantId,
-			@Valid @RequestBody MenuItem menuItem) {
-		List<MenuItem> updatedMenu = restaurantService.addMenuItem(restaurantId, menuItem);
-		return new ResponseEntity<>(updatedMenu, HttpStatus.CREATED);
+	public ResponseEntity<List<MenuItemDTO>> addMenuItem(@PathVariable String restaurantId,
+			@RequestBody MenuItem menuItem) {
+		Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+		if (restaurant == null) {
+			throw new ReportNotFoundException("Restaurant does not exist with the given Id.");
+		}
+		menuItem.setRestaurant(restaurant);
+		List<MenuItem> createdMenuItems = restaurantService.addMenuItem(restaurantId, menuItem);
+		List<MenuItemDTO> createdMenuItemDTOs = MenuItemMapper.toMenuItemDTOList(createdMenuItems);
+		return new ResponseEntity<>(createdMenuItemDTOs, HttpStatus.CREATED);
 	}
 
 	// Get a restaurant's feedbacks

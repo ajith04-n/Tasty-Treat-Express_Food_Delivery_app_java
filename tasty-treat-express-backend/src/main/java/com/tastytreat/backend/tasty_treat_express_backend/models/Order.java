@@ -29,19 +29,21 @@ public class Order {
 	@JsonProperty("id")
 	private Long orderId;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
 	//@JsonBackReference("orderUserReference")
 	@JsonIgnoreProperties("orders")
 	private User user;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	// @ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId")
 	//@JsonBackReference("orderRestaurantReference")
 	@JsonIgnoreProperties("orders")
 	private Restaurant restaurant;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	//@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@ManyToMany
 	@JoinTable(name = "menu_order_map", joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "orderId"), inverseJoinColumns = @JoinColumn(name = "menu_id", referencedColumnName = "menu_id"))
 	// @JsonManagedReference("order-menu")
 	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -50,7 +52,7 @@ public class Order {
 
 
 	// Add One-to-Many relationship with Feedback
-	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonIgnoreProperties("orders")
 	private List<Feedback> feedbacks = new ArrayList<>();
 

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
@@ -199,10 +200,15 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     public void notifyRestaurantOnLowRating(Feedback feedback) {
-        if (feedback.getRating() <= 2) {
-            String message = "Your restaurant received a low rating of " + feedback.getRating() +
-                    ". Please check the feedback and improve your services.";
-            emailService.sendSimpleMessage(feedback.getRestaurant().getEmail(), "Low Rating Alert", message);
+        Optional<Feedback> dFeedback = feedbackRepository.findById(feedback.getFeedbackId());
+        if (dFeedback.isPresent()) {
+            if (feedback.getRating() <= 2) {
+                String message = "Your restaurant received a low rating of " + feedback.getRating() +
+                        ". Please check the feedback and improve your services.";
+                emailService.sendSimpleMessage(dFeedback.get().getRestaurant().getEmail(), "Low Rating Alert", message);
+            }
+        }else{
+            throw new ReportNotFoundException("The restaurant does not exist on the server");
         }
     }
 

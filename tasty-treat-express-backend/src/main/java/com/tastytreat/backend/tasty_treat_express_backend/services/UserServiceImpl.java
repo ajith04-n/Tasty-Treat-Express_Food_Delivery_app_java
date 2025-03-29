@@ -95,15 +95,23 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-        if (!user.getPassword().equals(oldPassword)) {
-            throw new RuntimeException("Incorrect old password");
+                if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                    throw new RuntimeException("Incorrect old password");
+                }
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters long.");
         }
 
         if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$")) {
             throw new RuntimeException(
                     "Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, and one special character.");
         }
-        userRepository.updateUserPassword(userId, newPassword);
+        if (oldPassword.equals(newPassword)) {
+            throw new RuntimeException("New password must be different from the old password.");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+       // userRepository.updateUserPassword(userId, newPassword);
         logger.info("Updated password for User ID: {}", userId);
     }
 
@@ -198,6 +206,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         return user.getFeedbacks();
+    }
+
+    @Override
+    public boolean existsById(Long userId) {
+       return userRepository.existsById(userId);
     }
 
 }
