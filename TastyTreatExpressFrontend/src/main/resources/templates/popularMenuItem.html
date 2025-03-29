@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details</title>
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #f39c12;
+            --bg-base: #dfe6e9;
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: url('https://www.transparenttextures.com/patterns/food.png');
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table-container {
+            background: var(--bg-base);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .table-container:hover {
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark), -4px -4px 12px var(--neu-shadow-light);
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table-container th, .table-container td {
+            padding: 20px;
+            text-align: left;
+        }
+
+        .table-container th {
+            background: var(--primary);
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 1.1em;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .table-container td {
+            background: var(--bg-base);
+            box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+        }
+
+        .table-container tr:hover td {
+            background: rgba(243, 156, 18, 0.2);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-dark);
+            text-decoration: none;
+            padding: 15px 30px;
+            background: var(--secondary);
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Details</h1>
+            <p>Restaurant ID: <span th:text="${restaurantId}"></span></p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.customerName}"></td>
+                        <td th:text="${order.items}"></td>
+                        <td th:text="'$' + ${order.total}"></td>
+                        <td th:text="${order.status}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="5" style="text-align: center;">No orders found</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/dashboard}" class="back-link">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

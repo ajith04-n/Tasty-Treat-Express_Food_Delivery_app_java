@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Treat Express - Reviews</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #34495e;    /* Slate blue */
+            --secondary: #f39c12;  /* Vibrant orange */
+            --bg-base: #dfe6e9;    /* Light silver */
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --text-dark: #2d3436;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            background: var(--bg-base);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Neumorphism */
+        .neu-card {
+            background: var(--bg-base);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px var(--neu-shadow-dark),
+                       -8px -8px 16px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .neu-card:hover {
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+                       -4px -4px 12px var(--neu-shadow-light);
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .header {
+            padding: 1.5rem 2rem;
+            background: var(--primary);
+            margin: 1rem 1rem 0;
+        }
+
+        .header-brand img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .header-brand:hover img {
+            transform: rotate(5deg);
+        }
+
+        .search-bar {
+            max-width: 400px;
+            margin: 0 1rem;
+        }
+
+        .search-bar input {
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-base);
+            box-shadow: inset 3px 3px 6px var(--neu-shadow-dark),
+                       inset -3px -3px 6px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            box-shadow: inset 2px 2px 4px var(--neu-shadow-dark);
+            outline: none;
+        }
+
+        .user-menu .dropdown-toggle {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+        }
+
+        .user-menu .dropdown-menu {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            border-radius: 10px;
+        }
+
+        .user-menu .dropdown-item {
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .user-menu .dropdown-item:hover {
+            background: var(--secondary);
+            color: var(--text-dark);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .side-nav {
+            width: 250px;
+            padding: 1.5rem;
+            background: var(--primary);
+        }
+
+        .side-nav h6 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .side-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .side-nav a:hover {
+            background: rgba(243, 156, 18, 0.2);
+            transform: translateX(5px);
+        }
+
+        .side-nav a.active {
+            background: var(--secondary);
+            color: var(--text-dark);
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-nav a i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-card {
+            padding: 2rem;
+            background: var(--bg-base);
+            margin-bottom: 2rem;
+        }
+
+        .profile-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--secondary);
+            margin-right: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-card h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item strong {
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+
+        .content-area {
+            flex-grow: 1;
+        }
+
+        .content-card {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .content-card img {
+            width: 120px;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-card p {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-action {
+            background: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: 4px 4px 12px var(--neu-shadow-dark);
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            padding: 2rem;
+            background: var(--primary);
+            margin: 0 1rem 1rem;
+        }
+
+        .footer h6 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer a {
+            color: var(--text-light);
+            padding: 0.5rem 0;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--secondary);
+            padding-left: 0.75rem;
+        }
+
+        @media (max-width: 991px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .side-nav {
+                width: 100%;
+                margin: 0;
+            }
+            .profile-card {
+                text-align: center;
+                flex-direction: column;
+            }
+            .profile-card img {
+                margin: 0 auto 1rem;
+            }
+            .stats-grid {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header, .footer {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            .search-bar {
+                max-width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header glass-panel">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <a href="/" class="header-brand">
+                <img src="logo.jpg" alt="Tasty Treat Express Logo">
+            </a>
+            <div class="search-bar">
+                <input type="text" class="form-control" placeholder="Search for restaurant, cuisine or a dish">
+            </div>
+            <div class="user-menu">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png/30x30" class="rounded-circle me-1" alt="Profile">
+                        <span th:text="${user.firstName}">User-Name</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <nav class="side-nav glass-panel">
+            <h6>ACTIVITY</h6>
+            <a href="/users/profile/reviews" class="active"><i class="fas fa-star"></i> Reviews</a>
+            <a href="/users/profile/photos"><i class="fas fa-camera"></i> Photos</a>
+            <a href="/users/profile/followers"><i class="fas fa-users"></i> Followers</a>
+            <a href="/users/profile/recently-viewed"><i class="fas fa-eye"></i> Recently Viewed</a>
+            <h6 class="mt-4">ONLINE ORDERING</h6>
+            <a href="/users/profile/addresses"><i class="fas fa-map-marker-alt"></i> My Addresses</a>
+            <h6 class="mt-4">PAYMENTS</h6>
+            <a href="/users/profile/manage-cards"><i class="fas fa-credit-card"></i> Manage Cards</a>
+            <h6 class="mt-4">TABLE BOOKING</h6>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="profile-card neu-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                    <img src="logo.jpg" alt="Profile Picture">
+                    <div>
+                        <h2 th:text="${user.fullName}">User-Full-Name</h2>
+                        <div class="stats-grid">
+                            <div class="stat-item neu-card">
+                                <strong th:text="${user.reviewsCount}">0</strong><br>Reviews
+                            </div>
+                            <div class="stat-item neu-card">
+                                <strong th:text="${user.photosCount}">0</strong><br>Photos
+                            </div>
+                            <div class="stat-item neu-card">
+                                <strong th:text="${user.followersCount}">0</strong><br>Followers
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="btn-action">Edit Profile</a>
+            </div>
+
+            <div class="content-card neu-card">
+                <h3 style="color: var(--primary); font-weight: 600; margin-bottom: 1.5rem;">Reviews</h3>
+                <img src="https://via.placeholder.com/100x100?text=📝" alt="No Reviews">
+                <p>No reviews yet</p>
+                <a href="/users/profile/select-restaurant" class="btn-action">Add Review</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer glass-panel">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 col-md-2">
+                    <h6>ABOUT TASTY TREAT EXPRESS</h6>
+                    <a href="#">Who We Are</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Work With Us</a>
+                    <a href="#">Investor Relations</a>
+                    <a href="#">Report Fraud</a>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>TASTY TREAT EXPRESS</h6>
+                    <a href="#">Tasty Treat Express</a>
+                    <a href="#">Blinkit</a>
+                    <a href="#">District</a>
+                    <a href="#">Feeding India</a>
+                    <a href="#">Hyperpure</a>
+                    <a href="#">Zomaland</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>FOR RESTAURANTS</h6>
+                    <a href="#">Partner With Us</a>
+                    <a href="#">Apps For You</a>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h6>LEARN MORE</h6>
+                    <a href="#">Privacy</a>
+                    <a href="#">Security</a>
+                    <a href="#">Terms</a>
+                </div>
+                <div class="col-12 col-md-4">
+                    <h6>SOCIAL LINKS</h6>
+                    <div class="social-links d-flex justify-content-center justify-content-md-start gap-3">
+                        <a href="#"><img src="https://via.placeholder.com/20x20?text=LinkedIn" alt="LinkedIn"></a>
+                        <a href="#"><img src="https://via.placeholder.com/20x20?text=Instagram" alt="Instagram"></a>
+                        <a href="#"><img src="https://via.placeholder.com/20x20?text=Twitter" alt="Twitter"></a>
+                        <a href="#"><img src="https://via.placeholder.com/20x20?text=YouTube" alt="YouTube"></a>
+                        <a href="#"><img src="https://via.placeholder.com/20x20?text=Facebook" alt="Facebook"></a>
+                    </div>
+                    <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-3">
+                        <a href="#"><img src="https://via.placeholder.com/100x30?text=App Store" alt="App Store"></a>
+                        <a href="#"><img src="https://via.placeholder.com/100x30?text=Google Play" alt="Google Play"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

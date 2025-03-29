@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.InvalidEnumValueException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
@@ -39,6 +41,99 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private EmailService emailService;
 
+    public enum PaymentMethods {
+        CREDIT_CARD("Credit Card"),
+        DEBIT_CARD("Debit Card"),
+        CASH("Cash On Delivery"),
+        PAYPAL("PayPal"),
+        STRIPE("Stripe"),
+        BANK_TRANSFER("Bank Transfer"),
+        APPLE_PAY("Apple Pay"),
+        PHONE_PAY("Phone Pay"),
+        WALLET("Wallet"),
+        GOOGLE_PAY("Google Pay"),
+        AMAZON_PAY("Amazon Pay"),
+        PAYTM("PayTM"),
+        CRYPTOCURRENCY("Cryptocurrency");
+
+        private final String method;
+
+        PaymentMethods(String method) {
+            this.method = method;
+        }
+
+        public String getMethod() {
+            return method;
+        }
+
+        public static boolean isValidMethod(String method) {
+            for (PaymentMethods value : values()) {
+                if (value.getMethod().equalsIgnoreCase(method)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    }
+
+    public enum OrderStatus {
+        PENDING("Pending"),
+        PROCESSING("Processing"),
+        COMPLETED("Completed"),
+        CANCELLED("Cancelled"),
+        DELIVERED("Delivered");
+
+        private final String status;
+
+        OrderStatus(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public static boolean isValidStatus(String status) {
+            for (OrderStatus value : values()) {
+                if (value.getStatus().equalsIgnoreCase(status)) {
+                    return true;
+
+                }
+
+            }
+
+            return false;
+        }
+    }
+
+    public enum PaymentStatus {
+        PENDING("Pending"),
+        COMPLETED("Completed"),
+        FAILED("Failed"),
+        CANCELED("Canceled"),
+        REFUNDED("Refunded");
+
+        private final String status;
+
+        PaymentStatus(String status) {
+            this.status = status;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public static boolean isValidStatus(String status) {
+            for (PaymentStatus paymentStatus : PaymentStatus.values()) {
+                if (paymentStatus.getStatus().equalsIgnoreCase(status)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
@@ -52,14 +147,14 @@ public class OrderServiceImpl implements OrderService {
 
         for (MenuItem menuItem : orderObj.getMenuItems()) {
             MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
-                    .orElseThrow(() -> new RuntimeException("MenuItem not found"));
+                    .orElseThrow(() -> new RuntimeException("MenuItem not found"));       
 
             logger.info("Checking stock for {}: Requested: {}, Available: {}", dbMenuItem.getName(),
                     menuItem.getQuantity(), dbMenuItem.getQuantity());
-            
-                if (menuItem.getQuantity() == null) {
-                    menuItem.setQuantity(1);
-                }
+
+            if (menuItem.getQuantity() == null) {
+                menuItem.setQuantity(1);
+            }
 
             if (dbMenuItem.getQuantity() < menuItem.getQuantity()) {
                 logger.error("Out of stock for {}: Requested: {}, Available: {}", dbMenuItem.getName(),
@@ -80,17 +175,32 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(customer);
         order.setRestaurant(restaurant);
         order.setTotalAmount(totalAmount);
-        order.setStatus("Pending");
+        order.setStatus(OrderStatus.PENDING.getStatus());
 
         String paymentMethod = orderObj.getPaymentMethod();
-        if (paymentMethod != null && !paymentMethod.equals("Cash-On-Delivery")) {
-           
-        	order.setPaymentStatus("Paid");
-            order.setTransactionId(UUID.randomUUID().toString()); // temporaryly added
-        } else {
-        	order.setPaymentStatus("Pending");
+        if (paymentMethod == null) {
+            throw new ReportNotFoundException("Payment method not specified in the order");
         }
-        
+
+        // try {
+        // PaymentMethods.valueOf(paymentMethod.toUpperCase());
+        // } catch (IllegalArgumentException e) {
+        // throw new InvalidEnumValueException("Invalid Payment Method: " +
+        // paymentMethod);
+        // }
+        PaymentMethods selectedPaymentMethod = PaymentMethods.CASH;
+        String methodName = selectedPaymentMethod.getMethod();
+
+        if (PaymentMethods.isValidMethod(paymentMethod)) {
+            if (!paymentMethod.equals(methodName)) {
+                order.setPaymentStatus(PaymentStatus.COMPLETED.getStatus());
+                order.setTransactionId(UUID.randomUUID().toString()); // temporaryly added
+            } else {
+                order.setPaymentStatus(PaymentStatus.PENDING.getStatus());
+            }
+        }else{
+            throw new InvalidEnumValueException("Invalid Payment Method: " + paymentMethod);
+        }
         order.setDeliveryAddress(orderObj.getDeliveryAddress());
         order.setOrderDate(LocalDateTime.now());
         order.setDeliveryTime(LocalDateTime.now().plusHours(2));
@@ -127,7 +237,7 @@ public class OrderServiceImpl implements OrderService {
         if (order.isPresent()) {
             return order.get();
         } else {
-            throw new RuntimeException("Order not found with id " + orderId);
+            throw new ReportNotFoundException("Order not found with id " + orderId);
         }
     }
 
@@ -149,6 +259,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Order updateOrderDeliveryTime(Long orderId, LocalDateTime deliveryTime) {
+
         Order order = getOrderById(orderId);
         order.setDeliveryTime(deliveryTime);
         return orderRepository.save(order);
@@ -363,19 +474,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order updateOrderStatus(Long orderId, String status) {
-        Order order = getOrderById(orderId);
-        order.setStatus(status);
-        Order updatedOrder = orderRepository.save(order);
-        try {
-            notificationService.sendNotification(order.getUser().getId(),
-                    "Your order status has been updated to: " + status);
-            emailService.sendSimpleMessage(order.getUser().getEmail(), "Order Update",
-                    "Your order status has been updated to: " + status);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        Order order = getOrderById(orderId);
+
+        if (OrderStatus.isValidStatus(status)) {
+            order.setStatus(status);
+            Order updatedOrder = orderRepository.save(order);
+            try {
+                notificationService.sendNotification(order.getUser().getId(),
+                        "Your order status has been updated to: " + status);
+                emailService.sendSimpleMessage(order.getUser().getEmail(), "Order Update",
+                        "Your order status has been updated to: " + status);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return updatedOrder;
+        } else {
+            // throw new RuntimeException("Invalid order status: " + status);
+            throw new InvalidEnumValueException("Invalid order status: " + status);
         }
-        return updatedOrder;
     }
 
     public Map<String, Object> getOrderAnalytics(String restaurantId, LocalDateTime startDate, LocalDateTime endDate) {
@@ -418,82 +536,3 @@ public class OrderServiceImpl implements OrderService {
     }
 
 }
-
-
-
-/*
- * @Override
- * 
- * @Transactional
- * public Order placeOrder(Long customerId, String restaurantId, List<MenuItem>
- * menuItems, String deliveryAddress, String paymentMethod) {
- * User customer = userRepository.findById(customerId)
- * .orElseThrow(() -> new RuntimeException("Customer not found"));
- * 
- * Restaurant restaurant = restaurantRepository.findById(restaurantId)
- * .orElseThrow(() -> new RuntimeException("Restaurant not found"));
- * 
- * 
- * for (MenuItem menuItem : menuItems) {
- * MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
- * .orElseThrow(() -> new RuntimeException("MenuItem not found"));
- * 
- * if (dbMenuItem.getQuantity() < menuItem.getQuantity()) {
- * throw new RuntimeException("Item " + dbMenuItem.getName() +
- * " is out of stock. Available quantity: " + dbMenuItem.getQuantity());
- * }
- * 
- * }
- * 
- * 
- * 
- * double totalAmount = 0.0;
- * for (MenuItem menuItem : menuItems) {
- * MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
- * .orElseThrow(() -> new RuntimeException("MenuItem not found"));
- * totalAmount += dbMenuItem.getPrice() * menuItem.getQuantity();
- * }
- * 
- * 
- * Order order = new Order();
- * order.setCustomer(customer);
- * order.setRestaurant(restaurant);
- * // order.setMenuItems(menuItems);
- * order.setTotalAmount(totalAmount);
- * order.setStatus("Pending");
- * order.setDeliveryAddress(deliveryAddress);
- * order.setPaymentMethod(paymentMethod);
- * order.setPaymentStatus("Pending");
- * order.setOrderDate(LocalDateTime.now());
- * order.setDeliveryTime(LocalDateTime.now().plusHours(2));
- * 
- * //--
- * List<MenuItem> managedMenuItems = menuItems.stream()
- * .map(menuItem -> menuItemRepository.findById(menuItem.getId())
- * .orElseThrow(() -> new RuntimeException("MenuItem not found")))
- * .collect(Collectors.toList());
- * 
- * order.setMenuItems(managedMenuItems);
- * 
- * Order savedOrder = orderRepository.save(order);
- * 
- * 
- * for (MenuItem menuItem : menuItems) {
- * MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
- * .orElseThrow(() -> new RuntimeException("MenuItem not found"));
- * 
- * int remainingQuantity = dbMenuItem.getQuantity() - menuItem.getQuantity();
- * 
- * 
- * dbMenuItem.setQuantity(remainingQuantity);
- * 
- * if (remainingQuantity == 0) {
- * dbMenuItem.setIsAvailable(false);
- * }
- * 
- * menuItemRepository.save(dbMenuItem);
- * }
- * 
- * return savedOrder;
- * }
- */

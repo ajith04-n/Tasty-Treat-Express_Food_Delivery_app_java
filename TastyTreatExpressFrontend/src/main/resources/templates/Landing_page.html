@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Treat Express</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-orange: #FF5722;
+            --soft-orange: #FF8A65;
+            --thyme-green: #388E3C;
+            --neutral-gray: #333333;
+            --soft-white: #F5F5F5;
+            --light-gray: #B0BEC5;
+            --dark-bg: #000000;
+            --dark-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --neu-shadow-light: #ffffff;
+            --neu-shadow-dark: #b2bec3;
+            --card-bg: linear-gradient(135deg, rgba(51, 51, 51, 0.9), rgba(30, 30, 30, 0.9));
+            --form-bg: #2a2a2a;
+            --form-input-bg: #3a3a3a;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--soft-white);
+            overflow-x: hidden;
+            background: var(--dark-bg);
+        }
+        .hero-bg {
+            background-image: url('/food.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+            opacity: 1;
+            z-index: 0;
+        }
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            padding: 0 2rem;
+            text-align: center;
+            z-index: 1;
+            color: var(--soft-white);
+        }
+        .hero-content input {
+            color: var(--neutral-gray);
+        }
+        .hero-content input::placeholder {
+            color: var(--light-gray);
+        }
+        .logo-text {
+            font-family: 'Monotype Corsiva', 'Lucida Handwriting', cursive;
+            font-size: 2.5rem;
+            color: var(--soft-white);
+            font-weight: bold;
+        }
+        .navbar {
+            background: var(--dark-bg);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        .navbar.scrolled {
+            background: var(--dark-bg);
+        }
+        .navbar .nav-links a {
+            color: var(--light-gray);
+            margin-left: 2rem;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            color: var(--soft-white);
+        }
+        /* Hamburger Menu Styles */
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--soft-white);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .hamburger:hover {
+            color: var(--primary-orange);
+        }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 75%;
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            transition: right 0.3s ease-in-out;
+        }
+        .mobile-menu.active {
+            right: 0;
+        }
+        .mobile-menu .close-menu {
+            align-self: flex-end;
+            font-size: 1.5rem;
+            color: var(--soft-white);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .mobile-menu .close-menu:hover {
+            color: var(--primary-orange);
+        }
+        .mobile-menu .nav-links-mobile {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .mobile-menu .nav-links-mobile a {
+            color: var(--light-gray);
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .mobile-menu .nav-links-mobile a:hover {
+            color: var(--soft-white);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay-container {
+            background: var(--form-bg);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+                        -8px -8px 16px rgba(80, 80, 80, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+            position: relative;
+            color: var(--soft-white);
+            backdrop-filter: blur(5px);
+            transition: box-shadow 0.3s ease;
+        }
+        .overlay-container:hover {
+            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.1),
+                        -4px -4px 12px rgba(255, 255, 255, 0.1);
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--soft-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            color: var(--primary-orange);
+        }
+        .tab-group {
+            display: flex;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            color: var(--light-gray);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        .tab-btn.active {
+            color: var(--primary-orange);
+        }
+        .tab-underline {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background: var(--primary-orange);
+            width: 50%;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:nth-child(1).active ~ .tab-underline {
+            left: 0;
+        }
+        .tab-btn:nth-child(2).active ~ .tab-underline {
+            left: 50%;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-content a {
+            color: var(--light-gray);
+        }
+        .tab-content a:hover {
+            color: var(--soft-white);
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-gray);
+            font-size: 1rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            background: var(--form-input-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--soft-white);
+            font-size: 1rem;
+            box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.3),
+                        inset -4px -4px 8px rgba(80, 80, 80, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-group input::placeholder {
+            color: rgba(245, 245, 245, 0.6);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4),
+                        inset -2px -2px 4px rgba(80, 80, 80, 0.2),
+                        0 0 8px rgba(255, 87, 34, 0.3);
+        }
+        .password-strength {
+            height: 4px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 5px;
+            border-radius: 2px;
+        }
+        .strength-weak { background: #ff4d4d; width: 33%; }
+        .strength-medium { background: #ffd700; width: 66%; }
+        .strength-strong { background: #00cc00; width: 100%; }
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .neu-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-orange);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3),
+                        -4px -4px 8px rgba(80, 80, 80, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .neu-btn:hover {
+            background: var(--soft-orange);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4),
+                        -2px -2px 4px rgba(80, 80, 80, 0.2);
+            transform: translateY(-2px);
+        }
+        .background-3d {
+            position: relative;
+            height: 500px;
+            background: #000;
+            overflow: hidden;
+        }
+        .background-3d .star {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 10s infinite;
+        }
+        .background-3d .line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            transform-origin: 0 0;
+            animation: rotate 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .neu-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+                        -8px -8px 16px rgba(80, 80, 80, 0.2);
+            transition: all 0.3s ease;
+            padding: 1rem;
+            text-align: center;
+            color: var(--soft-white);
+            backdrop-filter: blur(5px);
+            flex: 0 0 300px;
+            margin: 0 15px;
+            opacity: 0.7;
+            transform: scale(0.9);
+        }
+        .neu-card.active {
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5),
+                        -4px -4px 12px rgba(80, 80, 80, 0.3);
+            transform: scale(1);
+            opacity: 1;
+            flex: 0 0 350px;
+        }
+        .neu-card:hover:not(.active) {
+            transform: scale(0.95);
+            opacity: 0.85;
+        }
+        .neu-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .neu-card h5 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--soft-white);
+        }
+        .neu-card p {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+        }
+        .neu-card input {
+            color: var(--soft-white);
+        }
+        .neu-card input::placeholder {
+            color: rgba(245, 245, 245, 0.6);
+        }
+        .neu-card button {
+            color: var(--light-gray);
+            transition: color 0.3s ease;
+        }
+        .neu-card button:hover {
+            color: var(--soft-white);
+        }
+        .carousel-container {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: var(--light-gray);
+            font-size: 1.2rem;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3),
+                        -4px -4px 8px rgba(80, 80, 80, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+        .carousel-btn:hover {
+            color: var(--soft-white);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4),
+                        -2px -2px 4px rgba(80, 80, 80, 0.2);
+        }
+        .prev-btn {
+            left: 20px;
+        }
+        .next-btn {
+            right: 20px;
+        }
+        footer a {
+            color: var(--light-gray);
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: var(--soft-white);
+        }
+        footer input {
+            color: var(--neutral-gray);
+        }
+        footer input::placeholder {
+            color: var(--light-gray);
+        }
+        /* Search and Location Bar Styles */
+        .search-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-wrapper {
+            display: flex;
+            background-color: var(--soft-white);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 50px;
+            width: 63%;
+            overflow: hidden;
+        }
+        .location-box, .search-box {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            height: 100%;
+        }
+        .location-box {
+            width: 200px;
+            position: relative;
+        }
+        .location-box i {
+            color: #ff4d4f;
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        .location-box input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--neutral-gray);
+            width: 100%;
+            background: transparent;
+        }
+        .location-box::after {
+            content: "▼";
+            position: absolute;
+            right: 15px;
+            font-size: 12px;
+            color: var(--neutral-gray);
+            pointer-events: none;
+        }
+        .location-box::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 60%;
+            background-color: var(--light-gray);
+        }
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+        }
+        .search-box i {
+            color: var(--neutral-gray);
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--neutral-gray);
+            width: 100%;
+            background: transparent;
+        }
+        .search-box input::placeholder {
+            color: var(--light-gray);
+        }
+        @media (max-width: 768px) {
+            .neu-card {
+                flex: 0 0 250px;
+            }
+            .neu-card.active {
+                flex: 0 0 300px;
+            }
+            .neu-card img {
+                height: 150px;
+            }
+            .neu-card h5 {
+                font-size: 1rem;
+            }
+            .neu-card p {
+                font-size: 0.8rem;
+            }
+            .overlay-container {
+                padding: 1.5rem;
+            }
+            .tab-btn {
+                font-size: 1rem;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-wrapper {
+                width: 100%;
+                flex-direction: column;
+                height: auto;
+            }
+            .location-box, .search-box {
+                width: 100%;
+                max-width: none;
+                padding: 10px;
+            }
+            .location-box::before {
+                display: none;
+            }
+            .location-box::after {
+                right: 10px;
+            }
+            /* Mobile Navbar Styles */
+            .navbar {
+                padding: 1rem;
+            }
+            .logo-text {
+                font-size: 2rem;
+            }
+            .nav-links {
+                display: none;
+            }
+            .hamburger {
+                display: block;
+            }
+        }
+        @media (max-width: 480px) {
+            .neu-card {
+                flex: 0 0 200px;
+            }
+            .neu-card.active {
+                flex: 0 0 250px;
+            }
+            .neu-card img {
+                height: 120px;
+            }
+            .neu-card h5 {
+                font-size: 0.9rem;
+            }
+            .neu-card p {
+                font-size: 0.7rem;
+            }
+            .overlay-container {
+                padding: 1rem;
+                max-width: 90%;
+            }
+            .tab-btn {
+                font-size: 0.9rem;
+            }
+            .search-wrapper {
+                height: auto;
+            }
+            .location-box, .search-box {
+                height: 45px;
+            }
+            .location-box i, .search-box i {
+                font-size: 18px;
+            }
+            .location-box input, .search-box input {
+                font-size: 14px;
+            }
+            .logo-text {
+                font-size: 1.8rem;
+            }
+            .hamburger {
+                font-size: 1.3rem;
+            }
+            .mobile-menu {
+                width: 80%;
+            }
+            .mobile-menu .nav-links-mobile a {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="logo-text">Tasty Treat Express</div>
+        <div class="nav-links">
+            <a href="#" onclick="showLogin()">Login</a>
+            <a href="#" onclick="showRestaurant()">Partner with Us</a>
+        </div>
+        <div class="hamburger" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="close-menu" onclick="toggleMobileMenu()">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="nav-links-mobile">
+            <a href="#" onclick="showLogin(); toggleMobileMenu()">Login</a>
+            <a href="#" onclick="showRestaurant(); toggleMobileMenu()">Partner with Us</a>
+        </div>
+    </div>
+
+    <section class="hero-bg" id="heroSection">
+        <div class="hero-overlay" id="heroOverlay"></div>
+        <div class="hero-content">
+            <h1 class="text-5xl md:text-6xl font-bold text-primary-orange mb-4"><strong style="color: var(--primary-orange);">T</strong>asty <strong style="color: var(--primary-orange);">T</strong>reat <strong style="color: var(--primary-orange);">E</strong>xpress</h1>
+            <p class="text-2xl md:text-3xl font-semibold mb-6">Fast. Fresh. Flavorful.</p>
+            <p class="text-lg md:text-xl text-soft-white mb-8">Order your favorite meals, delivered in a snap!</p>
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <div class="location-box">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="locationInput" placeholder="Enter location">
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search restaurants or food">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="background-3d py-20">
+        <canvas class="absolute inset-0" id="top-picks-canvas"></canvas>
+        <div class="container mx-auto px-8 relative z-10">
+            <h2 class="text-4xl font-bold mb-10 text-white text-center">Our Top Picks in City</h2>
+            <div class="carousel-container">
+                <button class="carousel-btn prev-btn" onclick="moveSlide(-1)">❮</button>
+                <div class="carousel" id="restaurantCarousel">
+                    <div class="neu-card">
+                        <img src="https://via.placeholder.com/500x250?text=Restaurant+1" alt="Restaurant 1">
+                        <h5>Restaurant 1</h5>
+                        <p>Delicious meals with fast delivery.</p>
+                    </div>
+                    <div class="neu-card">
+                        <img src="https://via.placeholder.com/500x250?text=Pizza+Palace" alt="Pizza Palace">
+                        <h5>Pizza Palace</h5>
+                        <p>Best pizza in town with quick delivery.</p>
+                    </div>
+                    <div class="neu-card">
+                        <img src="https://via.placeholder.com/500x250?text=Restaurant+3" alt="Restaurant 3">
+                        <h5>Restaurant 3</h5>
+                        <p>Fresh and tasty options available.</p>
+                    </div>
+                    <div class="neu-card">
+                        <img src="https://via.placeholder.com/500x250?text=Restaurant+4" alt="Restaurant 4">
+                        <h5>Restaurant 4</h5>
+                        <p>Great food with quick service.</p>
+                    </div>
+                    <div class="neu-card">
+                        <img src="https://via.placeholder.com/500x250?text=Restaurant+5" alt="Restaurant 5">
+                        <h5>Restaurant 5</h5>
+                        <p>Delightful dining experience.</p>
+                    </div>
+                </div>
+                <button class="carousel-btn next-btn" onclick="moveSlide(1)">❯</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="background-3d py-20">
+        <canvas class="absolute inset-0" id="offers-canvas"></canvas>
+        <div class="container mx-auto text-center px-8 relative z-10">
+            <h2 class="text-4xl font-bold mb-10 text-white">Offers</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="neu-card">
+                    <h5>Discount Code</h5>
+                    <p>Use <strong>TASTY10</strong> for 10% off your next order!</p>
+                    <input type="text" placeholder="Enter code" class="w-full p-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-thyme-green">
+                    <button class="mt-2" onclick="alert('Code applied!')">Apply</button>
+                </div>
+                <div class="neu-card">
+                    <h5>Special Offer</h5>
+                    <p>Happy Hour: 20% off from 6-8 PM today!</p>
+                    <button class="mt-2" onclick="alert('Details viewed!')">View Details</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="background-3d py-20">
+        <canvas class="absolute inset-0" id="support-canvas"></canvas>
+        <div class="container mx-auto text-center px-8 relative z-10">
+            <h2 class="text-4xl font-bold mb-10 text-white">Customer Support</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="neu-card">
+                    <h5>Chat Support</h5>
+                    <p>Live chat available 24/7</p>
+                    <button class="mt-2" onclick="alert('Chat started!')">Start Chat</button>
+                </div>
+                <div class="neu-card">
+                    <h5>Call Us</h5>
+                    <p>+1-555-987-6543</p>
+                    <button class="mt-2" onclick="alert('Calling now!')">Call Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12" style="background: var(--dark-gradient);">
+        <div class="container mx-auto text-white relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 px-8">
+                <div>
+                    <a href="/" class="footer-logo text-soft-white text-2xl font-bold">Tasty Treat Express</a>
+                    <p class="mt-4 text-lg">Fast. Fresh. Flavorful.</p>
+                </div>
+                <div class="flex flex-col space-y-4 text-lg">
+                    <a href="/about">About</a>
+                    <a href="/contact">Contact</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/privacy">Privacy</a>
+                </div>
+                <div>
+                    <input type="email" placeholder="Subscribe" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange">
+                    <a href="#" class="mt-4 inline-block">Subscribe</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="overlay login-overlay" id="loginOverlay">
+        <div class="overlay-container">
+            <span class="close-btn" onclick="hideLogin()">×</span>
+            <div class="tab-group">
+                <button class="tab-btn active" onclick="showTab('login', 'loginOverlay')">Login</button>
+                <button class="tab-btn" onclick="showTab('register', 'loginOverlay')">Register</button>
+                <div class="tab-underline"></div>
+            </div>
+            <div class="tab-content active" id="login">
+                <h2 class="text-2xl font-bold text-soft-white mb-6 text-center">Welcome Back</h2>
+                <form th:action="@{/signin}" method="post" onsubmit="return validateUserLogin()">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="user-login-password" placeholder="Password" name="password" required>
+                    </div>
+                    <a href="#" class="text-sm block text-right mb-4">Forgot Password?</a>
+                    <button type="submit" class="neu-btn">Sign In</button>
+                </form>
+            </div>
+            <div class="tab-content" id="register">
+                <h2 class="text-2xl font-bold text-soft-white mb-6 text-center">Join Us</h2>
+                <form th:action="@{/signup}" method="post" onsubmit="return validateUserSignup()">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Name" name="name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="user-signup-password" placeholder="Password" name="password" required oninput="checkPasswordStrength(this, 'user-signup-strength')">
+                        <div id="user-signup-strength" class="password-strength"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="user-signup-confirm" placeholder="Confirm Password" required oninput="checkPasswordMatch('user-signup-password', this, 'user-signup-error')">
+                        <div id="user-signup-error" class="error-message">Passwords do not match</div>
+                    </div>
+                    <button type="submit" class="neu-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay restaurant-overlay" id="restaurantOverlay">
+        <div class="overlay-container">
+            <span class="close-btn" onclick="hideRestaurant()">×</span>
+            <div class="tab-group">
+                <button class="tab-btn active" onclick="showTab('restaurant-login', 'restaurantOverlay')">Login</button>
+                <button class="tab-btn" onclick="showTab('restaurant-register', 'restaurantOverlay')">Register</button>
+                <div class="tab-underline"></div>
+            </div>
+            <div class="tab-content active" id="restaurant-login">
+                <h2 class="text-2xl font-bold text-soft-white mb-6 text-center">Restaurant Sign In</h2>
+                <form th:action="@{/restaurant/signin}" method="post" onsubmit="return validateRestaurantLogin()">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="restaurant-login-password" placeholder="Password" name="password" required>
+                    </div>
+                    <a href="#" class="text-sm block text-right mb-4">Forgot Password?</a>
+                    <button type="submit" class="neu-btn">Sign In</button>
+                </form>
+            </div>
+            <div class="tab-content" id="restaurant-register">
+                <h2 class="text-2xl font-bold text-soft-white mb-6 text-center">Partner with Us</h2>
+                <form th:action="@{/restaurant/signup}" method="post" onsubmit="return validateRestaurantSignup()">
+                    <div class="input-group">
+                        <i class="fas fa-store"></i>
+                        <input type="text" placeholder="Business Name" name="businessName" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="restaurant-signup-password" placeholder="Password" name="password" required oninput="checkPasswordStrength(this, 'restaurant-signup-strength')">
+                        <div id="restaurant-signup-strength" class="password-strength"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="restaurant-signup-confirm" placeholder="Confirm Password" required oninput="checkPasswordMatch('restaurant-signup-password', this, 'restaurant-signup-error')">
+                        <div id="restaurant-signup-error" class="error-message">Passwords do not match</div>
+                    </div>
+                    <button type="submit" class="neu-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const heroOverlay = document.getElementById('heroOverlay');
+            const heroSection = document.getElementById('heroSection');
+            const scrollPosition = window.scrollY;
+
+            if (scrollPosition > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            const heroHeight = heroSection.offsetHeight;
+            const fadeEnd = heroHeight * 0.7;
+
+            if (scrollPosition <= fadeEnd) {
+                const opacity = 1 - (scrollPosition / fadeEnd);
+                heroOverlay.style.opacity = Math.max(0, Math.min(1, opacity));
+            } else {
+                heroOverlay.style.opacity = '0';
+            }
+        });
+
+        function showOverlay(overlayId) {
+            document.getElementById(overlayId).style.display = 'flex';
+        }
+        function hideOverlay(overlayId) {
+            document.getElementById(overlayId).style.display = 'none';
+        }
+        const showLogin = () => showOverlay('loginOverlay');
+        const hideLogin = () => hideOverlay('loginOverlay');
+        const showRestaurant = () => showOverlay('restaurantOverlay');
+        const hideRestaurant = () => hideOverlay('restaurantOverlay');
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        function showTab(tab, context) {
+            const tabs = document.querySelectorAll(`#${context} .tab-content`);
+            const btns = document.querySelectorAll(`#${context} .tab-btn`);
+            tabs.forEach(t => t.classList.remove('active'));
+            btns.forEach(b => b.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.querySelector(`#${context} .tab-btn[onclick="showTab('${tab}', '${context}')"]`).classList.add('active');
+        }
+
+        function checkPasswordStrength(input, strengthId) {
+            const password = input.value;
+            const strengthBar = document.getElementById(strengthId);
+            strengthBar.className = 'password-strength';
+            if (password.length < 8) {
+                strengthBar.classList.add('strength-weak');
+            } else if (password.length < 12 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+                strengthBar.classList.add('strength-medium');
+            } else {
+                strengthBar.classList.add('strength-strong');
+            }
+        }
+
+        function checkPasswordMatch(passwordId, confirmInput, errorId) {
+            const password = document.getElementById(passwordId).value;
+            const confirmPassword = confirmInput.value;
+            const errorMessage = document.getElementById(errorId);
+            if (password !== confirmPassword) {
+                errorMessage.style.display = 'block';
+                return false;
+            } else {
+                errorMessage.style.display = 'none';
+                return true;
+            }
+        }
+
+        function validateUserLogin() {
+            return document.getElementById('user-login-password').value.length >= 8;
+        }
+
+        function validateUserSignup() {
+            const password = document.getElementById('user-signup-password').value;
+            const confirmPassword = document.getElementById('user-signup-confirm').value;
+            return password.length >= 8 && checkPasswordMatch('user-signup-password', document.getElementById('user-signup-confirm'), 'user-signup-error');
+        }
+
+        function validateRestaurantLogin() {
+            return document.getElementById('restaurant-login-password').value.length >= 8;
+        }
+
+        function validateRestaurantSignup() {
+            const password = document.getElementById('restaurant-signup-password').value;
+            const confirmPassword = document.getElementById('restaurant-signup-confirm').value;
+            return password.length >= 8 && checkPasswordMatch('restaurant-signup-password', document.getElementById('restaurant-signup-confirm'), 'restaurant-signup-error');
+        }
+
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.neu-card');
+        const carousel = document.getElementById('restaurantCarousel');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            const containerWidth = document.querySelector('.carousel-container').offsetWidth;
+            const activeSlideWidth = 350;
+            const inactiveSlideWidth = 300;
+            const margin = 15;
+            const offset = -(currentSlide * (inactiveSlideWidth + margin * 2)) + (containerWidth - activeSlideWidth) / 2;
+
+            carousel.style.transform = `translateX(${offset}px)`;
+
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function moveSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            updateSlide();
+        }
+
+        let autoSlide = setInterval(() => moveSlide(1), 5000);
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseover', () => clearInterval(autoSlide));
+        carouselContainer.addEventListener('mouseout', () => autoSlide = setInterval(() => moveSlide(1), 5000));
+
+        // Debounce function to limit how often the search function is called
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Search function to handle the search logic
+        function performSearch() {
+            const location = document.getElementById('locationInput').value.trim();
+            const query = document.getElementById('searchInput').value.trim();
+
+            // Only perform the search if at least one field has a value
+            if (location || query) {
+                console.log(`Searching for "${query}" in "${location}"`);
+                alert(`Searching for "${query}" in "${location}"`);
+                // In a real application, you would make an API call here, e.g.:
+                // fetch(`/search?location=${encodeURIComponent(location)}&query=${encodeURIComponent(query)}`)
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         // Update the UI with search results
+                //     });
+            }
+        }
+
+        // Debounced search function (wait 500ms after the user stops typing)
+        const debouncedSearch = debounce(performSearch, 500);
+
+        // Add event listeners to the inputs
+        window.onload = () => {
+            initBackground('top-picks-canvas');
+            initBackground('offers-canvas');
+            initBackground('support-canvas');
+            updateSlide();
+            window.addEventListener('resize', updateSlide);
+
+            // Add input event listeners for automatic search
+            const locationInput = document.getElementById('locationInput');
+            const searchInput = document.getElementById('searchInput');
+
+            locationInput.addEventListener('input', debouncedSearch);
+            searchInput.addEventListener('input', debouncedSearch);
+        };
+
+        function initBackground(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = 500;
+
+            const stars = [];
+            const lines = [];
+
+            for (let i = 0; i < 50; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.2 + 0.1
+                });
+            }
+
+            for (let i = 0; i < 20; i++) {
+                lines.push({
+                    x1: canvas.width / 2,
+                    y1: canvas.height / 2,
+                    x2: Math.random() * canvas.width,
+                    y2: Math.random() * canvas.height,
+                    length: Math.random() * 200 + 50
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fill();
+                    star.y -= star.speed;
+                    if (star.y < 0) star.y = canvas.height;
+                });
+
+                lines.forEach(line => {
+                    ctx.beginPath();
+                    ctx.moveTo(line.x1, line.y1);
+                    const angle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
+                    const endX = line.x1 + Math.cos(angle) * line.length;
+                    const endY = line.y1 + Math.sin(angle) * line.length;
+                    ctx.lineTo(endX, endY);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = 500;
+            });
+        }
+    </script>
+</body>
+</html>

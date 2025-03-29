@@ -69,5 +69,40 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadRequest(BadRequestException ex, WebRequest request) {
         return new ResponseEntity<>(new ErrorResponse("Bad request", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
+
     
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(DuplicateMenuItemException.class)
+    public ResponseEntity<String> handleDuplicateMenuItem(DuplicateMenuItemException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReportNotFoundException(ReportNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("NOT_FOUND", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OrderValidationException.class)
+    public ResponseEntity<ErrorResponse> handleOrderValidationException(OrderValidationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("Invalid Order", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // order not found exception
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("NOT_FOUND", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidEnumValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("Invalid Enum Value", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 }

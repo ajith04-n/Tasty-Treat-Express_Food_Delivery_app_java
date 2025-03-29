@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Orders</title>
+    <style>
+                
+      /* Reset styles */
+      body,
+      h1,
+      ul,
+      li,
+      a {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+        list-style: none;
+        text-decoration: none;
+        text-align: center;
+      }
+
+      /* Navbar styles */
+      .navbar {
+        display: flex;
+        align-items: center;
+        padding: 15px 40px;
+        border-bottom: 2px solid #d50000;
+        background-color: #ffffff;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .logo {
+        color: #d50000;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links li {
+        position: relative;
+      }
+
+      .nav-links a {
+        color: #d50000;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 10px 15px;
+        display: block;
+        transition: background 0.3s;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+      }
+
+      /* Dropdown menu */
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        background: white;
+        top: 40px;
+        left: 0;
+        min-width: 150px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+
+      .dropdown-menu li {
+        border-bottom: 1px solid #ddd;
+      }
+
+      .dropdown-menu li:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-menu a {
+        color: #333;
+        padding: 10px;
+        display: block;
+      }
+
+      .dropdown-menu a:hover {
+        background: #f1f1f1;
+      }
+
+      /* Show dropdown on hover */
+      .dropdown:hover .dropdown-menu {
+        display: block;
+      }
+
+      /* Mobile menu button */
+      .menu-toggle {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #d50000;
+      }
+
+      /* Centered container */
+      .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+        padding-top: 80px;
+        text-align: center;
+      }
+
+      .option {
+        font-size: 22px;
+        margin: 20px 0;
+        padding: 10px;
+        transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        cursor: pointer;
+      }
+
+      .option:hover {
+        color: #d50000;
+        transform: scale(1.1);
+      }
+
+      /* Button Styling */
+      button {
+        background-color: #d50000;
+        color: white;
+        font-size: 16px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        font-weight: bold;
+        box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        background-color: #a30000;
+        transform: scale(1.05);
+      }
+
+	        /* Footer */
+	        footer {
+	    background-color: #ffffff;
+	    color: #d50000;
+	    padding: 10px 0;
+	    text-align: center;
+	    width: 100%;
+	    position: relative;
+	    bottom: 0;
+	  }
+
+	  .footer-container {
+	    display: flex;
+	    justify-content: center; /* Ensures all content is centered */
+	    flex-wrap: wrap;
+	    max-width: 1200px;
+	    margin: 0 auto;
+	  }
+
+	  .footer-info {
+	    text-align: center; /* Ensures text is centered */
+	    width: 100%;
+	    font-size: 14px;
+	  }
+
+
+	        .footer-links h3,
+	        .footer-social h3 {
+	          margin-bottom: 10px;
+	        }
+
+	        .footer-links ul,
+	        .footer-social ul {
+	          list-style-type: none;
+	          padding: 0;
+	        }
+
+	        .footer-links a,
+	        .footer-social a {
+	          color: #000000;
+	          text-decoration: none;
+	        }
+
+	        .footer-links a:hover,
+	        .footer-social a:hover {
+	          text-decoration: underline;
+	          color: #d50000;
+	        }
+
+	        /* Responsive Design */
+	        @media (max-width: 768px) {
+	          .navbar {
+	            flex-direction: column;
+	            padding: 10px;
+	          }
+
+	          .nav-links {
+	            flex-direction: column;
+	            display: none;
+	            width: 100%;
+	            text-align: center;
+	          }
+
+	          .nav-links.active {
+	            display: flex;
+	          }
+
+	          .menu-toggle {
+	            display: block;
+	          }
+
+	          .container {
+	            width: 95%;
+	          }
+
+	          .footer-container {
+	            flex-direction: column;
+	            align-items: center;
+	          }
+	          
+	        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #d50000;
+            color: white;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgb(241, 233, 233);
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e8acac;
+            text-align: center;
+          
+        }
+        th {
+            background-color: #c5cacf;
+            color: white;
+           
+           
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .status.COMPLETED {
+            color: green;
+        }
+        .status.PENDING {
+            color: orange;
+        }
+        .status.CANCELLED {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Tasty Treat Express</div>
+        <span class="menu-toggle" onclick="toggleMenu()">☰</span>
+        <ul class="nav-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Menu</a></li>
+          <li><a href="#">Cart</a></li>
+          <li class="dropdown">
+            <a href="#">Admin ▼</a>
+            <ul class="dropdown-menu">
+              <li><a href="/admin/dashboard">Dashboard</a></li>
+              <li><a href="/reports/create">Create Report</a></li>
+              <li><a href="/reports/view">Manage Report</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    <div class="container">
+        <h1>User Orders</h1>
+
+        <!-- Search Orders by User ID -->
+        <form method="get" action="#" th:action="@{/api/orders/user/{userId}(userId=${userId})}">
+            <label>Enter User ID:</label>
+            <input type="number" name="userId" required />
+            <button type="submit">Fetch Orders</button>
+        </form>
+
+        <!-- Display Orders -->
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Order Name</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+                <th>Restaurant ID</th>
+                <th>Most Ordered Item</th>
+                <th>User ID</th>
+                <th>Order Date</th>
+            </tr>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.orderName}"></td>
+                <td th:text="${order.status}" th:classappend="'status ' + ${order.status}"></td>
+                <td th:text="${order.totalAmount}"></td>
+                <td th:text="${order.restaurantId}"></td>
+                <td th:text="${order.mostOrderedItem}"></td>
+                <td th:text="${order.userId}"></td>
+                <td th:text="${order.orderDate}"></td>
+            </tr>
+        </table>
+    </div>
+    <footer>
+        <div class="footer-container">
+          <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#about">About Us</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#contact">Contact</a></li>
+              <li><a href="#privacy">Privacy Policy</a></li>
+            </ul>
+          </div>
+          <div class="footer-info">
+            <p>&copy; 2025 TastyTreatExpress. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+</body>
+</html>

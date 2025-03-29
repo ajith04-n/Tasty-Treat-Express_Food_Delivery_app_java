@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.tastyTreatExpress.DTO.MenuItemDTO;
 import com.tastyTreatExpress.DTO.MenuItemMapper;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.DuplicateMenuItemException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.services.MenuItemService;
@@ -24,8 +26,24 @@ public class MenuItemController {
     // Add a menu item
     @PostMapping("/add/{restaurantId}")
     public ResponseEntity<MenuItemDTO> addMenuItem(@PathVariable String restaurantId, @RequestBody MenuItem menuItem) {
+        if (restaurantId == null || restaurantId.isEmpty()) {
+            throw new ReportNotFoundException("Restaurant does not exist with the given Id.");
+        }
+        if (menuItem.getPrice() < 0) {
+            throw new IllegalArgumentException("Price of menu item cannot be negative.");
+        }
+        if (menuItem.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantity of menu item cannot be negative.");
+        }
+        if (menuItem.getName() == null || menuItem.getName().isEmpty()) {
+            throw new IllegalArgumentException("Menu item name cannot be empty.");
+        }
+        if (menuItemService.existsByNameAndRestaurantId(menuItem.getName(), restaurantId)) {
+            throw new DuplicateMenuItemException("Menu item with this name already exists in this restaurant.");
+        }
         MenuItem createdMenuItem = menuItemService.addMenuItem(restaurantId, menuItem);
         MenuItemDTO createdMenuItemDTO = MenuItemMapper.toMenuItemDTO(createdMenuItem);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMenuItemDTO);
     }
 
@@ -43,6 +61,12 @@ public class MenuItemController {
     // Get a menu item by ID
     @GetMapping("/{id}")
     public ResponseEntity<MenuItemDTO> getMenuItemById(@PathVariable long id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Menu item ID must be positive.");
+        }
+        if (!menuItemService.existsById(id)) {
+            throw new ReportNotFoundException("Menu item not found with the given ID: "+id);
+        }
         MenuItem menuItem = menuItemService.getMenuItemById(id);
         if (menuItem != null) {
             MenuItemDTO menuItemDTO = MenuItemMapper.toMenuItemDTO(menuItem);
@@ -65,6 +89,12 @@ public class MenuItemController {
     // Get menu items by restaurant
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<List<MenuItemDTO>> getMenuItemsByRestaurant(@PathVariable String restaurantId) {
+        if (restaurantId == null || restaurantId.isEmpty()) {
+            throw new ReportNotFoundException("Restaurant does not exist with the given Id.");
+        }
+        if (!menuItemService.existsByRestaurantId(restaurantId)) {
+            throw new ReportNotFoundException("No menu items found for this restaurant.");
+        }
         List<MenuItem> menuItems = menuItemService.getAllMenuItemsByRestaurant(restaurantId);
         List<MenuItemDTO> menuItemDTOs = menuItems.stream()
                 .map(MenuItemMapper::toMenuItemDTO)
@@ -75,6 +105,18 @@ public class MenuItemController {
     // Update a menu item
     @PutMapping("/update")
     public ResponseEntity<MenuItemDTO> updateMenuItem(@RequestBody MenuItem menuItem) {
+        if (menuItem == null) {
+            throw new IllegalArgumentException("Menu item cannot be null.");
+        }
+        if (menuItem.getId() <= 0) {
+            throw new IllegalArgumentException("Menu item ID must be positive.");
+        }
+        if (menuItem.getPrice() < 0) {
+            throw new IllegalArgumentException("Price of menu item cannot be negative.");
+        }
+        if (menuItem.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantity of menu item cannot be negative.");
+        }
         MenuItem updatedMenuItem = menuItemService.updateMenuItem(menuItem);
         MenuItemDTO updatedMenuItemDTO = MenuItemMapper.toMenuItemDTO(updatedMenuItem);
         return ResponseEntity.ok(updatedMenuItemDTO);
@@ -84,6 +126,21 @@ public class MenuItemController {
     @PutMapping("/update-qnty")
     public ResponseEntity<MenuItemDTO> updateMenuItemQnty(@RequestBody MenuItem menuItem,
             @RequestParam int quantity) {
+        if (menuItem == null) {
+            throw new IllegalArgumentException("Menu item cannot be null.");
+        }
+        if (menuItem.getId() <= 0) {
+            throw new IllegalArgumentException("Menu item ID must be positive.");
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity of menu item cannot be negative.");
+        }
+        if (!menuItemService.existsById(menuItem.getId())) {
+            throw new ReportNotFoundException("Menu item not found with the given ID: "+menuItem.getId());
+        }
+        if (!menuItemService.existsByNameAndRestaurantId(menuItem.getName(), menuItem.getRestaurant().getRestaurantId())) {
+            throw new ReportNotFoundException("Menu item not found with the given name and restaurant ID.");
+        }
         MenuItem updatedMenuItem = menuItemService.updateMenuItemQnty(menuItem, quantity);
         MenuItemDTO updatedMenuItemDTO = MenuItemMapper.toMenuItemDTO(updatedMenuItem);
         return ResponseEntity.ok(updatedMenuItemDTO);
@@ -92,6 +149,12 @@ public class MenuItemController {
     // Delete a menu item
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteMenuItem(@PathVariable long id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Menu item ID must be positive.");
+        }
+        if (!menuItemService.existsById(id)) {
+            throw new ReportNotFoundException("Menu item not found with the given ID: "+id);
+        }
         menuItemService.deleteMenuItem(id);
         return ResponseEntity.noContent().build();
     }

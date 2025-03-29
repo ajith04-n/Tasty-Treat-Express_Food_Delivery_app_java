@@ -17,25 +17,28 @@ public class Feedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedbackId;
 
-    @ManyToOne
+    
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     // @JsonBackReference("feedbackUserReference")
     @JsonIgnoreProperties("feedbacks")
     private User user;
 
-    @ManyToOne
+    
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", referencedColumnName = "orderId", nullable = false)
     // @JsonBackReference("feedbackOrderReference")
     @JsonIgnoreProperties("feedbacks")
     private Order orders;
 
-    @ManyToOne
+    //@ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId", nullable = false)
     // @JsonBackReference("feedbackRestaurantReference")
     @JsonIgnoreProperties("feedbacks")
     private Restaurant restaurant;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_item_id", referencedColumnName = "menu_id", nullable = true)
     // @JsonBackReference("feedbackMenuItemReference")
     @JsonIgnoreProperties("feedbacks")

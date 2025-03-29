@@ -53,4 +53,10 @@ public class MenuItemMapper {
 
         return menuItem;
     }
+
+    public static List<MenuItemDTO> toMenuItemDTOList(List<MenuItem> menuItems) {
+        return menuItems.stream()
+                .map(MenuItemMapper::toMenuItemDTO)
+                .collect(Collectors.toList());
+    }
 }

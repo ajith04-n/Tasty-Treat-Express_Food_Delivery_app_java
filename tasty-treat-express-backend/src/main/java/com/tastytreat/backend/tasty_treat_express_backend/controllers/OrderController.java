@@ -2,7 +2,10 @@ package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.management.relation.RelationNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,9 +14,16 @@ import org.springframework.web.bind.annotation.*;
 
 import com.tastyTreatExpress.DTO.OrderDTO;
 import com.tastyTreatExpress.DTO.OrderMapper;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.InvalidEnumValueException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.OrderNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.OrderValidationException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.services.OrderService;
+import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantService;
+import com.tastytreat.backend.tasty_treat_express_backend.services.UserService;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -21,21 +31,46 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RestaurantService restaurantService;
 
-    // Place an order
+    // // Place an order
     @PostMapping("/placeOrder/{userId}/{restaurantId}")
     public ResponseEntity<OrderDTO> placeOrder(
             @PathVariable Long userId,
             @PathVariable String restaurantId,
             @RequestBody Order orderobj) {
-        try {
-            Order placedOrder = orderService.placeOrder(userId, restaurantId, orderobj);
-            OrderDTO placedOrderDTO = OrderMapper.toOrderDTO(placedOrder);
-            return ResponseEntity.status(HttpStatus.CREATED).body(placedOrderDTO);
-        } catch (RuntimeException e) {
-        	 System.out.println(e.getMessage().toString());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+        if (userId == null || !userService.existsById(userId)) {
+            throw new UserNotFoundException("User not found with id " + userId);
         }
+
+        if (restaurantId == null || !restaurantService.existsById(restaurantId)) {
+            throw new ReportNotFoundException("Restaurant not found with id " + restaurantId);
+        }
+
+        if (orderobj == null || orderobj.getMenuItems().isEmpty()) {
+            throw new OrderValidationException("Order must contain at least one item.");
+        }
+
+        if (orderobj.getPaymentMethod() == null) {
+            throw new OrderValidationException("Payment method is required.");
+        }
+
+        for (MenuItem item : orderobj.getMenuItems()) {
+            if (item.getId() == null || item.getQuantity() <= 0) {
+                throw new OrderValidationException("Invalid menu item: " + item);
+            }
+        }
+        if (orderobj.getDeliveryAddress() == null || orderobj.getDeliveryAddress().isEmpty()) {
+            throw new OrderValidationException("Delivery address is required.");
+        }
+
+        Order placedOrder = orderService.placeOrder(userId, restaurantId, orderobj);
+        OrderDTO placedOrderDTO = OrderMapper.toOrderDTO(placedOrder);
+        return ResponseEntity.status(HttpStatus.CREATED).body(placedOrderDTO);
     }
 
     // Retrieve order by ID
@@ -78,16 +113,16 @@ public class OrderController {
         }
     }
 
-    // Update order status
     @PutMapping("/updateStatus/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
-        try {
-            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
-            OrderDTO updatedOrderDTO = OrderMapper.toOrderDTO(updatedOrder);
-            return ResponseEntity.ok(updatedOrderDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+       
+        Order order = orderService.getOrderById(orderId);
+        if (order == null) {
+            throw new OrderNotFoundException("Order not found with id " + orderId);
         }
+        Order updatedOrder = orderService.updateOrderStatus(orderId, status.toUpperCase());
+        OrderDTO orderDTO = OrderMapper.toOrderDTO(updatedOrder);
+        return ResponseEntity.ok(orderDTO);
     }
 
     // Update delivery time for an order
