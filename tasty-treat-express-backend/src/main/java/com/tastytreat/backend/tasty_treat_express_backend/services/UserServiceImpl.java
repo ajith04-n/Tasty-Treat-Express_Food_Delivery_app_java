@@ -15,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
+import com.tastyTreatExpress.DTO.UserDTO;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.*;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
@@ -62,9 +65,16 @@ public class UserServiceImpl implements UserService {
         return user.get();
     }
 
-    public User saveUser(@Valid User user) {
+    public User saveUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("User with this email already exists!");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to save user, please try again later.");
+        }
     }
 
     public boolean existsByEmail(String email) {
@@ -79,8 +89,25 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId).orElse(null);
     }
 
-    public User updateUser(@Valid User user) {
-        return userRepository.save(user);
+    public User updateUser(Long userId, @Valid User userDTO) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        if (userDTO.getName() != null)
+            existingUser.setName(userDTO.getName());
+        if (userDTO.getEmail() != null)
+            existingUser.setEmail(userDTO.getEmail());
+        if (userDTO.getPassword() != null)
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        if (userDTO.getPhoneNumber() != null)
+            existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.getAddress() != null)
+            existingUser.setAddress(userDTO.getAddress());
+        try {
+            return userRepository.save(existingUser);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update user, please try again later.");
+        }
     }
 
     public void updateUserAddress(long userId, String newAddress) {
@@ -95,9 +122,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-                if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-                    throw new RuntimeException("Incorrect old password");
-                }
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Incorrect old password");
+        }
         if (newPassword.length() < 6) {
             throw new RuntimeException("Password must be at least 6 characters long.");
         }
@@ -111,16 +138,19 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-       // userRepository.updateUserPassword(userId, newPassword);
+        // userRepository.updateUserPassword(userId, newPassword);
         logger.info("Updated password for User ID: {}", userId);
     }
 
-    public void deleteUser(long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found with ID: " + id);
+    public void deleteUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        try {
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to delete user, please try again later.");
         }
-        userRepository.deleteById(id);
-        logger.info("Deleted User ID: {}", id);
     }
 
     @Override
@@ -210,7 +240,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsById(Long userId) {
-       return userRepository.existsById(userId);
+        return userRepository.existsById(userId);
+    }
+
+    public void updateUserPassword(long userId, PasswordUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Old password is incorrect!");
+        }
+        if (request.getNewPassword().length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters long.");
+        }
+        
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update password, please try again later.");
+        }
     }
 
 }

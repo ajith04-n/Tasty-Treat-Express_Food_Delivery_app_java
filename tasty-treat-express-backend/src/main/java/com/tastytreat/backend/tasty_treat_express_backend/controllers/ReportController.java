@@ -1,9 +1,9 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
-
 import com.tastyTreatExpress.DTO.ReportDTO;
 import com.tastyTreatExpress.DTO.ReportMapper;
 import com.tastyTreatExpress.DTO.ReportRequest;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.services.ReportService;
 
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,7 @@ public class ReportController {
     public ResponseEntity<ReportDTO> generateReport(
             @RequestBody ReportRequest request,
             @PathVariable String reportType) {
-    	
+
         Report report = reportService.saveReport(request, reportType);
         ReportDTO reportDTO = ReportMapper.toReportDTO(report);
         return ResponseEntity.status(HttpStatus.CREATED).body(reportDTO);
@@ -60,19 +62,37 @@ public class ReportController {
         return ResponseEntity.ok(reportDTOs);
     }
 
-    // Get Reports by Criteria (Date Range, Type, Pagination)
-    @GetMapping("/criteria")
+    @GetMapping("/criteria/{startDate}/{endDate}/{reportType}/{page}/{size}")
     public ResponseEntity<List<ReportDTO>> getReportsByCriteria(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate,
-            @RequestParam String reportType,
-            @RequestParam int page,
-            @RequestParam int size) {
-        List<Report> reports = reportService.getReportsByCriteria(startDate, endDate, reportType, page, size);
-        List<ReportDTO> reportDTOs = reports.stream()
-                .map(ReportMapper::toReportDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(reportDTOs);
+            @PathVariable String startDate,
+            @PathVariable String endDate,
+            @PathVariable String reportType,
+            @PathVariable int page,
+            @PathVariable int size) {
+
+        try {
+            LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+            LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+            if (start.isAfter(end)) {
+                throw new InvalidInputException("Start date cannot be after end date.");
+            }
+
+            List<Report> reports = reportService.getReportsByCriteria(start, end, reportType, page, size);
+
+            if (reports.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            List<ReportDTO> reportDTOs = reports.stream()
+                    .map(ReportMapper::toReportDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(reportDTOs);
+
+        } catch (DateTimeParseException e) {
+            throw new InvalidInputException("Invalid date format. Use YYYY-MM-DD.");
+        }
     }
 
     // Update a Report
@@ -88,8 +108,12 @@ public class ReportController {
     // Delete a Report by ID
     @DeleteMapping("/{reportId}")
     public ResponseEntity<String> deleteReport(@PathVariable Long reportId) {
-        reportService.deleteReport(reportId);
-        return ResponseEntity.ok("Report deleted successfully.");
+        try {
+            reportService.deleteReport(reportId);
+            return ResponseEntity.ok("Report deleted successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report not found.");
+        }
     }
 
     // Delete All Reports
@@ -112,21 +136,26 @@ public class ReportController {
     }
 
     // Send Report via Email
-    @PostMapping("/send-report")
+    @PostMapping("/send-report/{email}/{reportFormat}")
     public ResponseEntity<String> sendReport(
-            @RequestParam String email,
-            @RequestParam String reportFormat) throws IOException {
-        List<Report> reports = reportService.getAllReports();
+            @PathVariable String email,
+            @PathVariable String reportFormat) throws IOException {
 
-        String fileName = "reports." + reportFormat;
-        if ("csv".equalsIgnoreCase(reportFormat)) {
-            String csvData = reportService.exportReportsToCSV(reports);
-            reportService.sendReportByEmail(email, "Your Reports", "Please find the attached report.",
-                    csvData.getBytes(), fileName);
-        } else {
-            return ResponseEntity.badRequest().body("Invalid report format. Use 'csv' or 'pdf'.");
+        if (!email.contains("@")) {
+            throw new InvalidInputException("Invalid email format: " + email);
         }
 
+        List<Report> reports = reportService.getAllReports();
+        String fileName = "reports." + reportFormat;
+
+        if ("csv".equalsIgnoreCase(reportFormat)) {
+            byte[] csvData = reportService.exportReportsToCSV(reports).getBytes();
+            reportService.sendReportByEmail(email, "Your Reports", "Attached report file.", csvData, fileName);
+
+        } else {
+            throw new InvalidInputException("Invalid report format. Use 'csv' or 'pdf'.");
+        }
         return ResponseEntity.ok("Report sent successfully to " + email);
     }
+
 }

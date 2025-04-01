@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tastyTreatExpress.DTO.RestaurantDTO;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.DatabaseOperationException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.RestaurantNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
@@ -23,15 +27,22 @@ import com.tastytreat.backend.tasty_treat_express_backend.repositories.Restauran
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
-	@Autowired
-	RestaurantRepository restaurantRepository;
+    @Autowired
+    RestaurantRepository restaurantRepository;
     @Autowired
     private MenuItemRepository menuItemRepository;
-	
+
     public Restaurant saveRestaurant(Restaurant restaurant) {
+        if (restaurant.getPassword() == null || restaurant.getPassword().isEmpty()) {
+            throw new InvalidInputException("Password cannot be empty.");
+        }
+        if (restaurant.getName() == null || restaurant.getName().isEmpty()) {
+            throw new InvalidInputException("Name cannot be empty.");
+        }
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPassword = encoder.encode(restaurant.getPassword());
-        restaurant.setPassword(hashedPassword); 
+        restaurant.setPassword(hashedPassword);
         return restaurantRepository.save(restaurant);
     }
 
@@ -39,7 +50,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant restaurant = restaurantRepository.findByEmail(email);
         if (restaurant != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            return encoder.matches(password, restaurant.getPassword()); 
+            return encoder.matches(password, restaurant.getPassword());
         }
         return false;
     }
@@ -53,7 +64,32 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     public Restaurant updateRestaurant(Restaurant restaurant) {
-        return restaurantRepository.save(restaurant);
+        Restaurant existingRestaurant = restaurantRepository.findById(restaurant.getRestaurantId()).orElse(null);
+        if (existingRestaurant == null) {
+            throw new RestaurantNotFoundException("Restaurant with ID " + restaurant.getRestaurantId() + " not found");
+        }
+        existingRestaurant.setName(restaurant.getName());
+        existingRestaurant.setEmail(restaurant.getEmail());
+        existingRestaurant.setPassword(restaurant.getPassword());
+        return restaurantRepository.save(existingRestaurant);
+    }
+
+    public Restaurant updateRestaurant(String restaurantId, Restaurant restaurantDTO) {
+        Restaurant existingRestaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(
+                        () -> new RestaurantNotFoundException("Restaurant with ID " + restaurantId + " not found"));
+
+        if (restaurantDTO.getName() != null)
+            existingRestaurant.setName(restaurantDTO.getName());
+        if (restaurantDTO.getEmail() != null)
+            existingRestaurant.setEmail(restaurantDTO.getEmail());
+        if (restaurantDTO.getAddress() != null)
+            existingRestaurant.setAddress(restaurantDTO.getAddress());
+        try {
+            return restaurantRepository.save(existingRestaurant);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update restaurant details.");
+        }
     }
 
     public List<Restaurant> findAll() {
@@ -63,15 +99,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     public Restaurant getRestaurantById(String restaurantId) {
         return restaurantRepository.findById(restaurantId).orElse(null);
     }
+
     @Override
     public void deleteRestaurant(String restaurantId) {
         restaurantRepository.deleteById(restaurantId);
     }
 
-    // methods i updated later
     public List<MenuItem> getRestaurantMenu(String restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);
-        if (restaurant!= null) {
+        if (restaurant != null) {
             return restaurant.getMenu();
         } else {
             throw new ObjectNotFoundException("Restaurant not found", Restaurant.class);
@@ -80,7 +116,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public List<Restaurant> findRestaurantsByLocation(String location) {
-            return restaurantRepository.findByLocation(location);
+        return restaurantRepository.findByLocation(location);
     }
 
     public List<MenuItem> addMenuItem(String restaurantId, MenuItem menuItem) {
@@ -98,13 +134,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     public List<Feedback> getRestaurantFeedback(String restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);
-        if (restaurant!= null) {
+        if (restaurant != null) {
             return restaurant.getFeedbacks();
         } else {
             throw new ObjectNotFoundException("Restaurant not found", Restaurant.class);
         }
     }
-
 
     public List<Feedback> addFeedback(String restaurantId, Feedback feedback) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);
@@ -147,7 +182,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        double earthRadius = 6371; 
+        double earthRadius = 6371;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
 
@@ -164,14 +199,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
         return restaurant.getOrders();
-        }
+    }
 
     @Override
     public List<Report> getRestaurantReport(String restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
         return restaurant.getReports();
-        }
+    }
 
     @Override
     public boolean existsById(String restaurantId) {

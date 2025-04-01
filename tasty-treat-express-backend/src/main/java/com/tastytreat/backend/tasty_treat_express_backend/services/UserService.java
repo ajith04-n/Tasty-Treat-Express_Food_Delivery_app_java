@@ -1,8 +1,10 @@
 package com.tastytreat.backend.tasty_treat_express_backend.services;
 
+import java.net.PasswordAuthentication;
 import java.util.List;
 import java.util.Map;
 
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 
@@ -15,11 +17,12 @@ public interface UserService {
 	 public boolean existsByEmail(String email);
 	 public List<User> findAll();
 	 public User getUserById(long userId);
-	 public User updateUser(@Valid User user);  
+	 public User updateUser(Long userId, @Valid User user);  
 
 //- newAddional methods - 
 	 public void updateUserAddress(long userId, String newAddress);
 	 public void updateUserPassword(long userId,String oldPassword,String newPassword);
+	 public void updateUserPassword(long userId, PasswordUpdateRequest request);
 	 public void deleteUser(long userId);
 	 public Map<String,Object> generateUserOrderSummaryReport(long userId);
 	public Feedback addFeedback(long userId, String restaurantId, Feedback feedback);

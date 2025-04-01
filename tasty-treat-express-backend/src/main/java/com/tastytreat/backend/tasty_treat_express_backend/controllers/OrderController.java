@@ -1,6 +1,9 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,9 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import com.tastyTreatExpress.DTO.OrderDTO;
 import com.tastyTreatExpress.DTO.OrderMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.InvalidEnumValueException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidCouponException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidOrderStatusException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidPaymentMethodException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.RestaurantNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.OrderNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.OrderValidationException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.SuccessResponse;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
@@ -48,7 +57,7 @@ public class OrderController {
         }
 
         if (restaurantId == null || !restaurantService.existsById(restaurantId)) {
-            throw new ReportNotFoundException("Restaurant not found with id " + restaurantId);
+            throw new RestaurantNotFoundException("Restaurant not found with id " + restaurantId);
         }
 
         if (orderobj == null || orderobj.getMenuItems().isEmpty()) {
@@ -73,11 +82,15 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(placedOrderDTO);
     }
 
+
     // Retrieve order by ID
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long orderId) {
         try {
             Order order = orderService.getOrderById(orderId);
+            if (order == null) {
+                throw new OrderNotFoundException("Order not found with id " + orderId);
+            }
             OrderDTO orderDTO = OrderMapper.toOrderDTO(order);
             return ResponseEntity.ok(orderDTO);
         } catch (RuntimeException e) {
@@ -99,11 +112,11 @@ public class OrderController {
         }
     }
 
-    // Get orders by customer ID
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@PathVariable Long customerId) {
+    // Get orders by User ID
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByUser(@PathVariable Long userId) {
         try {
-            List<Order> orders = orderService.getOrdersByCustomer(customerId);
+            List<Order> orders = orderService.getOrdersByCustomer(userId);
             List<OrderDTO> orderDTOs = orders.stream()
                     .map(OrderMapper::toOrderDTO)
                     .collect(Collectors.toList());
@@ -113,35 +126,55 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/updateStatus/{orderId}")
-    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
-       
+
+    @PutMapping("/updateStatus/{orderId}/{status}")
+    public ResponseEntity<OrderDTO> updateOrderStatus(
+            @PathVariable Long orderId,
+            @PathVariable String status) {
+
         Order order = orderService.getOrderById(orderId);
         if (order == null) {
             throw new OrderNotFoundException("Order not found with id " + orderId);
         }
+
+        List<String> validStatuses = Arrays.asList("PENDING", "SHIPPED", "DELIVERED", "CANCELLED");
+
+        if (!validStatuses.contains(status.toUpperCase())) {
+            throw new InvalidOrderStatusException("Invalid order status: " + status);
+        }
+
         Order updatedOrder = orderService.updateOrderStatus(orderId, status.toUpperCase());
         OrderDTO orderDTO = OrderMapper.toOrderDTO(updatedOrder);
+
         return ResponseEntity.ok(orderDTO);
     }
 
-    // Update delivery time for an order
-    @PutMapping("/updateDeliveryTime/{orderId}")
-    public ResponseEntity<OrderDTO> updateOrderDeliveryTime(@PathVariable Long orderId,
-            @RequestParam String deliveryTime) {
+    @PutMapping("/updateDeliveryTime/{orderId}/{deliveryTime}")
+    public ResponseEntity<OrderDTO> updateOrderDeliveryTime(
+            @PathVariable Long orderId,
+            @PathVariable String deliveryTime) {
+
         try {
-            LocalDateTime updatedDeliveryTime = LocalDateTime.parse(deliveryTime);
+            LocalDateTime updatedDeliveryTime = LocalDateTime.parse(deliveryTime,
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             Order updatedOrder = orderService.updateOrderDeliveryTime(orderId, updatedDeliveryTime);
             OrderDTO updatedOrderDTO = OrderMapper.toOrderDTO(updatedOrder);
+
             return ResponseEntity.ok(updatedOrderDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (DateTimeParseException e) {
+            throw new InvalidInputException("Invalid date format. Please use ISO format (YYYY-MM-DDTHH:MM:SS).");
         }
     }
 
     // Delete an order
     @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long orderId) {
+        if (orderId == null) {
+            throw new InvalidInputException("Order ID is required.");
+        }
+        if (orderService.getOrderById(orderId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+        }
         try {
             orderService.deleteOrder(orderId);
             return ResponseEntity.ok("Order deleted successfully");
@@ -162,19 +195,27 @@ public class OrderController {
     }
 
     // Process payment for an order
-    @PutMapping("/payment/{orderId}")
-    public ResponseEntity<String> processPayment(@PathVariable Long orderId, @RequestParam String paymentMethod) {
-        try {
-            String paymentResult = orderService.processPayment(orderId, paymentMethod);
-            return ResponseEntity.ok(paymentResult);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    @PutMapping("/payment/{orderId}/{paymentMethod}")
+    public ResponseEntity<SuccessResponse> processPayment(
+            @PathVariable Long orderId,
+            @PathVariable String paymentMethod) {
+
+        if (paymentMethod.trim().isEmpty()) {
+            throw new InvalidPaymentMethodException("Payment method cannot be empty.");
         }
+        String paymentResult = orderService.processPayment(orderId, paymentMethod);
+        return ResponseEntity.ok(new SuccessResponse("Payment processed successfully", paymentResult));
     }
 
     // Cancel an order
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long orderId) {
+        if (orderId == null) {
+            throw new InvalidInputException("Order ID is required.");
+        }
+        if (orderService.getOrderById(orderId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+        }
         try {
             String cancellationResult = orderService.cancelOrder(orderId);
             return ResponseEntity.ok(cancellationResult);
@@ -184,20 +225,28 @@ public class OrderController {
     }
 
     // Apply a discount to an order
-    @PutMapping("/discount/{orderId}")
-    public ResponseEntity<OrderDTO> applyDiscount(@PathVariable Long orderId, @RequestParam String couponCode) {
-        try {
-            Order discountedOrder = orderService.applyDiscount(orderId, couponCode);
-            OrderDTO discountedOrderDTO = OrderMapper.toOrderDTO(discountedOrder);
-            return ResponseEntity.ok(discountedOrderDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    @PutMapping("/discount/{orderId}/{couponCode}")
+    public ResponseEntity<OrderDTO> applyDiscount(
+            @PathVariable Long orderId,
+            @PathVariable String couponCode) {
+
+        if (couponCode.trim().isEmpty()) {
+            throw new InvalidCouponException("Coupon code cannot be empty.");
         }
+        Order discountedOrder = orderService.applyDiscount(orderId, couponCode);
+        OrderDTO discountedOrderDTO = OrderMapper.toOrderDTO(discountedOrder);
+        return ResponseEntity.ok(discountedOrderDTO);
     }
 
     // Reorder an existing order
     @PostMapping("/reorder/{orderId}")
     public ResponseEntity<OrderDTO> reorder(@PathVariable Long orderId) {
+        if (orderId == null) {
+            throw new InvalidInputException("Order ID is required.");
+        }
+        if (orderService.getOrderById(orderId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         try {
             Order reorderedOrder = orderService.reorder(orderId);
             OrderDTO reorderedOrderDTO = OrderMapper.toOrderDTO(reorderedOrder);
@@ -210,6 +259,12 @@ public class OrderController {
     // Estimate delivery time for an order
     @GetMapping("/estimate-delivery/{orderId}")
     public ResponseEntity<LocalDateTime> estimateDeliveryTime(@PathVariable Long orderId) {
+        if (orderId == null) {
+            throw new InvalidInputException("Order ID is required.");
+        }
+        if (orderService.getOrderById(orderId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         try {
             LocalDateTime estimatedTime = orderService.estimateDeliveryTime(orderId);
             return ResponseEntity.ok(estimatedTime);
@@ -218,9 +273,15 @@ public class OrderController {
         }
     }
 
-    // Notify customer if delivery is near
+    // Notify User if delivery is near
     @PostMapping("/notify-near/{orderId}")
-    public ResponseEntity<String> notifyCustomerIfNear(@PathVariable Long orderId) {
+    public ResponseEntity<String> notifyUserIfNear(@PathVariable Long orderId) {
+        if (orderId == null) {
+            throw new InvalidInputException("Order ID is required.");
+        }
+        if (orderService.getOrderById(orderId) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+        }
         try {
             orderService.notifyCustomerIfNear(orderId);
             return ResponseEntity.ok("Customer notified successfully.");
@@ -241,13 +302,13 @@ public class OrderController {
     }
 
     // Notify customer if order is late
-    @PostMapping("/notify-late-customer/{orderId}")
-    public ResponseEntity<String> notifyCustomerIfLate(@PathVariable Long orderId) {
+    @PostMapping("/notify-late-user/{orderId}")
+    public ResponseEntity<String> notifyUserIfLate(@PathVariable Long orderId) {
         try {
             orderService.notifyCustomerIfOrderIsLate(orderId);
-            return ResponseEntity.ok("Customer notified successfully.");
+            return ResponseEntity.ok("User notified successfully.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error notifying customer.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error notifying User.");
         }
     }
 
