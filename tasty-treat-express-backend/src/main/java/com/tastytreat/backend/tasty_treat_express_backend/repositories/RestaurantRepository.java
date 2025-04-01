@@ -14,6 +14,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant,String>{
     boolean existsByEmail(String email);
     
     List<Restaurant> findByLocation(String location);
+    boolean existsByNameAndRestaurantId(String name, String restaurantId);
   
     
     

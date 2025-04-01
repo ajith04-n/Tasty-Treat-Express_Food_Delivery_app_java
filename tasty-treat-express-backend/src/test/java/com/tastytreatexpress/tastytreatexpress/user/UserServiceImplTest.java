@@ -1,6 +1,5 @@
 package com.tastytreatexpress.tastytreatexpress.user;
 
-
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
@@ -110,7 +109,8 @@ public class UserServiceImplTest {
         User user = new User("test@example.com", "Test User", "password", "123 Test St", "1234567890");
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
 
-        User updatedUser = userService.updateUser(user);
+        long userId = user.getId();
+        User updatedUser = userService.updateUser(userId, user);
 
         Assertions.assertNotNull(updatedUser);
         Assertions.assertEquals("Test User", updatedUser.getName());
@@ -128,123 +128,128 @@ public class UserServiceImplTest {
         Mockito.verify(userRepository, Mockito.times(1)).deleteById(1L);
     }
 
-//     @Test
-// public void testGenerateUserOrderSummaryReport() {
-//     User user = new User("test@example.com", "Test User", "password", "123 Test St", "1234567890");
-//     List<Order> orders = List.of(
-//         new Order(1L, "PLACED", 100.0, LocalDateTime.now(), user),
-//         new Order(2L, "DELIVERED", 200.0, LocalDateTime.now().minusDays(1), user)
-//     );
-//     Mockito.when(orderRepository.findByCustomer_Id(1L)).thenReturn(orders);
+    // @Test
+    // public void testGenerateUserOrderSummaryReport() {
+    // User user = new User("test@example.com", "Test User", "password", "123 Test
+    // St", "1234567890");
+    // List<Order> orders = List.of(
+    // new Order(1L, "PLACED", 100.0, LocalDateTime.now(), user),
+    // new Order(2L, "DELIVERED", 200.0, LocalDateTime.now().minusDays(1), user)
+    // );
+    // Mockito.when(orderRepository.findByCustomer_Id(1L)).thenReturn(orders);
 
-//     Map<String, Object> report = userService.generateUserOrderSummaryReport(1L);
+    // Map<String, Object> report = userService.generateUserOrderSummaryReport(1L);
 
-//     Assertions.assertEquals(2, report.get("totalOrders"));
-//     Assertions.assertEquals(300.0, report.get("totalRevenue"));
-//     Mockito.verify(orderRepository, Mockito.times(1)).findByCustomer_Id(1L);
-// }
+    // Assertions.assertEquals(2, report.get("totalOrders"));
+    // Assertions.assertEquals(300.0, report.get("totalRevenue"));
+    // Mockito.verify(orderRepository, Mockito.times(1)).findByCustomer_Id(1L);
+    // }
 
-// @Test
-// public void testAddFeedback() {
-//     User user = new User("test@example.com", "Test User", "password", "123 Test St", "1234567890");
-//     Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Cuisine", "Location");
-//     Feedback feedback = new Feedback(5, "Great food!", user, restaurant);
+    // @Test
+    // public void testAddFeedback() {
+    // User user = new User("test@example.com", "Test User", "password", "123 Test
+    // St", "1234567890");
+    // Restaurant restaurant = new Restaurant(1L, "Test Restaurant", "Cuisine",
+    // "Location");
+    // Feedback feedback = new Feedback(5, "Great food!", user, restaurant);
 
-//     Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-//     Mockito.when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
-//     Mockito.when(feedbackRepo.save(Mockito.any(Feedback.class))).thenReturn(feedback);
+    // Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    // Mockito.when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+    // Mockito.when(feedbackRepo.save(Mockito.any(Feedback.class))).thenReturn(feedback);
 
-//     Feedback savedFeedback = userService.addFeedback(1L, 1L, feedback);
+    // Feedback savedFeedback = userService.addFeedback(1L, 1L, feedback);
 
-//     Assertions.assertNotNull(savedFeedback);
-//     Assertions.assertEquals(5, savedFeedback.getRating());
-//     Mockito.verify(feedbackRepo, Mockito.times(1)).save(feedback);
-// }
-
+    // Assertions.assertNotNull(savedFeedback);
+    // Assertions.assertEquals(5, savedFeedback.getRating());
+    // Mockito.verify(feedbackRepo, Mockito.times(1)).save(feedback);
+    // }
 
 }
 
-
-
-//class UserServiceImplTest {
+// class UserServiceImplTest {
 //
-//    @Mock
-//    private UserRepository userRepository;
+// @Mock
+// private UserRepository userRepository;
 //
-//    @InjectMocks
-//    private UserService userService;
+// @InjectMocks
+// private UserService userService;
 //
-//    private Optional<User> user;
+// private Optional<User> user;
 //
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this); 
-//        user = Optional.ofNullable(new User());
-//        user.get().setEmail("test@example.com");
-//        user.get().setPassword("password123"); 
-//    }
+// @BeforeEach
+// void setUp() {
+// MockitoAnnotations.openMocks(this);
+// user = Optional.ofNullable(new User());
+// user.get().setEmail("test@example.com");
+// user.get().setPassword("password123");
+// }
 //
-//    @Test
-//    void testSaveUser() {
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        String hashedPassword = encoder.encode(user.getPassword());
-//        user.setPassword(hashedPassword);
-//        
-//
-//        when(userRepository.save(any(User.class))).thenReturn(user);
+// @Test
+// void testSaveUser() {
+// BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+// String hashedPassword = encoder.encode(user.getPassword());
+// user.setPassword(hashedPassword);
 //
 //
-//        User savedUser = userService.saveUser(user);
+// when(userRepository.save(any(User.class))).thenReturn(user);
 //
-//        // Assertions
-//        assertNotNull(savedUser);
-//        assertEquals(user.getEmail(), savedUser.getEmail());
-//        assertTrue(encoder.matches("password123", savedUser.getPassword()));
-//    }
 //
-//    @Test
-//    void testAuthenticateUser_Success() {
-//        // Set up mock user with hashed password
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        String hashedPassword = encoder.encode("password123");
-//        user.setPassword(hashedPassword);
+// User savedUser = userService.saveUser(user);
 //
-//        // Mock repository find behavior
-//        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+// // Assertions
+// assertNotNull(savedUser);
+// assertEquals(user.getEmail(), savedUser.getEmail());
+// assertTrue(encoder.matches("password123", savedUser.getPassword()));
+// }
 //
-//        // Call the authenticateUser method
-//        boolean isAuthenticated = userService.authenticateUser(user.getEmail(), "password123");
+// @Test
+// void testAuthenticateUser_Success() {
+// // Set up mock user with hashed password
+// BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+// String hashedPassword = encoder.encode("password123");
+// user.setPassword(hashedPassword);
 //
-//        // Assertions
-//        assertTrue(isAuthenticated); // Authentication should succeed
-//    }
+// // Mock repository find behavior
+// when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
 //
-//    @Test
-//    void testAuthenticateUser_Failure() {
-//        // Mock repository to return null for non-existing user
-//        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+// // Call the authenticateUser method
+// boolean isAuthenticated = userService.authenticateUser(user.getEmail(),
+// "password123");
 //
-//        // Call the authenticateUser method with incorrect credentials
-//        boolean isAuthenticated = userService.authenticateUser(user.getEmail(), "wrongpassword");
+// // Assertions
+// assertTrue(isAuthenticated); // Authentication should succeed
+// }
 //
-//        // Assertions
-//        assertFalse(isAuthenticated); // Authentication should fail because user doesn't exist
-//    }
+// @Test
+// void testAuthenticateUser_Failure() {
+// // Mock repository to return null for non-existing user
+// when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
 //
-//    @Test
-//    void testAuthenticateUser_IncorrectPassword() {
-//        // Set up mock user with hashed password
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        String hashedPassword = encoder.encode("password123");
-//        user.setPassword(hashedPassword);
+// // Call the authenticateUser method with incorrect credentials
+// boolean isAuthenticated = userService.authenticateUser(user.getEmail(),
+// "wrongpassword");
 //
-//        // Mock repository find behavior
-//        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+// // Assertions
+// assertFalse(isAuthenticated); // Authentication should fail because user
+// doesn't exist
+// }
 //
-//        // Call the authenticateUser method with incorrect password
-//        boolean isAuthenticated = userService.authenticateUser(user.getEmail(), "incorrectPassword");
+// @Test
+// void testAuthenticateUser_IncorrectPassword() {
+// // Set up mock user with hashed password
+// BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+// String hashedPassword = encoder.encode("password123");
+// user.setPassword(hashedPassword);
 //
-//        // Assertions
-//        assertFalse(isAuthenticated); // Authentication should fail because password doesn't match
-//    }
-//}
+// // Mock repository find behavior
+// when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+//
+// // Call the authenticateUser method with incorrect password
+// boolean isAuthenticated = userService.authenticateUser(user.getEmail(),
+// "incorrectPassword");
+//
+// // Assertions
+// assertFalse(isAuthenticated); // Authentication should fail because password
+// doesn't match
+// }
+// }

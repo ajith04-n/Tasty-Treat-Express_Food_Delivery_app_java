@@ -55,7 +55,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         User user = order.getUser();
 
-        // Check if feedback already exists for this user and restaurant for the given order
         Feedback existingFeedback = feedbackRepository.findByUserAndOrdersAndRestaurant(user, order, restaurant);
 
         if (existingFeedback != null) {

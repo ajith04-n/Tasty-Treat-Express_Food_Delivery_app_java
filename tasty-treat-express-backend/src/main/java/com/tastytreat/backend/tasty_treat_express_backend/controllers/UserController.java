@@ -1,17 +1,30 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import com.tastyTreatExpress.DTO.LoginRequest;
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
 import com.tastyTreatExpress.DTO.UserDTO;
 import com.tastyTreatExpress.DTO.UserMapper;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.DatabaseConnectionException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.DuplicateResourceException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidCredentialsException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidPasswordException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.NoActiveSessionException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.SuccessResponse;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 import com.tastytreat.backend.tasty_treat_express_backend.services.UserService;
@@ -28,103 +41,183 @@ public class UserController {
 
     // Register a user
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
-        if (userService.existsByEmail(user.getEmail())) {
-            return new ResponseEntity<>("User with this email already exists!", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<UserDTO> registerUser(@RequestBody User user) {
+        try {
+            if (userService.existsByEmail(user.getEmail())) {
+                throw new DuplicateResourceException("User with this email already exists!");
+            }
+            User new_user = userService.saveUser(user);
+            UserDTO userDto = UserMapper.toUserDTO(new_user);
+            return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        userService.saveUser(user);
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
     }
 
     // Login endpoint
-    @PostMapping("/login")
+    @PostMapping("/login/{email}/{password}")
     public ResponseEntity<String> authenticateUser(
-            @RequestParam String email,
-            @RequestParam String password,
+            @PathVariable String email,
+            @PathVariable String password,
             HttpSession session) {
-        if (userService.authenticateUser(email, password)) {
-            User user = userService.findUserByEmail(email);
-            session.setAttribute("user", user);
-            session.setAttribute("authenticatedUser", true);
-            return new ResponseEntity<>("User authenticated successfully!", HttpStatus.OK);
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            return new ResponseEntity<>("Email and password must be provided!", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Invalid email or password!", HttpStatus.UNAUTHORIZED);
+        try {
+            if (userService.authenticateUser(email, password)) {
+                User user = userService.findUserByEmail(email);
+                if (user == null) {
+                    return new ResponseEntity<>("User not found!", HttpStatus.NOT_FOUND);
+                }
+                session.setAttribute("user", user);
+                session.setAttribute("authenticatedUser", true);
+                return new ResponseEntity<>("User authenticated successfully!", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid email or password!", HttpStatus.UNAUTHORIZED);
+            }
+        } catch (UserNotFoundException ex) {
+            return new ResponseEntity<>("User not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (DatabaseConnectionException ex) {
+            return new ResponseEntity<>("Database connection error: " + ex.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            return new ResponseEntity<>("An unexpected error occurred: " + ex.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    // Logout 
+    @PostMapping("/login") // as we deal with secure login- request body is preferred
+    public ResponseEntity<?> authenticateUser2(@RequestBody LoginRequest loginRequest, HttpSession session) {
+        if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty() ||
+                loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+            throw new InvalidCredentialsException("Email and password must be provided!");
+        }
+        if (!userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword())) {
+            throw new InvalidCredentialsException("Invalid email or password!");
+        }
+        User user = userService.findUserByEmail(loginRequest.getEmail());
+        if (user == null) {
+            throw new UserNotFoundException("User not found!");
+        }
+        session.setAttribute("user", user);
+        session.setAttribute("authenticatedUser", true);
+
+        return ResponseEntity.ok(new SuccessResponse("User authenticated successfully!", LocalDateTime.now()));
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
+    public ResponseEntity<SuccessResponse> logout(HttpSession session) {
+        if (session.getAttribute("authenticatedUser") == null) {
+            throw new NoActiveSessionException("No active session found!");
+        }
         session.invalidate();
-        return new ResponseEntity<>("Logged out successfully!", HttpStatus.NO_CONTENT);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new SuccessResponse("Logged out successfully!", LocalDateTime.now()));
     }
 
- // Fetch all users and return as DTOs
-    @GetMapping("/")
+    // Fetch all users and return as DTOs
+    @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<User> users = userService.findAll();
+        try {
+            List<User> users = userService.findAll();
+            if (users.isEmpty()) {
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+            }
+            List<UserDTO> userDTOs = users.stream().map(UserMapper::toUserDTO).collect(Collectors.toList());
+            return new ResponseEntity<>(userDTOs, HttpStatus.OK);
 
-  
-        List<UserDTO> userDTOs = users.stream()
-                                      .map(UserMapper::toUserDTO)
-                                      .collect(Collectors.toList());
-        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    
-    
 
- // Fetch user by ID and return as DTO
+    // Fetch user by ID and return as DTO
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable long userId) {
         User user = userService.getUserById(userId);
         if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException("User " + userId + " not found in database");
         }
-
         UserDTO userDTO = UserMapper.toUserDTO(user);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
-    
-    
 
-    // Update user details
-    @PutMapping("/{userId}")
+    @PutMapping("/update/{userId}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable long userId,
-            @Valid @RequestBody User user) {
-        if (userId != user.getId()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        User updatedUser = userService.updateUser(user);
-        UserDTO updatedUserDTO = UserMapper.toUserDTO(updatedUser);
-        return new ResponseEntity<>(updatedUserDTO, HttpStatus.OK);
-    }
-
-    // Update user address
-    @PutMapping("/{userId}/address")
-    public ResponseEntity<String> updateUserAddress(
-            @PathVariable long userId,
-            @RequestParam String newAddress) {
+            @RequestBody User user) {
         try {
-            userService.updateUserAddress(userId, newAddress);
-            return new ResponseEntity<>("Address updated successfully!", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Unable to update address: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            User existingUser = userService.getUserById(userId);
+            if (existingUser == null) {
+                throw new UserNotFoundException("User " + userId + " not found in database");
+            }
+            User updatedUser = userService.updateUser(userId, user);
+            UserDTO updatedUserDTO = UserMapper.toUserDTO(updatedUser);
+            return new ResponseEntity<>(updatedUserDTO, HttpStatus.OK);
+        } catch (UserNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Update user password
-    @PutMapping("/{userId}/password")
-    public ResponseEntity<String> updateUserPassword(
+    /*
+     * // Update user address
+     * 
+     * @PutMapping("/{userId}/address")
+     * public ResponseEntity<String> updateUserAddress(
+     * 
+     * @PathVariable long userId,
+     * 
+     * @RequestParam String newAddress) {
+     * try {
+     * userService.updateUserAddress(userId, newAddress);
+     * return new ResponseEntity<>("Address updated successfully!", HttpStatus.OK);
+     * } catch (Exception e) {
+     * return new ResponseEntity<>("Unable to update address: " + e.getMessage(),
+     * HttpStatus.BAD_REQUEST);
+     * }
+     * }
+     */
+
+    @PutMapping("/{userId}/update-password") // for security purposes
+    public ResponseEntity<SuccessResponse> updateUserPassword(
             @PathVariable long userId,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword) {
-        try {
-            userService.updateUserPassword(userId, oldPassword, newPassword);
-            return new ResponseEntity<>("Password updated successfully!", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Unable to update password: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            @Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        if (passwordUpdateRequest.getOldPassword() == null || passwordUpdateRequest.getOldPassword().isEmpty() ||
+                passwordUpdateRequest.getNewPassword() == null || passwordUpdateRequest.getNewPassword().isEmpty()) {
+            throw new InvalidPasswordException("Old and new passwords must be provided!");
         }
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User " + userId + " not found in database");
+        }
+        userService.updateUserPassword(userId, passwordUpdateRequest);
+
+        return ResponseEntity.ok(new SuccessResponse("Password updated successfully!", LocalDateTime.now()));
     }
+
+    /*
+     * // Update user password
+     * 
+     * @PutMapping("/{userId}/password")
+     * public ResponseEntity<String> updateUserPassword(
+     * 
+     * @PathVariable long userId,
+     * 
+     * @RequestParam String oldPassword,
+     * 
+     * @RequestParam String newPassword) {
+     * try {
+     * userService.updateUserPassword(userId, oldPassword, newPassword);
+     * return new ResponseEntity<>("Password updated successfully!", HttpStatus.OK);
+     * } catch (Exception e) {
+     * return new ResponseEntity<>("Unable to update password: " + e.getMessage(),
+     * HttpStatus.BAD_REQUEST);
+     * }
+     * }
+     * 
+     */
 
     // Delete a user
     @DeleteMapping("/{userId}")

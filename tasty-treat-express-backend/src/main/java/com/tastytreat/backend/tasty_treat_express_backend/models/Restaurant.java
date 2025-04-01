@@ -244,6 +244,10 @@ public class Restaurant {
 	public void setReports(List<Report> reports) {
 		this.reports = reports;
 	}
+    public Restaurant orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 	
 }
 

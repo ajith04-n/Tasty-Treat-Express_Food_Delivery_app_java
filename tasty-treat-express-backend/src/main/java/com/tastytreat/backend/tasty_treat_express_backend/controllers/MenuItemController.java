@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.tastyTreatExpress.DTO.MenuItemDTO;
 import com.tastyTreatExpress.DTO.MenuItemMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.DuplicateMenuItemException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
@@ -65,7 +66,7 @@ public class MenuItemController {
             throw new IllegalArgumentException("Menu item ID must be positive.");
         }
         if (!menuItemService.existsById(id)) {
-            throw new ReportNotFoundException("Menu item not found with the given ID: "+id);
+            throw new ReportNotFoundException("Menu item not found with the given ID: " + id);
         }
         MenuItem menuItem = menuItemService.getMenuItemById(id);
         if (menuItem != null) {
@@ -122,6 +123,25 @@ public class MenuItemController {
         return ResponseEntity.ok(updatedMenuItemDTO);
     }
 
+    @PutMapping("/update-qnty/{menuItemId}/{quantity}")
+    public ResponseEntity<MenuItemDTO> updateMenuItemQnty(
+            @PathVariable Long menuItemId,
+            @PathVariable int quantity) {
+
+        if (quantity < 0) {
+            throw new InvalidInputException("Quantity cannot be negative.");
+        }
+
+        if (!menuItemService.existsById(menuItemId)) {
+            throw new ReportNotFoundException("Menu item not found with the given ID: " + menuItemId);
+        }
+        MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+        MenuItem updatedMenuItem = menuItemService.updateMenuItemQnty(menuItem, quantity);
+        MenuItemDTO updatedMenuItemDTO = MenuItemMapper.toMenuItemDTO(updatedMenuItem);
+
+        return ResponseEntity.ok(updatedMenuItemDTO);
+    }
+
     // Update menu item quantity
     @PutMapping("/update-qnty")
     public ResponseEntity<MenuItemDTO> updateMenuItemQnty(@RequestBody MenuItem menuItem,
@@ -136,9 +156,10 @@ public class MenuItemController {
             throw new IllegalArgumentException("Quantity of menu item cannot be negative.");
         }
         if (!menuItemService.existsById(menuItem.getId())) {
-            throw new ReportNotFoundException("Menu item not found with the given ID: "+menuItem.getId());
+            throw new ReportNotFoundException("Menu item not found with the given ID: " + menuItem.getId());
         }
-        if (!menuItemService.existsByNameAndRestaurantId(menuItem.getName(), menuItem.getRestaurant().getRestaurantId())) {
+        if (!menuItemService.existsByNameAndRestaurantId(menuItem.getName(),
+                menuItem.getRestaurant().getRestaurantId())) {
             throw new ReportNotFoundException("Menu item not found with the given name and restaurant ID.");
         }
         MenuItem updatedMenuItem = menuItemService.updateMenuItemQnty(menuItem, quantity);
@@ -153,7 +174,7 @@ public class MenuItemController {
             throw new IllegalArgumentException("Menu item ID must be positive.");
         }
         if (!menuItemService.existsById(id)) {
-            throw new ReportNotFoundException("Menu item not found with the given ID: "+id);
+            throw new ReportNotFoundException("Menu item not found with the given ID: " + id);
         }
         menuItemService.deleteMenuItem(id);
         return ResponseEntity.noContent().build();
