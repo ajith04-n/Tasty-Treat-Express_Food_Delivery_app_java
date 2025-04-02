@@ -15,13 +15,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
+import com.tastyTreatExpress.DTO.UserDTO;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.*;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.ReportRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
@@ -31,7 +34,7 @@ import jakarta.validation.Valid;
 
 @Service
 public class UserServiceImpl implements UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -39,14 +42,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ReportRepository reportRepository;
     @Autowired
-    private FeedbackRepo feedbackRepo;
+    private FeedbackRepository feedbackRepo;
     @Autowired
     private RestaurantRepository restaurantRepository;
-    
+
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-   
     // 1. authenticate user
     public boolean authenticateUser(String email, String password) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -57,39 +59,56 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-   
     public User findUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
-        System.out.println("User found by email: " + user); 
+        System.out.println("User found by email: " + user);
         return user.get();
     }
 
-    
-    public User saveUser(@Valid User user) {
+    public User saveUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("User with this email already exists!");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to save user, please try again later.");
+        }
     }
 
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
-	public boolean existsByEmail(String email) {
-		return userRepository.existsByEmail(email);
-	}
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 
+    public User getUserById(long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 
-	public List<User> findAll() {
-		return userRepository.findAll();
-	}
+    public User updateUser(Long userId, @Valid User userDTO) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
 
-
-	public User getUserById(long userId) {
-		return userRepository.findById(userId).orElse(null);
-	}
-
-
-	public User updateUser(@Valid User user) {
-		return userRepository.save(user); 
-	}
-
+        if (userDTO.getName() != null)
+            existingUser.setName(userDTO.getName());
+        if (userDTO.getEmail() != null)
+            existingUser.setEmail(userDTO.getEmail());
+        if (userDTO.getPassword() != null)
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        if (userDTO.getPhoneNumber() != null)
+            existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userDTO.getAddress() != null)
+            existingUser.setAddress(userDTO.getAddress());
+        try {
+            return userRepository.save(existingUser);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update user, please try again later.");
+        }
+    }
 
     public void updateUserAddress(long userId, String newAddress) {
         if (!userRepository.existsById(userId)) {
@@ -103,31 +122,40 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new RuntimeException("Incorrect old password");
+        }
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters long.");
         }
 
         if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$")) {
             throw new RuntimeException(
                     "Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, and one special character.");
         }
-        userRepository.updateUserPassword(userId, newPassword);
+        if (oldPassword.equals(newPassword)) {
+            throw new RuntimeException("New password must be different from the old password.");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        // userRepository.updateUserPassword(userId, newPassword);
         logger.info("Updated password for User ID: {}", userId);
     }
 
-    
+    public void deleteUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
 
-    public void deleteUser(long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found with ID: " + id);
+        try {
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to delete user, please try again later.");
         }
-        userRepository.deleteById(id);
-        logger.info("Deleted User ID: {}", id);
     }
 
     @Override
-     public Map<String, Object> generateUserOrderSummaryReport(long userId) {
-        List<Order> userOrders = orderRepository.findByCustomer_Id(userId);
+    public Map<String, Object> generateUserOrderSummaryReport(long userId) {
+        List<Order> userOrders = orderRepository.findByUser_Id(userId);
 
         if (userOrders.isEmpty()) {
             Map<String, Object> report = new HashMap<>();
@@ -138,7 +166,7 @@ public class UserServiceImpl implements UserService {
             report.put("totalRevenue", 0.0);
             report.put("latestOrderDate", null);
             report.put("averageOrderValue", 0.0);
-            report.put("orders", Collections.emptyList()); 
+            report.put("orders", Collections.emptyList());
             return report;
         }
         int totalOrders = userOrders.size();
@@ -170,19 +198,18 @@ public class UserServiceImpl implements UserService {
         response.put("totalRevenue", totalRevenue);
         response.put("latestOrderDate", latestOrderDate);
         response.put("averageOrderValue", averageOrderValue);
-        response.put("orders", userOrders); 
+        response.put("orders", userOrders);
 
-       
-        User user = userOrders.get(0).getCustomer();
+        User user = userOrders.get(0).getUser();
         List<Report> existingReport = reportRepository.findByUserId(userId);
         if (existingReport.isEmpty()) {
-           // Report report = new Report(user, totalOrders, totalRevenue, latestOrderDate);
-           Report report = new Report();
-                report.setUser(user);
-                report.setTotalOrders(totalOrders);
-                report.setTotalOrderValue(totalRevenue);
-                report.setCreatedAt(latestOrderDate); 
-                report.setAverageOrderValue(averageOrderValue);
+            // Report report = new Report(user, totalOrders, totalRevenue, latestOrderDate);
+            Report report = new Report();
+            report.setUser(user);
+            report.setTotalOrders(totalOrders);
+            report.setTotalOrderValue(totalRevenue);
+            report.setCreatedAt(latestOrderDate);
+            report.setAverageOrderValue(averageOrderValue);
             reportRepository.save(report);
         }
 
@@ -196,7 +223,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
-        
+
         feedback.setUser(user);
         feedback.setRestaurant(restaurant);
         Feedback savedFeedback = feedbackRepo.save(feedback);
@@ -208,8 +235,33 @@ public class UserServiceImpl implements UserService {
     public List<Feedback> getUserFeedback(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        return user.getFeedbacks(); 
+        return user.getFeedbacks();
     }
 
+    @Override
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public void updateUserPassword(long userId, PasswordUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Old password is incorrect!");
+        }
+        if (request.getNewPassword().length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters long.");
+        }
+        
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update password, please try again later.");
+        }
+    }
 
 }

@@ -40,20 +40,18 @@ public class User {
 	@Column(name = "user_id")
 	private long id;
 	
-	 @NotNull(message = "Email cannot be null")
-	 @NotEmpty(message = "Email cannot be empty")
+	 
 	 @Email(message = "Email should be valid")
 	 @Column(name="email_id", unique = true, nullable = false)
 	private String email;
 	
-	 @NotNull(message = "Name cannot be null")
-	 @NotEmpty(message = "Name cannot be empty")
+	 
+	
 	 @Column(name="user_name")
 	private String name;
 	
 	 
-	 @NotNull(message = "Password cannot be null")
-	 @NotEmpty(message = "Password cannot be empty")
+	 
 	 @Size(min = 8, message = "Password must be at least 8 characters long")
 	 @Column(nullable = false)
 	private String password;
@@ -61,8 +59,7 @@ public class User {
 	@Column 
 	private String address;
 	
-	@NotNull(message = "Phone number cannot be null")
-    @NotEmpty(message = "Phone number cannot be empty")
+	
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
     @Column(length = 10)
 	private String phoneNumber;
@@ -70,19 +67,21 @@ public class User {
 	private double latitude;
 	private double longitude;
 
-	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference("orderUserReference")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	//@JsonManagedReference("orderUserReference")
+	@JsonIgnoreProperties("user")
 	private List<Order> orders= new ArrayList<>();
 	
 	
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference("reportUserReference")
+	//@JsonManagedReference("reportUserReference")
+	@JsonIgnoreProperties("user")
 	private List<Report> reports= new ArrayList<>();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JsonManagedReference("userFeedbackReference")
-	@JsonManagedReference("feedbackUserReference")
+	//@JsonManagedReference("feedbackUserReference")
+	 @JsonIgnoreProperties("user")
 	private List<Feedback> feedbacks = new ArrayList<>(); // i initialized here to avoid null pointer exception
 
 	@CreationTimestamp
@@ -193,12 +192,5 @@ public class User {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", Email=" + email + ", Name=" + name + ", Password=" + password + ", address="
-				+ address + ", phoneNumber=" + phoneNumber + "]";
-	}
-
-	
 
 }

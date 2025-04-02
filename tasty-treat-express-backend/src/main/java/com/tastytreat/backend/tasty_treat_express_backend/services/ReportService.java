@@ -42,6 +42,8 @@ public interface ReportService {
     Report saveReport(ReportRequest request, String reportType);
 
     Report updateReport(Long id, ReportData updateData);
+    
+     Report updateReport2(Long reportId, Report updatedReportData);
 
     String exportReportsToCSV(List<Report> reports);
 

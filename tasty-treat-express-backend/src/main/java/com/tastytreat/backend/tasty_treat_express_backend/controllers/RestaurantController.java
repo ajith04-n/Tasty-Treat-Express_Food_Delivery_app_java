@@ -1,18 +1,37 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.tastyTreatExpress.DTO.LoginRequest;
+import com.tastyTreatExpress.DTO.MenuItemDTO;
+import com.tastyTreatExpress.DTO.MenuItemMapper;
+import com.tastyTreatExpress.DTO.RestaurantDTO;
+import com.tastyTreatExpress.DTO.RestaurantMapper;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.DuplicateMenuItemException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.EmailAlreadyExistsException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidCredentialsException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.NoActiveSessionException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.RestaurantNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.SuccessResponse;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
+import com.tastytreat.backend.tasty_treat_express_backend.models.User;
+import com.tastytreat.backend.tasty_treat_express_backend.services.MenuItemServiceImpl;
 import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -21,62 +40,136 @@ public class RestaurantController {
 
 	@Autowired
 	private RestaurantService restaurantService;
+	@Autowired
+	private MenuItemServiceImpl menuItemService;
 
 	// Add a restaurant
 	@PostMapping("/register")
-	public ResponseEntity<Restaurant> saveRestaurant(@Valid @RequestBody Restaurant restaurant) {
+	public ResponseEntity<RestaurantDTO> saveRestaurant(@Valid @RequestBody Restaurant restaurant) {
+
+		if (restaurant.getEmail().isEmpty()) {
+			throw new InvalidInputException("Email is required");
+		}
+
+		if (restaurant.getName().isEmpty()) {
+			throw new InvalidInputException("Name is required");
+		}
+		if (restaurantService.existsByEmail(restaurant.getEmail())) {
+			throw new EmailAlreadyExistsException("Email is already registered.");
+		}
+
 		Restaurant savedRestaurant = restaurantService.saveRestaurant(restaurant);
-		return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
+		RestaurantDTO savedRestaurantDTO = RestaurantMapper.toRestaurantDTO(savedRestaurant);
+		return new ResponseEntity<>(savedRestaurantDTO, HttpStatus.CREATED);
 	}
 
-	// Authenticate a restaurant
+	// // Authenticate a restaurant
+	// @PostMapping("/authenticate")
+	// public ResponseEntity<String> authenticateRestaurant(@RequestParam String
+	// email, @RequestParam String password) {
+	// boolean isAuthenticated = restaurantService.authenticateRestaurant(email,
+	// password);
+	// if (isAuthenticated) {
+	// return new ResponseEntity<>("Authentication successful", HttpStatus.OK);
+	// } else {
+	// return new ResponseEntity<>("Invalid email or password",
+	// HttpStatus.UNAUTHORIZED);
+	// }
+	// }
+
 	@PostMapping("/authenticate")
-	public ResponseEntity<String> authenticateRestaurant(@RequestParam String email, @RequestParam String password) {
-		boolean isAuthenticated = restaurantService.authenticateRestaurant(email, password);
-		if (isAuthenticated) {
-			return new ResponseEntity<>("Authentication successful", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+	public ResponseEntity<SuccessResponse> authenticateRestaurant(@Valid @RequestBody LoginRequest loginRequest,
+			HttpSession session) {
+		if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty() ||
+				loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+			throw new InvalidCredentialsException("Email and password must be provided!");
 		}
+		if (!restaurantService.authenticateRestaurant(loginRequest.getEmail(), loginRequest.getPassword())) {
+			throw new InvalidCredentialsException("Invalid email or password!");
+		}
+		Restaurant restaurant = restaurantService.findByEmail(loginRequest.getEmail());
+		if (restaurant == null) {
+			throw new RestaurantNotFoundException("Restaurant not found!");
+		}
+		session.setAttribute("restaurant", restaurant);
+		session.setAttribute("authenticatedRest", true);
+
+		return ResponseEntity.ok(new SuccessResponse("Restaurant authenticated successfully!", LocalDateTime.now()));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<SuccessResponse> logout(HttpSession session) {
+		if (session.getAttribute("authenticatedRest") == null) {
+			throw new NoActiveSessionException("No active session found!");
+		}
+		session.invalidate();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT)
+				.body(new SuccessResponse("Logged out successfully!", LocalDateTime.now()));
 	}
 
 	// Check if a restaurant email exists
-	@GetMapping("/exists")
-	public ResponseEntity<Boolean> existsByEmail(@RequestParam String email) {
+	@GetMapping("/exists/{email}")
+	public ResponseEntity<Boolean> existsByEmail(@PathVariable String email) {
+		if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+			throw new InvalidInputException("Invalid email format.");
+		}
 		boolean exists = restaurantService.existsByEmail(email);
 		return new ResponseEntity<>(exists, HttpStatus.OK);
 	}
 
 	// Get all restaurants
-	@GetMapping
-	public ResponseEntity<List<Restaurant>> findAll() {
+	@GetMapping("/all")
+	public ResponseEntity<List<RestaurantDTO>> findAll() {
 		List<Restaurant> restaurants = restaurantService.findAll();
-		return new ResponseEntity<>(restaurants, HttpStatus.OK);
+		if (restaurants.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		List<RestaurantDTO> restaurantDTOs = restaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(restaurantDTOs, HttpStatus.OK);
 	}
 
 	// Get a restaurant by ID
 	@GetMapping("/{restaurantId}")
-	public ResponseEntity<Restaurant> getRestaurantById(@PathVariable String restaurantId) {
+	public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId) {
+		if (restaurantId == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
 		if (restaurant != null) {
-			return new ResponseEntity<>(restaurant, HttpStatus.OK);
+			RestaurantDTO restaurantDTO = RestaurantMapper.toRestaurantDTO(restaurant);
+			return new ResponseEntity<>(restaurantDTO, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			throw new RestaurantNotFoundException("Restaurant doesnt exist with the given Id.");
 		}
 	}
 
 	// Update restaurant details
-	@PutMapping("/{restaurantId}")
-	public ResponseEntity<Restaurant> updateRestaurant(@PathVariable String restaurantId,
+	@PutMapping("/update/{restaurantId}")
+	public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
 			@Valid @RequestBody Restaurant restaurant) {
+		if (restaurantId == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		if (!restaurantService.existsById(restaurantId)) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 		restaurant.setRestaurantId(restaurantId);
-		Restaurant updatedRestaurant = restaurantService.updateRestaurant(restaurant);
-		return new ResponseEntity<>(updatedRestaurant, HttpStatus.OK);
+		Restaurant updatedRestaurant = restaurantService.updateRestaurant(restaurantId, restaurant);
+		RestaurantDTO updatedRestaurantDTO = RestaurantMapper.toRestaurantDTO(updatedRestaurant);
+		return new ResponseEntity<>(updatedRestaurantDTO, HttpStatus.OK);
 	}
 
 	// Delete a restaurant
 	@DeleteMapping("/{restaurantId}")
 	public ResponseEntity<String> deleteRestaurant(@PathVariable String restaurantId) {
+		if (restaurantId == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		if (!restaurantService.existsById(restaurantId)) {
+			throw new RestaurantNotFoundException("Restaurant Not Found: " + restaurantId);
+		}
 		restaurantService.deleteRestaurant(restaurantId);
 		return new ResponseEntity<>("Restaurant deleted successfully", HttpStatus.NO_CONTENT);
 	}
@@ -89,11 +182,31 @@ public class RestaurantController {
 	}
 
 	// Add a menu item to a restaurant
-	@PostMapping("/{restaurantId}/menu")
-	public ResponseEntity<List<MenuItem>> addMenuItem(@PathVariable String restaurantId,
-			@Valid @RequestBody MenuItem menuItem) {
-		List<MenuItem> updatedMenu = restaurantService.addMenuItem(restaurantId, menuItem);
-		return new ResponseEntity<>(updatedMenu, HttpStatus.CREATED);
+	@PostMapping("/{restaurantId}/addmenu")
+	public ResponseEntity<List<MenuItemDTO>> addMenuItem(@PathVariable String restaurantId,
+			@RequestBody MenuItem menuItem) {
+
+		Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+		if (restaurantId == null || restaurantId.isEmpty()) {
+			throw new ReportNotFoundException("Restaurant does not exist with the given Id.");
+		}
+		if (menuItem.getPrice() < 0) {
+			throw new IllegalArgumentException("Price of menu item cannot be negative.");
+		}
+		if (menuItem.getQuantity() < 0) {
+			throw new IllegalArgumentException("Quantity of menu item cannot be negative.");
+		}
+		if (menuItem.getName() == null || menuItem.getName().isEmpty()) {
+			throw new IllegalArgumentException("Menu item name cannot be empty.");
+		}
+		if (menuItemService.existsByNameAndRestaurantId(menuItem.getName(), restaurantId)) {
+			throw new DuplicateMenuItemException("Menu item with this name already exists in this restaurant.");
+		}
+
+		menuItem.setRestaurant(restaurant);
+		List<MenuItem> createdMenuItems = restaurantService.addMenuItem(restaurantId, menuItem);
+		List<MenuItemDTO> createdMenuItemDTOs = MenuItemMapper.toMenuItemDTOList(createdMenuItems);
+		return new ResponseEntity<>(createdMenuItemDTOs, HttpStatus.CREATED);
 	}
 
 	// Get a restaurant's feedbacks
@@ -118,27 +231,55 @@ public class RestaurantController {
 		return new ResponseEntity<>(averageRating, HttpStatus.OK);
 	}
 
-	// Find restaurants by location
-	@GetMapping("/search/location")
-	public ResponseEntity<List<Restaurant>> findRestaurantsByLocation(@RequestParam String location) {
+	// // Find restaurants by location
+	// @GetMapping("/search/location")
+	// public ResponseEntity<List<RestaurantDTO>>
+	// findRestaurantsByLocation(@RequestParam String location) {
+	// List<Restaurant> restaurants =
+	// restaurantService.findRestaurantsByLocation(location);
+	// List<RestaurantDTO> restaurantDTOs = restaurants.stream()
+	// .map(RestaurantMapper::toRestaurantDTO)
+	// .collect(Collectors.toList());
+	// return new ResponseEntity<>(restaurantDTOs, HttpStatus.OK);
+	// }
+
+	@GetMapping("/search/location/{location}")
+	public ResponseEntity<List<RestaurantDTO>> findRestaurantsByLocation(@PathVariable String location) {
 		List<Restaurant> restaurants = restaurantService.findRestaurantsByLocation(location);
-		return new ResponseEntity<>(restaurants, HttpStatus.OK);
+
+		if (restaurants.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+
+		List<RestaurantDTO> restaurantDTOs = restaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(restaurantDTOs);
 	}
 
 	// Find restaurants nearby
-	@GetMapping("/search/nearby")
-	public ResponseEntity<List<Restaurant>> findRestaurantsNearby(
-			@RequestParam double latitude,
-			@RequestParam double longitude,
-			@RequestParam double radiusKm) {
+	@GetMapping("/search/nearby/{latitude}/{longitude}/{radiusKm}")
+	public ResponseEntity<List<RestaurantDTO>> findRestaurantsNearby(
+			@PathVariable double latitude,
+			@PathVariable double longitude,
+			@PathVariable double radiusKm) {
+
 		List<Restaurant> nearbyRestaurants = restaurantService.findRestaurantsNearby(latitude, longitude, radiusKm);
-		return new ResponseEntity<>(nearbyRestaurants, HttpStatus.OK);
+
+		if (nearbyRestaurants.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+		List<RestaurantDTO> nearbyRestaurantDTOs = nearbyRestaurants.stream()
+				.map(RestaurantMapper::toRestaurantDTO)
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(nearbyRestaurantDTOs);
 	}
 
+	// Get reports for a restaurant
 	@GetMapping("/{restaurantId}/reports")
-    public ResponseEntity<List<Report>> getReportsByRestaurant(@PathVariable String restaurantId) {
-        List<Report> reports = restaurantService.getRestaurantReport(restaurantId);
-        return new ResponseEntity<>(reports, HttpStatus.OK);
-    }
-
+	public ResponseEntity<List<Report>> getReportsByRestaurant(@PathVariable String restaurantId) {
+		List<Report> reports = restaurantService.getRestaurantReport(restaurantId);
+		return new ResponseEntity<>(reports, HttpStatus.OK);
+	}
 }

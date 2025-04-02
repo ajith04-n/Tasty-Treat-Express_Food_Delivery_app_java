@@ -18,6 +18,8 @@ public interface RestaurantService {
 	public List<Restaurant> findAll();
 	public Restaurant getRestaurantById(String restaurantId);
 	public Restaurant updateRestaurant(@Valid Restaurant restaurant);  
+	public Restaurant updateRestaurant(String restaurantId,@Valid Restaurant restaurant);
+
 	
 	 // - newAddional methods -
 	public void deleteRestaurant(String restaurantId);
@@ -32,7 +34,8 @@ public interface RestaurantService {
 	public List<Feedback> addFeedback(String restaurantId, Feedback feedback);
 	public List<MenuItem> addMenuItem(String restaurantId, MenuItem menuItem);
 	public List<Restaurant> findRestaurantsNearby(double userLat, double userLon, double radiusKm);
-
+    public boolean existsById(String restaurantId);
+   
 
 	
 	

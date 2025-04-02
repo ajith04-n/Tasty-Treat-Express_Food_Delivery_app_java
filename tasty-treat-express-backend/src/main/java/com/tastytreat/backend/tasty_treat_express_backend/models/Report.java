@@ -7,6 +7,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +25,7 @@ import java.util.Map;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @Entity
@@ -57,6 +59,7 @@ public class Report {
     private Double averageFeedbackRating;
     private Integer positiveFeedbackCount;
     private Integer negativeFeedbackCount;
+
     @ElementCollection
     @CollectionTable(name = "feedback_rating_distribution", joinColumns = @JoinColumn(name = "report_id"))
     @MapKeyColumn(name = "rating")
@@ -85,14 +88,17 @@ public class Report {
     private Integer outOfStockCount;
    
     
-    @ManyToOne(cascade = CascadeType.ALL)
+    //@ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @JsonBackReference("reportUserReference")
+   // @JsonBackReference("reportUserReference")
+   @JsonIgnoreProperties("reports")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-    @JsonBackReference("restaurantReportReference")
+   // @JsonBackReference("restaurantReportReference")
+    @JsonIgnoreProperties("reports")
     private Restaurant restaurant;
 
     private String reportType;

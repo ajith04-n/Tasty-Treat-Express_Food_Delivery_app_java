@@ -19,7 +19,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
-import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepo;
+import com.tastytreat.backend.tasty_treat_express_backend.repositories.FeedbackRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.OrderRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
@@ -34,7 +34,7 @@ public class FeedbackServiceImplTest {
     private FeedbackServiceImpl feedbackService;
 
     @Mock
-    private FeedbackRepo feedbackRepository;
+    private FeedbackRepository feedbackRepository;
 
     @Mock
     private OrderRepository orderRepository;
@@ -65,16 +65,16 @@ public class FeedbackServiceImplTest {
 
         order = new Order();
         order.setOrderId(1L);
-        order.setCustomer(user);
+        order.setUser(user);
         order.setRestaurant(restaurant);
         order.setMenuItems(List.of(menuItem));
 
         feedback = new Feedback();
         feedback.setFeedbackId(1L);
-        feedback.setOrder(order);
+        feedback.setOrders(order);
         feedback.setRestaurant(restaurant);
         feedback.setUser(user);
-        feedback.setMenuItem(menuItem);
+        feedback.setMenuItems(menuItem);
         feedback.setRating(5);
         feedback.setComments("Great food!");
         feedback.setFeedbackDate(LocalDateTime.now());
@@ -103,7 +103,7 @@ public class FeedbackServiceImplTest {
         Feedback createdFeedback = feedbackService.addMenuItemFeedback(1L, 1L, feedback);
 
         Assertions.assertNotNull(createdFeedback);
-        Assertions.assertEquals("Pizza", createdFeedback.getMenuItem().getName());
+        Assertions.assertEquals("Pizza", createdFeedback.getMenuItems().getName());
         Assertions.assertEquals(5, createdFeedback.getRating());
         Mockito.verify(feedbackRepository, Mockito.times(1)).save(feedback);
     }
