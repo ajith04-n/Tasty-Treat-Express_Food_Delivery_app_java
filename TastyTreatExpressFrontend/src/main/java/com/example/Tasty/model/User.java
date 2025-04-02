@@ -1,7 +1,6 @@
-package com.example.frontend.model;
+package com.example.Tasty.model;
 
 import java.io.Serializable;
-
 
 import java.util.ArrayList;
 import java.util.List;

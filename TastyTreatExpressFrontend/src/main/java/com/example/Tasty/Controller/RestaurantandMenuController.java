@@ -1,6 +1,6 @@
-package com.example.frontend.Controller;
-import java.util.Arrays;
+package com.example.Tasty.Controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 
 @Controller
-public class RestUiController {
+public class RestaurantandMenuController {
 
     @Autowired
     private RestTemplate restTemplate;
