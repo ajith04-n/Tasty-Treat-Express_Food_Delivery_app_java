@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Haven - Place Order</title>
+    <style>
+        :root {
+            --primary-color: #e23744;
+            --secondary-color: #fc8019;
+            --dark-color: #2b1e16;
+            --light-color: #f8f8f8;
+            --text-color: #282c3f;
+            --light-text: #686b78;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Proxima Nova', Arial, sans-serif;
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* Header Styles */
+        .app-header {
+            background-color: white;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .user-actions a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: 600;
+        }
+        
+        /* Restaurant Banner */
+        .restaurant-banner {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        
+        .restaurant-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .restaurant-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+        
+        .restaurant-meta span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .restaurant-meta i {
+            margin-right: 5px;
+        }
+        
+        /* Order Container */
+        .order-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+        }
+        
+        .menu-section {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+        
+        .order-summary {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            padding: 20px;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+        
+        /* Menu Categories */
+        .menu-categories {
+            display: flex;
+            border-bottom: 1px solid #e9e9eb;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+        
+        .menu-category {
+            padding: 15px 10px;
+            font-weight: 600;
+            color: var(--light-text);
+            white-space: nowrap;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-category:hover {
+            color: var(--primary-color);
+        }
+        
+        .menu-category.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        /* Menu Items */
+        .menu-items {
+            padding: 20px;
+        }
+        
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9e9eb;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .item-price {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 5px 0;
+        }
+        
+        .item-desc {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .item-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #d4d5d9;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity {
+            margin: 0 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .add-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Order Summary */
+        .summary-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9e9eb;
+        }
+        
+        .selected-items {
+            margin-bottom: 20px;
+        }
+        
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .item-total {
+            font-weight: 600;
+        }
+        
+        .bill-details {
+            border-top: 1px dashed #d4d5d9;
+            border-bottom: 1px dashed #d4d5d9;
+            padding: 15px 0;
+            margin: 15px 0;
+        }
+        
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .bill-total {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .checkout-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        /* Delivery Info */
+        .delivery-info {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        
+        .delivery-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .delivery-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d4d5d9;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        /* Footer */
+        .app-footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-links a {
+            color: #bebfc5;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .contact-info {
+            color: #bebfc5;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #3e3e44;
+            margin-top: 20px;
+            color: #bebfc5;
+            font-size: 0.8rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .order-container {
+                flex-direction: column;
+                padding: 0 15px;
+            }
+            
+            .delivery-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .footer-section {
+                min-width: 150px;
+            }
+        }
+        
+        /* Hidden items */
+        .menu-category-content {
+            display: none;
+        }
+        
+        .menu-category-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="logo">TastyTreats</div>
+        <div class="user-actions">
+            <a href="#">Home</a>
+            <a href="#">My Orders</a>
+            <a href="#">Profile</a>
+        </div>
+    </header>
+    
+    <!-- Restaurant Banner -->
+    <div class="restaurant-banner">
+        <h1 class="restaurant-name">Pizza Haven</h1>
+        <div class="restaurant-meta">
+            <span><i>🍕</i> Italian</span>
+            <span><i>⏱️</i> 30-45 min</span>
+            <span><i>💰</i> $2.99 delivery</span>
+            <span><i>📦</i> Min $12.00</span>
+        </div>
+    </div>
+    
+    <!-- Order Container -->
+    <div class="order-container">
+        <!-- Menu Section -->
+        <div class="menu-section">
+            <!-- Menu Categories -->
+            <div class="menu-categories">
+                <div class="menu-category active" data-category="recommended">Recommended</div>
+                <div class="menu-category" data-category="pizzas">Pizzas</div>
+                <div class="menu-category" data-category="appetizers">Appetizers</div>
+                <div class="menu-category" data-category="burgers">Burgers</div>
+                <div class="menu-category" data-category="drinks">Drinks</div>
+                <div class="menu-category" data-category="desserts">Desserts</div>
+            </div>
+            
+            <!-- Menu Items -->
+            <div class="menu-items">
+                <!-- Recommended Items -->
+                <div id="recommended" class="menu-category-content active">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Margherita Pizza</div>
+                            <div class="item-price">$9.99</div>
+                            <div class="item-desc">Classic pizza with tomato sauce, mozzarella, and basil</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Pepperoni Pizza</div>
+                            <div class="item-price">$11.99</div>
+                            <div class="item-desc">Classic pizza with tomato sauce, mozzarella, and pepperoni</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pizzas -->
+                <div id="pizzas" class="menu-category-content">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Margherita Pizza</div>
+                            <div class="item-price">$9.99</div>
+                            <div class="item-desc">Classic pizza with tomato sauce, mozzarella, and basil</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Pepperoni Pizza</div>
+                            <div class="item-price">$11.99</div>
+                            <div class="item-desc">Classic pizza with tomato sauce, mozzarella, and pepperoni</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Vegetarian Pizza</div>
+                            <div class="item-price">$10.99</div>
+                            <div class="item-desc">Pizza with bell peppers, mushrooms, onions, and olives</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Hawaiian Pizza</div>
+                            <div class="item-price">$12.99</div>
+                            <div class="item-desc">Pizza with ham, pineapple, and mozzarella</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Appetizers -->
+                <div id="appetizers" class="menu-category-content">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Garlic Bread</div>
+                            <div class="item-price">$4.99</div>
+                            <div class="item-desc">Freshly baked bread with garlic butter</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Bruschetta</div>
+                            <div class="item-price">$5.99</div>
+                            <div class="item-desc">Toasted bread topped with tomatoes, garlic, and fresh basil</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Mozzarella Sticks</div>
+                            <div class="item-price">$6.99</div>
+                            <div class="item-desc">Breaded mozzarella cheese fried to perfection</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Burgers -->
+                <div id="burgers" class="menu-category-content">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Classic Cheeseburger</div>
+                            <div class="item-price">$8.99</div>
+                            <div class="item-desc">Beef patty with cheese, lettuce, tomato, and special sauce</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Bacon Burger</div>
+                            <div class="item-price">$9.99</div>
+                            <div class="item-desc">Beef patty with bacon, cheese, and caramelized onions</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drinks -->
+                <div id="drinks" class="menu-category-content">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Coca-Cola</div>
+                            <div class="item-price">$2.49</div>
+                            <div class="item-desc">16oz bottle</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Lemonade</div>
+                            <div class="item-price">$3.49</div>
+                            <div class="item-desc">Freshly squeezed lemonade</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Iced Tea</div>
+                            <div class="item-price">$2.99</div>
+                            <div class="item-desc">Freshly brewed iced tea</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Desserts -->
+                <div id="desserts" class="menu-category-content">
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Tiramisu</div>
+                            <div class="item-price">$5.99</div>
+                            <div class="item-desc">Classic Italian dessert with coffee-soaked ladyfingers</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-info">
+                            <div class="item-name">Chocolate Lava Cake</div>
+                            <div class="item-price">$6.49</div>
+                            <div class="item-desc">Warm chocolate cake with a molten center</div>
+                        </div>
+                        <div class="item-controls">
+                            <button class="quantity-btn">-</button>
+                            <span class="quantity">0</span>
+                            <button class="quantity-btn">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <div class="summary-title">Your Order</div>
+            
+            <div class="selected-items">
+                <!-- Items will be added dynamically -->
+                <div class="empty-cart">Your cart is empty</div>
+            </div>
+            
+            <div class="bill-details">
+                <div class="bill-row">
+                    <span>Item Total</span>
+                    <span>$0.00</span>
+                </div>
+                <div class="bill-row">
+                    <span>Delivery Fee</span>
+                    <span>$2.99</span>
+                </div>
+                <div class="bill-row">
+                    <span>Taxes</span>
+                    <span>$0.00</span>
+                </div>
+            </div>
+            
+            <div class="bill-row bill-total">
+                <span>Total</span>
+                <span>$2.99</span>
+            </div>
+            
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+    
+    <!-- Delivery Information -->
+    <div class="delivery-info">
+        <h2 class="delivery-title">Delivery Information</h2>
+        <form class="delivery-form" th:action="@{/placeorder}" method="post">
+            <input type="hidden" th:name="customerid" th:value="${customer.id}">
+            <input type="hidden" th:name="restaurantid" th:value="1">
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="address">Delivery Address</label>
+                <textarea id="address" th:name="deliveryaddress" rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="payment">Payment Method</label>
+                <select id="payment" th:name="paymentmethod" required>
+                    <option value="">Select payment method</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Debit Card">Debit Card</option>
+                    <option value="PayPal">PayPal</option>
+                    <option value="Cash on Delivery">Cash on Delivery</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="instructions">Delivery Instructions (Optional)</label>
+                <textarea id="instructions" name="instructions" rows="2"></textarea>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3 class="footer-title">TastyTreats</h3>
+                <p class="contact-info">
+                    Your favorite food, delivered fast and fresh to your doorstep.
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Restaurants</a></li>
+                    <li><a href="#">Cart</a></li>
+                    <li><a href="#">My Orders</a></li>
+                    <li><a href="#">Profile</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">Categories</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Pizza</a></li>
+                    <li><a href="#">Burgers</a></li>
+                    <li><a href="#">Sushi</a></li>
+                    <li><a href="#">Mexican</a></li>
+                    <li><a href="#">Vegetarian</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">Contact Us</h3>
+                <p class="contact-info">
+                    123 Main Street, Anytown, USA<br>
+                    +1 (555) 123-4567<br>
+                    info@tastytreats.com
+                </p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2023 TastyTreats. All rights reserved.
+        </div>
+    </footer>
+    
+    <script>
+        // Category switching functionality
+        document.querySelectorAll('.menu-category').forEach(category => {
+            category.addEventListener('click', function() {
+                // Remove active class from all categories
+                document.querySelectorAll('.menu-category').forEach(c => {
+                    c.classList.remove('active');
+                });
+                
+                // Add active class to clicked category
+                this.classList.add('active');
+                
+                // Hide all menu category contents
+                document.querySelectorAll('.menu-category-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the selected category content
+                const categoryId = this.getAttribute('data-category');
+                document.getElementById(categoryId).classList.add('active');
+            });
+        });
+        
+        // Quantity controls
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const quantityElement = this.parentElement.querySelector('.quantity');
+                let quantity = parseInt(quantityElement.textContent);
+                
+                if (this.textContent === '+') {
+                    quantity++;
+                } else if (this.textContent === '-' && quantity > 0) {
+                    quantity--;
+                }
+                
+                quantityElement.textContent = quantity;
+                updateOrderSummary();
+            });
+        });
+        
+        // Update order summary
+        function updateOrderSummary() {
+            const selectedItemsContainer = document.querySelector('.selected-items');
+            let itemTotal = 0;
+            let html = '';
+            
+            // Get all items with quantity > 0
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const quantity = parseInt(item.querySelector('.quantity').textContent);
+                if (quantity > 0) {
+                    const itemName = item.querySelector('.item-name').textContent;
+                    const itemPrice = parseFloat(item.querySelector('.item-price').textContent.replace('$', ''));
+                    const itemTotalPrice = (itemPrice * quantity).toFixed(2);
+                    
+                    html += `
+                        <div class="selected-item">
+                            <span>${itemName} × ${quantity}</span>
+                            <span class="item-total">$${itemTotalPrice}</span>
+                        </div>
+                    `;
+                    
+                    itemTotal += itemPrice * quantity;
+                }
+            });
+            
+            if (html === '') {
+                html = '<div class="empty-cart">Your cart is empty</div>';
+                selectedItemsContainer.innerHTML = html;
+            } else {
+                selectedItemsContainer.innerHTML = html;
+            }
+            
+            // Update totals
+            const deliveryFee = 2.99;
+            const tax = (itemTotal * 0.08).toFixed(2);
+            const total = (parseFloat(itemTotal) + deliveryFee + parseFloat(tax)).toFixed(2);
+            
+            document.querySelector('.bill-row:nth-child(1) span:last-child').textContent = `$${itemTotal.toFixed(2)}`;
+            document.querySelector('.bill-row:nth-child(3) span:last-child').textContent = `$${tax}`;
+            document.querySelector('.bill-total span:last-child').textContent = `$${total}`;
+        }
+    </script>
+</body>
+</html>

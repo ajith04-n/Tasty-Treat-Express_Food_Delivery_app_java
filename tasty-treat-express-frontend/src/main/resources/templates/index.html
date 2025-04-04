@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tasty Treat Express</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet" />
+    <link
+      href="assets/vendor/glightbox/css/glightbox.min.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
+    <link href="assets/css/main.css" rel="stylesheet" />
+  </head>
+
+  <body class="index-page">
+    <header id="header" class="header fixed-top">
+      <div class="topbar d-flex align-items-center">
+        <div
+          class="container d-flex justify-content-center justify-content-md-between"
+        >
+          <div class="contact-info d-flex align-items-center">
+            <i class="bi bi-envelope d-flex align-items-center"
+              ><a href="mailto:contact@example.com"
+                >myspringjourney@tastytreatexpress.com</a
+              ></i
+            >
+            <i class="bi bi-phone d-flex align-items-center ms-4"
+              ><span>+91 7013920820</span></i
+            >
+          </div>
+          <div class="languages d-none d-md-flex align-items-center">
+            <ul>
+              <li>En</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="branding d-flex align-items-cente">
+        <div
+          class="container position-relative d-flex align-items-center justify-content-between"
+        >
+          <a
+            href="index.html"
+            class="logo d-flex align-items-center me-auto me-xl-0"
+          >
+            <h1 class="sitename"></h1>
+          </a>
+
+          <nav id="navmenu" class="navmenu">
+            <ul th:if="${session.user != null || session.restaurant != null}">
+              <li>
+                <a href="#" class="active">Home<br /></a>
+              </li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#menu">Restaurants</a></li>
+              <li><a href="#specials">Specials</a></li>
+              <li><a href="#events">Events</a></li>
+
+              <li class="dropdown">
+                <a href="#"
+                  ><span>Functionalities</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i
+                ></a>
+                <ul>
+                  <li th:if="${session.restaurant != null}"><a href="/restaurants/addresform">Add Restaurant</a></li>
+                  <li th:if="${session.restaurant != null}" class="dropdown">
+                    <a href="#"
+                      ><span>Menu Section</span>
+                      <i class="bi bi-chevron-down toggle-dropdown"></i
+                    ></a>
+                    <ul>
+                      <li><a href="/menu/add">Add-menuItem</a></li>
+                      <li><a href="/menu/update">Update-menuItem</a></li>
+                      <li><a href="/menu/delete">Delete-menuItem</a></li>
+                      <li><a href="/menu/viewAllMenu">View All Menus</a></li>
+                    </ul>
+                  </li>
+
+                  <li th:if="${session.restaurant != null}">
+                    <a href="/orders/updateStatus">Update Order Status</a>
+                  </li>
+                  <li th:if="${session.restaurant != null}">
+                    <a href="/orders/updateEstimatedDeliveryTime"
+                      >Update Delivery Time</a
+                    >
+                  </li>
+
+                  <li class="dropdown">
+                    <a href="#"
+                      ><span>View Order Section</span>
+                      <i class="bi bi-chevron-down toggle-dropdown"></i
+                    ></a>
+                    <ul>
+                      <li><a href="/orders/viewOrders">View All Orders</a></li>
+                      <li>
+                        <a href="/orders/viewByPaymentMethod"
+                          >View Orders by paymentMethod</a
+                        >
+                      </li>
+                      <li>
+                        <a href="/orders/viewByStatus">View Orders by status</a>
+                      </li>
+                      <li>
+                        <a href="/orders/viewByDate">View Orders by date</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a href="/orders/delete">Delete order</a></li>
+                </ul>
+              </li>
+              <li>
+                <a
+                  th:href="@{/update}"
+                  class="auth-link"
+                  style="margin-right: 15px"
+                  >Profile</a
+                >
+              </li>
+              <li><a href="/logoutReq" class="auth-link">Logout</a></li>
+			  
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+            
+            <ul th:if="${session.user == null && session.restaurant == null}">
+              <li>
+                <a href="#" class="active">Home<br /></a>
+              </li>
+              <li><a href="/restaurant/login">Add Restaurant</a></li>
+              <li><a href="/login">Login</a></li>
+             
+              <li><a href="/register">Register</a></li>
+            </ul>
+
+            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+          </nav>
+
+          <!--    <a class="btn-book-a-table d-none d-xl-block" href="#book-a-table">Contact No</a> -->
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section id="hero" class="hero section dark-background">
+        <img src="assets/img/hero-bg.jpg" alt="" data-aos="fade-in" />
+
+        <div class="container">
+          <div class="row">
+            <div
+              class="col-lg-8 d-flex flex-column align-items-center align-items-lg-start"
+            >
+              <h2 data-aos="fade-up" data-aos-delay="100">
+                Welcome to <span>Tasty Treat Express</span>
+              </h2>
+              <p data-aos="fade-up" data-aos-delay="200">
+                Bringing Restaurant Dining to Your Home, Just a Click Away
+              </p>
+              <div class="d-flex mt-4" data-aos="fade-up" data-aos-delay="300">
+                <a href="#menu" class="cta-btn">Our Menu</a>
+              </div>
+            </div>
+            <div
+              class="col-lg-4 d-flex align-items-center justify-content-center mt-5 mt-lg-0"
+            >
+              <!--https://www.youtube.com/watch?v=95SNbn340TE-->
+              <a
+                href="assets/img/bg.mp4"
+                class="glightbox pulsating-play-btn"
+              ></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section id="about" class="about section">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-4">
+            <div class="col-lg-6 order-1 order-lg-2">
+              <!-- assets/img/about.jpg
+             https://s1.1zoom.me/b5353/683/Fast_food_Hamburger_Vegetables_Bottle_530823_1366x768.jpg
+             https://static.vecteezy.com/system/resources/previews/023/010/452/non_2x/the-fast-food-meal-in-the-black-background-with-ai-generated-free-photo.jpg-->
+              <img
+                src="https://static.vecteezy.com/system/resources/previews/023/010/452/non_2x/the-fast-food-meal-in-the-black-background-with-ai-generated-free-photo.jpg"
+                class="img-fluid about-img h-100"
+                alt=""
+              />
+            </div>
+            <div class="col-lg-6 order-2 order-lg-1 content">
+              <h3>Our Story</h3>
+              <p class="fst-italic">
+                At Tasty Treat Express, we’re passionate about bringing
+                restaurant-quality food to your doorstep. Our platform connects
+                you with local restaurants, providing a seamless ordering
+                experience with real-time updates. Whether you're craving
+                comfort food or looking to try something new, we’ve got you
+                covered!
+              </p>
+              <ul>
+                <li>
+                  <i class="bi bi-check2-all"></i>
+                  <span
+                    >Fast and reliable food delivery from local
+                    restaurants.</span
+                  >
+                </li>
+                <li>
+                  <i class="bi bi-check2-all"></i>
+                  <span
+                    >A wide variety of dishes, from comfort food to gourmet
+                    meals.</span
+                  >
+                </li>
+                <li>
+                  <i class="bi bi-check2-all"></i>
+                  <span
+                    >Real-time updates on your orders, so you’re always in the
+                    loop. A commitment to high-quality, fresh ingredients in
+                    every meal.</span
+                  >
+                </li>
+              </ul>
+              <p>
+                Experience dining in a new way with Tasty Treat Express—where
+                convenience and deliciousness meet.Our team works hard to ensure
+                your experience is seamless, from browsing menus to placing
+                orders.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /About Section -->
+
+      <!-- Why Us Section -->
+      <section id="why-us" class="why-us section">
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>WHY US</h2>
+          <p>Why Choose Tasty Treat Express</p>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="container">
+          <div class="row gy-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+              <div class="card-item">
+                <span>01</span>
+                <h4>
+                  <a href="" class="stretched-link">Unmatched Convenience</a>
+                </h4>
+                <p>
+                  Enjoy restaurant-quality meals delivered to your doorstep with
+                  just a few clicks. Our easy-to-use platform allows you to
+                  browse menus, place orders, and track deliveries in real-time,
+                  all from the comfort of your home.
+                </p>
+              </div>
+            </div>
+            <!-- Card Item -->
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+              <div class="card-item">
+                <span>02</span>
+                <h4>
+                  <a href="" class="stretched-link">Wide Variety of Options</a>
+                </h4>
+                <p>
+                  From comforting classics to gourmet meals, we offer a wide
+                  range of delicious options from local restaurants. Whatever
+                  you're craving, there's something for everyone.
+                </p>
+              </div>
+            </div>
+            <!-- Card Item -->
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+              <div class="card-item">
+                <span>03</span>
+                <h4>
+                  <a href="" class="stretched-link"
+                    >Fresh, High-Quality Ingredients</a
+                  >
+                </h4>
+                <p>
+                  We only work with restaurants that prioritize fresh,
+                  high-quality ingredients. You can count on every meal to be
+                  crafted with care and delivered hot, fresh, and right on time.
+                </p>
+              </div>
+            </div>
+            <!-- Card Item -->
+          </div>
+        </div>
+      </section>
+      <!-- /Why Us Section -->
+
+      <!-- Menu Section 
+<section id="menu" class="menu section">
+
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Menu</h2>
+    <p>Check Our Tasty Menu</p>
+  </div>
+
+  <div class="container isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+    <div class="row" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-lg-12 d-flex justify-content-center">
+        <ul class="menu-filters isotope-filters">
+          <li data-filter="*" class="filter-active">All</li>
+          <li data-filter=".filter-starters">Starters</li>
+          <li data-filter=".filter-salads">Salads</li>
+          <li data-filter=".filter-specialty">Specialty</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row isotope-container" data-aos="fade-up" data-aos-delay="200">
+
+      <div th:each="menuItem : ${menuItems}" th:class="'col-lg-6 menu-item isotope-item filter-' + ${menuItem.category}">
+        <img th:src="@{${menuItem.imageUrl}}" class="menu-img" alt="">
+        <div class="menu-content">
+          <a th:text="${menuItem.name}">Item Name</a><span th:text="'$' + ${menuItem.price}">$0.00</span>
+        </div>
+        <div class="menu-ingredients" th:text="${menuItem.description}">
+          Description
+        </div>
+        <div class="menu-button d-flex justify-content-end mt-2">
+          <form action="/orders/order/details" method="post">
+            <input type="hidden" name="menuItemId" th:value="${menuItem.id}">
+            <input type="hidden" name="menuItemName" th:value="${menuItem.name}">
+            <input type="hidden" name="price" th:value="${menuItem.price}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">Order Now</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+-->
+
+      <!-- 
+Restaurants Section - v1
+  <section
+        th:if="${session.user != null}"
+        class="menu section"
+        id="menu"
+        style="height: 100vh"
+      >
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Our Restaurants</h2>
+          <p>Explore Our Delicious Restaurants</p>
+        </div>
+
+        <div
+          class="container isotope-layout"
+          data-layout="masonry"
+          data-sort="original-order"
+        >
+          <div class="row" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-12 d-flex justify-content-center"></div>
+          </div>
+
+          <div
+            class="row isotope-container"
+            id="restaurant-list"
+            data-aos="fade-up"
+            data-aos-delay="200"
+            style="height: fit-content"
+          ></div>
+        </div>
+  </section>
+
+    <script>
+        function loadRestaurants() {
+          fetch("http://localhost:8082/restaurants/allres")
+            .then((response) => response.json())
+            .then((data) => {
+              const restaurantList = document.getElementById("restaurant-list");
+              restaurantList.innerHTML = "";
+              data.forEach((restaurant) => {
+                const restaurantItem = document.createElement("div");
+                restaurantItem.classList.add(
+                  "col-lg-6",
+                  "restaurant-item",
+                  "isotope-item"
+                );
+
+                restaurantItem.innerHTML = 
+               `
+            <img src="assets/img/hero-bg.jpg" class="menu-img" alt="${restaurant.name}">
+            <div class="menu-content">
+              <a href="/menu/add/${restaurant.restaurantId}" class="menu-name">${restaurant.name}</a>
+              <span class="restaurant-address">${restaurant.address}</span>
+            </div>
+            <div class="menu-ingredients" class="restaurant-description">${restaurant.description}</div>
+            <div class="restaurant-button d-flex justify-content-end mt-2">
+              <a href="/restaurants/${restaurant.id}" class="btn btn-outline-primary btn-sm">View Details</a>
+            </div>
+          `;
+                restaurantList.appendChild(restaurantItem);
+              });
+            })
+            .catch((error) => {
+              console.error("Error fetching restaurants:", error);
+              alert("An error occurred while loading the restaurants." + error);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadRestaurants);
+    </script>
+  -->
+
+      <section id="menu">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Our Restaurants</h2>
+          <p>Explore Our Restaurants</p>
+        </div>
+
+        <div
+          class="container isotope-layout"
+          data-layout="masonry"
+          data-sort="original-order"
+        >
+          <div
+            class="restaurant-grid"
+            id="restaurant-list"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          ></div>
+        </div>
+      </section>
+
+      <style>
+        .restaurant-grid {
+          display: grid;
+          grid-template-columns: repeat(
+            auto-fill,
+            minmax(250px, 1fr)
+          ); /* Responsive grid */
+          gap: 30px;
+          padding: 20px;
+        }
+
+        .restaurant-item {
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+          transition: transform 0.3s ease;
+        }
+
+        .restaurant-item:hover {
+          transform: translateY(-10px);
+        }
+
+        .card-img-top {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+        }
+
+        .card-body {
+          padding: 15px;
+        }
+
+        .card-title {
+          font-size: 1.25rem;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+
+        .card-text {
+          font-size: 1rem;
+          color: #555;
+          margin-bottom: 15px;
+        }
+
+        .btn-primary {
+          background-color: #ff6347;
+          border-color: #ff6347;
+          padding: 10px 20px;
+          text-decoration: none;
+          color: white;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+          background-color: #ff4500;
+          border-color: #ff4500;
+        }
+      </style>
+
+      <script>
+        function loadRestaurants() {
+          fetch("http://localhost:8082/restaurants/allres")
+            .then((response) => response.json())
+            .then((data) => {
+              const restaurantList = document.getElementById("restaurant-list");
+              restaurantList.innerHTML = "";
+
+              data.forEach((restaurant) => {
+                const restaurantItem = document.createElement("div");
+                restaurantItem.classList.add("restaurant-item");
+
+              
+                restaurantItem.innerHTML = `
+            <div class="card">
+              <img class="card-img-top" src="assets/img/about.jpg" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">${restaurant.name}</h5>
+                <p class="card-text">${restaurant.description}</p>
+                <a href="/restaurants/${restaurant.restaurantId}" class="btn btn-primary">Explore Menu</a>
+              </div>
+            </div>
+          `;
+
+                restaurantList.appendChild(restaurantItem);
+              });
+            })
+            .catch((error) => {
+              console.error("Error fetching restaurants:", error);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadRestaurants);
+      </script>
+
+      <!-- Specials Section -->
+      <section
+        th:if="${session.user != null}"
+        id="specials"
+        class="specials section"
+      >
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Specials</h2>
+          <p>Check Out Our Exclusive Deals and Offers</p>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row">
+            <div class="col-lg-3">
+              <ul class="nav nav-tabs flex-column">
+                <li class="nav-item">
+                  <a
+                    class="nav-link active show"
+                    data-bs-toggle="tab"
+                    href="#specials-tab-1"
+                    >Exclusive Daily Deals</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    data-bs-toggle="tab"
+                    href="#specials-tab-2"
+                    >Meal Combo Offers</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    data-bs-toggle="tab"
+                    href="#specials-tab-3"
+                    >New Arrivals</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    data-bs-toggle="tab"
+                    href="#specials-tab-4"
+                    >Seasonal Promotions</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    data-bs-toggle="tab"
+                    href="#specials-tab-5"
+                    >Discounted Favorites</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="col-lg-9 mt-4 mt-lg-0">
+              <div class="tab-content">
+                <div class="tab-pane active show" id="specials-tab-1">
+                  <div class="row">
+                    <div class="col-lg-8 details order-2 order-lg-1">
+                      <h3>Exclusive Daily Deals</h3>
+                      <p class="fst-italic">
+                        Discover new daily offers on your favorite meals! These
+                        exclusive deals change every day, giving you something
+                        special to look forward to.
+                      </p>
+                      <p>
+                        Take advantage of these limited-time offers to enjoy
+                        your favorite dishes at a fraction of the price. Don’t
+                        miss out on these unbeatable deals!
+                      </p>
+                    </div>
+                    <div class="col-lg-4 text-center order-1 order-lg-2">
+                      <img
+                        src="assets/img/specials-1.png"
+                        alt="Exclusive Daily Deals"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="specials-tab-2">
+                  <div class="row">
+                    <div class="col-lg-8 details order-2 order-lg-1">
+                      <h3>Meal Combo Offers</h3>
+                      <p class="fst-italic">
+                        Get more value with our meal combo offers, where you can
+                        enjoy a variety of dishes at a discounted price when you
+                        order in sets.
+                      </p>
+                      <p>
+                        Perfect for sharing or just satisfying your cravings
+                        with variety, our combo offers ensure you get the most
+                        out of every meal.
+                      </p>
+                    </div>
+                    <div class="col-lg-4 text-center order-1 order-lg-2">
+                      <img
+                        src="assets/img/specials-2.png"
+                        alt="Meal Combo Offers"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="specials-tab-3">
+                  <div class="row">
+                    <div class="col-lg-8 details order-2 order-lg-1">
+                      <h3>New Arrivals</h3>
+                      <p class="fst-italic">
+                        Be the first to try our latest menu additions! Our new
+                        arrivals feature the freshest ingredients and unique
+                        flavors to excite your taste buds.
+                      </p>
+                      <p>
+                        Explore our new dishes and enjoy a fresh culinary
+                        experience with every bite!
+                      </p>
+                    </div>
+                    <div class="col-lg-4 text-center order-1 order-lg-2">
+                      <img
+                        src="assets/img/specials-3.png"
+                        alt="New Arrivals"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="specials-tab-4">
+                  <div class="row">
+                    <div class="col-lg-8 details order-2 order-lg-1">
+                      <h3>Seasonal Promotions</h3>
+                      <p class="fst-italic">
+                        Enjoy the flavors of the season with our seasonal
+                        promotions! From summer specials to holiday-themed
+                        dishes, we bring you the best of every season.
+                      </p>
+                      <p>
+                        Indulge in seasonal favorites that highlight fresh,
+                        local ingredients—available for a limited time only!
+                      </p>
+                    </div>
+                    <div class="col-lg-4 text-center order-1 order-lg-2">
+                      <img
+                        src="assets/img/specials-4.png"
+                        alt="Seasonal Promotions"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="specials-tab-5">
+                  <div class="row">
+                    <div class="col-lg-8 details order-2 order-lg-1">
+                      <h3>Discounted Favorites</h3>
+                      <p class="fst-italic">
+                        Our discounted favorites include some of the most-loved
+                        dishes at a fraction of the price. Enjoy comfort food
+                        and fan favorites at unbeatable rates.
+                      </p>
+                      <p>
+                        It’s the perfect chance to order your top picks and
+                        enjoy great savings. Don’t miss out on these amazing
+                        discounts!
+                      </p>
+                    </div>
+                    <div class="col-lg-4 text-center order-1 order-lg-2">
+                      <img
+                        src="assets/img/specials-5.png"
+                        alt="Discounted Favorites"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Specials Section -->
+
+      <!-- Events Section -->
+      <section
+        th:if="${session.user != null}"
+        id="events"
+        class="events section"
+      >
+        <img
+          class="slider-bg"
+          src="assets/img/events-bg.jpg"
+          alt=""
+          data-aos="fade-in"
+        />
+
+        <div class="container">
+          <div
+            class="swiper init-swiper"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <script type="application/json" class="swiper-config">
+              {
+                "loop": true,
+                "speed": 600,
+                "autoplay": {
+                  "delay": 5000
+                },
+                "slidesPerView": "auto",
+                "pagination": {
+                  "el": ".swiper-pagination",
+                  "type": "bullets",
+                  "clickable": true
+                }
+              }
+            </script>
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <div class="row gy-4 event-item">
+                  <div class="col-lg-6">
+                    <img
+                      src="assets/img/events-slider/events-slider-1.jpg"
+                      class="img-fluid"
+                      alt=""
+                    />
+                  </div>
+                  <div class="col-lg-6 pt-4 pt-lg-0 content">
+                    <h3>Exclusive Meal Previews</h3>
+                    <div class="price">
+                      <p><span>$189</span></p>
+                    </div>
+                    <p class="fst-italic">
+                      Get a sneak peek of our upcoming menu items with exclusive
+                      meal previews. Taste what’s next and give us your
+                      feedback!
+                    </p>
+                    <ul>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Exclusive access to new dishes before they hit the
+                          menu.</span
+                        >
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Interactive tasting sessions with our chefs.</span
+                        >
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Be part of the development of future meals!</span>
+                      </li>
+                    </ul>
+                    <p>
+                      Join us for a fun-filled food event and discover your next
+                      favorite dish while helping us refine our menu offerings.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- End Slider item -->
+
+              <div class="swiper-slide">
+                <div class="row gy-4 event-item">
+                  <div class="col-lg-6">
+                    <img
+                      src="assets/img/events-slider/events-slider-2.jpg"
+                      class="img-fluid"
+                      alt=""
+                    />
+                  </div>
+                  <div class="col-lg-6 pt-4 pt-lg-0 content">
+                    <h3>Seasonal Food Festivals</h3>
+                    <div class="price">
+                      <p><span>$290</span></p>
+                    </div>
+                    <p class="fst-italic">
+                      Celebrate the flavors of the season with our special food
+                      festivals, featuring fresh, seasonal ingredients in every
+                      dish.
+                    </p>
+                    <ul>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Seasonal ingredients and flavors brought to life in
+                          every dish.</span
+                        >
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Live cooking demonstrations from top chefs.</span>
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Special offers and exclusive deals on seasonal
+                          dishes.</span
+                        >
+                      </li>
+                    </ul>
+                    <p>
+                      Savor the best of what each season has to offer with
+                      curated dishes that highlight the freshest ingredients of
+                      the time.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- End Slider item -->
+
+              <div class="swiper-slide">
+                <div class="row gy-4 event-item">
+                  <div class="col-lg-6">
+                    <img
+                      src="assets/img/events-slider/events-slider-3.jpg"
+                      class="img-fluid"
+                      alt=""
+                    />
+                  </div>
+                  <div class="col-lg-6 pt-4 pt-lg-0 content">
+                    <h3>Family Feast Nights</h3>
+                    <div class="price">
+                      <p><span>$99</span></p>
+                    </div>
+                    <p class="fst-italic">
+                      Enjoy a fun and hearty family meal with our special Family
+                      Feast Nights—delicious food for the whole family to enjoy.
+                    </p>
+                    <ul>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Large platters and combo meals perfect for
+                          families.</span
+                        >
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span>Special family pricing and exclusive deals.</span>
+                      </li>
+                      <li>
+                        <i class="bi bi-check2-circle"></i>
+                        <span
+                          >Fun family activities and games to enjoy while you
+                          eat.</span
+                        >
+                      </li>
+                    </ul>
+                    <p>
+                      Bring the whole family together for a delicious,
+                      family-friendly meal at an unbeatable price.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- End Slider item -->
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </section>
+      <!-- /Events Section -->
+
+      <!-- Testimonials Section -->
+      <section
+        th:if="${session.user != null}"
+        id="testimonials"
+        class="testimonials section"
+      >
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>What Our Customers Are Saying</h2>
+          <p>Real experiences from food lovers</p>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div
+            class="swiper init-swiper"
+            data-speed="600"
+            data-delay="5000"
+            data-breakpoints='{ "320": { "slidesPerView": 1, "spaceBetween": 40 }, "1200": { "slidesPerView": 3, "spaceBetween": 40 } }'
+          >
+            <script type="application/json" class="swiper-config">
+              {
+                "loop": true,
+                "speed": 600,
+                "autoplay": {
+                  "delay": 5000
+                },
+                "slidesPerView": "auto",
+                "pagination": {
+                  "el": ".swiper-pagination",
+                  "type": "bullets",
+                  "clickable": true
+                },
+                "breakpoints": {
+                  "320": {
+                    "slidesPerView": 1,
+                    "spaceBetween": 40
+                  },
+                  "1200": {
+                    "slidesPerView": 3,
+                    "spaceBetween": 20
+                  }
+                }
+              }
+            </script>
+            <div class="swiper-wrapper">
+              <!-- Testimonial 1 -->
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >"Tasty Treat Express has made family dinners a breeze.
+                      The meals are always fresh, tasty, and delivered right to
+                      our door on time. Couldn’t ask for more!"</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                  <img
+                    src="assets/img/testimonials/testimonials-1.jpg"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Emily Rivera</h3>
+                  <h4>Mom & Happy Customer</h4>
+                </div>
+              </div>
+              <!-- End Testimonial item -->
+
+              <!-- Testimonial 2 -->
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >"I’ve tried many food delivery services, but none match
+                      the quality and variety of Tasty Treat Express. The
+                      convenience of having my favorite meals delivered is
+                      unmatched."</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                  <img
+                    src="assets/img/testimonials/testimonials-2.jpg"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Michael Johnson</h3>
+                  <h4>Busy Professional</h4>
+                </div>
+              </div>
+              <!-- End Testimonial item -->
+
+              <!-- Testimonial 3 -->
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >"Tasty Treat Express always delivers hot, delicious food,
+                      and the customer service is exceptional. I love how easy
+                      it is to order from their app!"</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                  <img
+                    src="assets/img/testimonials/testimonials-3.jpg"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Sara Thompson</h3>
+                  <h4>Food Lover & Loyal Customer</h4>
+                </div>
+              </div>
+              <!-- End Testimonial item -->
+
+              <!-- Testimonial 4 -->
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >"The best food delivery service I’ve used! I love the
+                      variety and quality of meals offered. Every time I order,
+                      it's a great experience."</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                  <img
+                    src="assets/img/testimonials/testimonials-4.jpg"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Jason Kim</h3>
+                  <h4>Tech Entrepreneur</h4>
+                </div>
+              </div>
+              <!-- End Testimonial item -->
+
+              <!-- Testimonial 5 -->
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >"Tasty Treat Express is my go-to for hassle-free meals.
+                      It saves me so much time, and the food is always fresh and
+                      delicious. Highly recommend!"</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                  <img
+                    src="assets/img/testimonials/testimonials-5.jpg"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>John Larson</h3>
+                  <h4>Entrepreneur & Satisfied Customer</h4>
+                </div>
+              </div>
+              <!-- End Testimonial item -->
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </section>
+      <!-- /Testimonials Section -->
+
+      <!-- Contact Section -->
+      <section
+        th:if="${session.user != null || session.restaurant!=null}"
+        id="contact"
+        class="contact section"
+      >
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Contact Us</h2>
+          <p>We'd love to hear from you!</p>
+        </div>
+        <!-- End Section Title -->
+
+        <div class="mb-5" data-aos="fade-up" data-aos-delay="200">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112253.87293832029!2d80.5624478129018!3d16.504440095553814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35eff9482d944b%3A0x939b7e84ab4a0265!2sVijayawada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1740334082504!5m2!1sen!2sin"
+            width="100%"
+            height="450"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <!-- End Google Maps -->
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-4">
+            <div class="col-lg-4">
+              <div
+                class="info-item d-flex"
+                data-aos="fade-up"
+                data-aos-delay="300"
+              >
+                <i class="bi bi-geo-alt flex-shrink-0"></i>
+                <div>
+                  <h3>Our Location</h3>
+                  <p>3435 Foodie Lane, Benz circle, Vijayawada 520001</p>
+                </div>
+              </div>
+              <!-- End Info Item -->
+
+              <div
+                class="info-item d-flex"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <i class="bi bi-telephone flex-shrink-0"></i>
+                <div>
+                  <h3>Open Hours</h3>
+                  <p>
+                    Monday-Sunday: <br />
+                    10:00 AM - 10:00 PM
+                  </p>
+                </div>
+              </div>
+              <!-- End Info Item -->
+
+              <div
+                class="info-item d-flex"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <i class="bi bi-telephone flex-shrink-0"></i>
+                <div>
+                  <h3>Call Us</h3>
+                  <p>+91 7013920820</p>
+                </div>
+              </div>
+              <!-- End Info Item -->
+
+              <div
+                class="info-item d-flex"
+                data-aos="fade-up"
+                data-aos-delay="500"
+              >
+                <i class="bi bi-envelope flex-shrink-0"></i>
+                <div>
+                  <h3>Email Us</h3>
+                  <p>myspringjourney@tastytreatexpress.com</p>
+                </div>
+              </div>
+              <!-- End Info Item -->
+            </div>
+
+            <div class="col-lg-8">
+              <form
+                action="/menu"
+                method="post"
+                class="php-email-form"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                <div class="row gy-4">
+                  <div class="col-md-6">
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      placeholder="Your Name"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-6">
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      placeholder="Your Email"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-12">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="subject"
+                      placeholder="Subject"
+                      required=""
+                    />
+                  </div>
+
+                  <div class="col-md-12">
+                    <textarea
+                      class="form-control"
+                      name="message"
+                      rows="6"
+                      placeholder="Message"
+                      required=""
+                    ></textarea>
+                  </div>
+
+                  <div class="col-md-12 text-center">
+                    <div class="loading">Loading</div>
+                    <div class="error-message"></div>
+                    <div class="sent-message">
+                      Your message has been sent. Thank you!
+                    </div>
+
+                    <button type="submit">Send Message</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Contact Section -->
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="logo d-flex align-items-center">
+              <span class="sitename">TastyTreatExpress</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>Vijayawada</p>
+              <p>Andhra Pradesh, India 520002</p>
+              <p class="mt-3">
+                <strong>Phone:</strong> <span>+91 7013920820</span>
+              </p>
+              <p>
+                <strong>Email:</strong>
+                <span>myspringjourney@tastytreatexpress.com</span>
+              </p>
+            </div>
+            <div class="social-links d-flex mt-4">
+              <a href=""><i class="bi bi-twitter-x"></i></a>
+              <a href=""><i class="bi bi-facebook"></i></a>
+              <a href=""><i class="bi bi-instagram"></i></a>
+              <a href=""><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">About us</a></li>
+              <li><a href="#">Services</a></li>
+              <li><a href="#">Terms of service</a></li>
+              <li><a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+          <!-- Footer Section -->
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+              <li><a href="#">Birthday Parties</a></li>
+              <li><a href="#">Private Parties</a></li>
+              <li><a href="#">Custom Party Planning</a></li>
+              <li><a href="#">Event Catering</a></li>
+              <li><a href="#">Dessert Bar Services</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-12 footer-newsletter">
+            <h4>Our Newsletter</h4>
+            <p>
+              Subscribe to our newsletter and get the latest updates on our
+              party services, special offers, and delicious treats!
+            </p>
+            <form
+              action="forms/newsletter.php"
+              method="post"
+              class="php-email-form"
+            >
+              <div class="newsletter-form">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                />
+                <input type="submit" value="Subscribe" />
+              </div>
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">
+                Your subscription request has been sent. Thank you!
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span>
+          <strong class="px-1 sitename">TastyTreatExpress</strong>
+          <span>All Rights Reserved</span>
+        </p>
+        <div class="credits">
+          Designed by
+          <a href="https://www.infosys.com/">InfosysSpringboardInterns-2025</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll Top -->
+    <a
+      href="#"
+      id="scroll-top"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
