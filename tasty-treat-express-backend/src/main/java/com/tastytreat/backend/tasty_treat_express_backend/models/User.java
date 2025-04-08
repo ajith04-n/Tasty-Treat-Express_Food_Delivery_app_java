@@ -23,87 +23,75 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-
 @Entity
-@Table(name="tbl_user")
+@Table(name = "tbl_user")
 public class User {
 	@Id
-	@SequenceGenerator(
-			name="user_sequence",
-			sequenceName = "user_sequence",
-			allocationSize=1
-	)
-	@GeneratedValue(
-			strategy = GenerationType.SEQUENCE,
-			generator = "user_sequence"
-	)
+	@SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
 	@Column(name = "user_id")
 	private long id;
-	
-	 
-	 @Email(message = "Email should be valid")
-	 @Column(name="email_id", unique = true, nullable = false)
+
+	@Email(message = "Email should be valid")
+	@Column(name = "email_id", unique = true, nullable = false)
 	private String email;
-	
-	 
-	
-	 @Column(name="user_name")
+
+	@Column(name = "user_name")
 	private String name;
-	
-	 
-	 
-	 @Size(min = 8, message = "Password must be at least 8 characters long")
-	 @Column(nullable = false)
+
+	@Size(min = 8, message = "Password must be at least 8 characters long")
+	@Column(nullable = false)
 	private String password;
-	
-	@Column 
+
+	@Column
 	private String address;
-	
-	
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
-    @Column(length = 10)
+
+	@Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
+	@Column(length = 10)
 	private String phoneNumber;
 
 	private double latitude;
 	private double longitude;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JsonManagedReference("orderUserReference")
+	// @JsonManagedReference("orderUserReference")
 	@JsonIgnoreProperties("user")
-	private List<Order> orders= new ArrayList<>();
-	
-	
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JsonManagedReference("reportUserReference")
-	@JsonIgnoreProperties("user")
-	private List<Report> reports= new ArrayList<>();
+	private List<Order> orders = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	//@JsonManagedReference("feedbackUserReference")
-	 @JsonIgnoreProperties("user")
+	// @JsonManagedReference("reportUserReference")
+	@JsonIgnoreProperties("user")
+	private List<Report> reports = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	// @JsonManagedReference("feedbackUserReference")
+	@JsonIgnoreProperties("user")
 	private List<Feedback> feedbacks = new ArrayList<>(); // i initialized here to avoid null pointer exception
 
 	@CreationTimestamp
 	@Column(name = "created_at")
 	private java.time.LocalDateTime createdAt;
-	
 
 	public java.time.LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
+
 	public void setCreatedAt(java.time.LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+
 	public List<Report> getReports() {
 		return reports;
 	}
+
 	public void setReports(List<Report> reports) {
 		this.reports = reports;
 	}
+
 	public List<Feedback> getFeedbacks() {
 		return feedbacks;
 	}
+
 	public void setFeedbacks(List<Feedback> feedbacks) {
 		this.feedbacks = feedbacks;
 	}
@@ -111,16 +99,18 @@ public class User {
 	public double getLatitude() {
 		return latitude;
 	}
+
 	public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
+		this.latitude = latitude;
+	}
+
 	public double getLongitude() {
 		return longitude;
 	}
+
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	
 
 	public List<Order> getOrders() {
 		return orders;
@@ -150,7 +140,6 @@ public class User {
 		return email;
 	}
 
-	
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -189,8 +178,7 @@ public class User {
 	}
 
 	public User() {
-		// TODO Auto-generated constructor stub
-	}
 
+	}
 
 }

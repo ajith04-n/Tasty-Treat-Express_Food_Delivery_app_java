@@ -61,6 +61,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     
     
     Feedback findByUserAndOrdersAndRestaurant(User user, Order order, Restaurant restaurant); // for existing user feedback
+    Feedback findByUserAndRestaurant(User user, Restaurant restaurant);
     Feedback findByUserAndOrdersAndMenuItem(User user, Order order, MenuItem menuItem);
 }
 

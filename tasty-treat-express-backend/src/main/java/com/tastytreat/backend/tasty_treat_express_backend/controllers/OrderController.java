@@ -52,6 +52,8 @@ public class OrderController {
             @PathVariable String restaurantId,
             @RequestBody Order orderobj) {
 
+        System.out.println("order req came..."+ orderobj.toString());
+
         if (userId == null || !userService.existsById(userId)) {
             throw new UserNotFoundException("User not found with id " + userId);
         }
@@ -81,7 +83,6 @@ public class OrderController {
         OrderDTO placedOrderDTO = OrderMapper.toOrderDTO(placedOrder);
         return ResponseEntity.status(HttpStatus.CREATED).body(placedOrderDTO);
     }
-
 
     // Retrieve order by ID
     @GetMapping("/{orderId}")
@@ -126,7 +127,6 @@ public class OrderController {
         }
     }
 
-
     @PutMapping("/updateStatus/{orderId}/{status}")
     public ResponseEntity<OrderDTO> updateOrderStatus(
             @PathVariable Long orderId,
@@ -137,7 +137,7 @@ public class OrderController {
             throw new OrderNotFoundException("Order not found with id " + orderId);
         }
 
-        List<String> validStatuses = Arrays.asList("PENDING", "SHIPPED", "DELIVERED", "CANCELLED");
+        List<String> validStatuses = Arrays.asList("PREPARING", "PENDING", "SHIPPED", "DELIVERED", "CANCELLED");
 
         if (!validStatuses.contains(status.toUpperCase())) {
             throw new InvalidOrderStatusException("Invalid order status: " + status);

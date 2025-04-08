@@ -1,11 +1,13 @@
 package com.tastytreat.backend.tasty_treat_express_backend.services;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private FeedbackRepository feedbackRepo;
     @Autowired
     private RestaurantRepository restaurantRepository;
+    @Autowired
+    private EmailService emailService;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -62,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public User findUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         System.out.println("User found by email: " + user);
-        return user.get();
+        return user.orElseThrow(() -> new UserNotFoundException("Email not found."));
     }
 
     public User saveUser(User user) {
@@ -129,10 +133,13 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Password must be at least 6 characters long.");
         }
 
-        if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$")) {
-            throw new RuntimeException(
-                    "Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, and one special character.");
-        }
+        // if
+        // (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{6,}$"))
+        // {
+        // throw new RuntimeException(
+        // "Password must be at least 6 characters long, include one uppercase letter,
+        // one lowercase letter, and one special character.");
+        // }
         if (oldPassword.equals(newPassword)) {
             throw new RuntimeException("New password must be different from the old password.");
         }
@@ -250,18 +257,71 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Old password is incorrect!");
         }
-        if (request.getNewPassword().length() < 6) {
-            throw new RuntimeException("Password must be at least 6 characters long.");
+
+        if (request.getNewPassword().length() < 8) {
+            throw new InvalidPasswordException("New password must be at least 8 characters long.");
         }
-        
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        try {
-            userRepository.save(user);
-        } catch (Exception e) {
-            throw new DatabaseOperationException("Failed to update password, please try again later.");
+    }
+
+    public boolean updateUserPassword2(long userId, PasswordUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Old password is incorrect!");
         }
+
+        if (request.getNewPassword().length() < 8) {
+            throw new InvalidPasswordException("New password must be at least 8 characters long.");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidPasswordException("New password and confirm password do not match.");
+        }
+
+        try {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to update password. Please try again later.");
+        }
+    }
+
+    // forgot password
+    public void forgotPassword(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new InvalidEmailException("Email not found in the system.");
+        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+
+        String newPassword = generateSecurePassword();
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        String emailContent = buildPasswordResetEmail(newPassword);
+        emailService.sendHtmlMessage(email, "Reset-Password", emailContent);
+    }
+
+    private String generateSecurePassword() {
+        SecureRandom secureRandom = new SecureRandom();
+        int password = 10000000 + secureRandom.nextInt(90000000);
+        return String.valueOf(password);
+    }
+
+    private String buildPasswordResetEmail(String newPassword) {
+        return "<html><body>" +
+                "<h3>Password Reset Request</h3>" +
+                "<p>Your new temporary password is: <strong>" + newPassword + "</strong></p>" +
+                "<p>Please use this password to log in, and change it as soon as possible after logging in.</p>" +
+                "<p>If you did not request a password reset, please ignore this email.</p>" +
+                "<p>Thank you,<br/>Tasty Treat Team</p>" +
+                "</body></html>";
     }
 
 }

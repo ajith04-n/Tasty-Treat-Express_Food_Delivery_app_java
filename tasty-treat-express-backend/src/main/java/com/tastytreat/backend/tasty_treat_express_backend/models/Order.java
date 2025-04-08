@@ -31,25 +31,25 @@ public class Order {
 
 	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
-	//@JsonBackReference("orderUserReference")
+	// @JsonBackReference("orderUserReference")
 	@JsonIgnoreProperties("orders")
 	private User user;
 
 	// @ManyToOne(cascade = CascadeType.ALL)
 	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId")
-	//@JsonBackReference("orderRestaurantReference")
+	// @JsonBackReference("orderRestaurantReference")
 	@JsonIgnoreProperties("orders")
 	private Restaurant restaurant;
 
-	//@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@ManyToMany
+	// @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	// @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToMany(cascade = CascadeType.REMOVE)
 	@JoinTable(name = "menu_order_map", joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "orderId"), inverseJoinColumns = @JoinColumn(name = "menu_id", referencedColumnName = "menu_id"))
 	// @JsonManagedReference("order-menu")
 	// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
 	@JsonIgnoreProperties("orders")
 	private List<MenuItem> menuItems;
-
 
 	// Add One-to-Many relationship with Feedback
 	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -58,13 +58,13 @@ public class Order {
 
 	private Double totalAmount;
 
-	private String status; 
+	private String status;
 
 	private String deliveryAddress;
 
-	private String paymentStatus; 
+	private String paymentStatus;
 
-	private String paymentMethod; 
+	private String paymentMethod;
 
 	private LocalDateTime orderDate;
 
@@ -247,13 +247,13 @@ public class Order {
 		this.orderDate = orderDate;
 		this.deliveryTime = deliveryTime;
 	}
-	
-	public Order(List<MenuItem> menuItems,String paymentMethod) {
-		this.menuItems=menuItems;
-		this.paymentMethod=paymentMethod;
+
+	public Order(List<MenuItem> menuItems, String paymentMethod, String deliveryAddress) {
+		this.menuItems = menuItems;
+		this.paymentMethod = paymentMethod;
+		this.deliveryAddress = deliveryAddress;
 	}
 
 	public Order() {
-		// TODO Auto-generated constructor stub
 	}
 }

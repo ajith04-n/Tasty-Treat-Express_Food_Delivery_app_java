@@ -54,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
         GOOGLE_PAY("Google Pay"),
         AMAZON_PAY("Amazon Pay"),
         PAYTM("PayTM"),
+        UPI("UPI"),
+        NET_BANKING("Net Banking"),
+        DIGITAL_WALLET("Digital Wallet"),
         CRYPTOCURRENCY("Cryptocurrency");
 
         private final String method;
@@ -80,8 +83,10 @@ public class OrderServiceImpl implements OrderService {
     public enum OrderStatus {
         PENDING("Pending"),
         PROCESSING("Processing"),
+        PREPARING("Preparing"),
         COMPLETED("Completed"),
         CANCELLED("Cancelled"),
+        SHIPPED("Shipped"),
         DELIVERED("Delivered");
 
         private final String status;
@@ -96,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
 
         public static boolean isValidStatus(String status) {
             for (OrderStatus value : values()) {
+                System.out.println(value+" "+status);
                 if (value.getStatus().equalsIgnoreCase(status)) {
                     return true;
 
@@ -147,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (MenuItem menuItem : orderObj.getMenuItems()) {
             MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
-                    .orElseThrow(() -> new RuntimeException("MenuItem not found"));       
+                    .orElseThrow(() -> new RuntimeException("MenuItem not found"));
 
             logger.info("Checking stock for {}: Requested: {}, Available: {}", dbMenuItem.getName(),
                     menuItem.getQuantity(), dbMenuItem.getQuantity());
@@ -198,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 order.setPaymentStatus(PaymentStatus.PENDING.getStatus());
             }
-        }else{
+        } else {
             throw new InvalidEnumValueException("Invalid Payment Method: " + paymentMethod);
         }
         order.setDeliveryAddress(orderObj.getDeliveryAddress());
@@ -215,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         for (MenuItem menuItem : orderObj.getMenuItems()) {
-            MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getId())
+            MenuItem dbMenuItem = menuItemRepository.findById(menuItem.getMenuId())
                     .orElseThrow(() -> new RuntimeException("MenuItem not found"));
 
             int remainingQuantity = dbMenuItem.getQuantity() - menuItem.getQuantity();

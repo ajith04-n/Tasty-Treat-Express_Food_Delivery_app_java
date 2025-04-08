@@ -1,6 +1,7 @@
 package com.tastytreat.backend.tasty_treat_express_backend.services;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,19 +12,27 @@ import java.util.stream.Collectors;
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
 import com.tastyTreatExpress.DTO.RestaurantDTO;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.DatabaseOperationException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidEmailException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidPasswordException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.RestaurantNotFoundException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.UserNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.models.MenuItem;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Order;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Report;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
+import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.MenuItemRepository;
 import com.tastytreat.backend.tasty_treat_express_backend.repositories.RestaurantRepository;
+
+import jakarta.validation.Valid;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
@@ -31,6 +40,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     RestaurantRepository restaurantRepository;
     @Autowired
     private MenuItemRepository menuItemRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public Restaurant saveRestaurant(Restaurant restaurant) {
         if (restaurant.getPassword() == null || restaurant.getPassword().isEmpty()) {
@@ -213,4 +225,55 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.existsById(restaurantId);
     }
 
+    public void forgotPassword(String email) {
+        if (!restaurantRepository.existsByEmail(email)) {
+            throw new InvalidEmailException("Email not found in the system.");
+        }
+        Restaurant user = restaurantRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("Restaurant not found with email: " + email);
+        }
+        String newPassword = generateSecurePassword();
+        System.out.println(newPassword);
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        restaurantRepository.save(user);
+
+        String emailContent = buildPasswordResetEmail(newPassword);
+        emailService.sendHtmlMessage(email, "Reset-Password", emailContent);
+    }
+
+    private String generateSecurePassword() {
+        SecureRandom secureRandom = new SecureRandom();
+        int password = 10000000 + secureRandom.nextInt(90000000);
+        return String.valueOf(password);
+    }
+
+    private String buildPasswordResetEmail(String newPassword) {
+        return "<html><body>" +
+                "<h3>Password Reset Request</h3>" +
+                "<p>Your new temporary password is: <strong>" + newPassword + "</strong></p>" +
+                "<p>Please use this password to log in, and change it as soon as possible after logging in.</p>" +
+                "<p>If you did not request a password reset, please ignore this email.</p>" +
+                "<p>Thank you,<br/>Tasty Treat Team</p>" +
+                "</body></html>";
+    }
+
+    public void updateUserPassword(String restaurantId, PasswordUpdateRequest request) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new UserNotFoundException("Restaurant with ID " + restaurantId + " not found"));
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(request.getOldPassword(), restaurant.getPassword())) {
+            throw new InvalidPasswordException("Old password is incorrect!");
+        }
+
+        if (request.getNewPassword().length() < 8) {
+            throw new InvalidPasswordException("New password must be at least 8 characters long.");
+        }
+
+        restaurant.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        restaurantRepository.save(restaurant);
+    }
 }

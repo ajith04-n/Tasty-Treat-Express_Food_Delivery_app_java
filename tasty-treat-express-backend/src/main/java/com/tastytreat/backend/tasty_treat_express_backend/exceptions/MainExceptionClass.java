@@ -26,6 +26,12 @@ public class MainExceptionClass extends RuntimeException {
         }
     }
 
+    public static class PasswordUpdateFailedException extends RuntimeException {
+        public PasswordUpdateFailedException(String message) {
+            super(message);
+        }
+    }
+
     public static class NoActiveSessionException extends RuntimeException {
         public NoActiveSessionException(String message) {
             super(message);
@@ -74,7 +80,11 @@ public class MainExceptionClass extends RuntimeException {
         }
     }
 
-
+    public static class EmailSendingException extends RuntimeException {
+        public EmailSendingException(String message) {
+            super(message);
+        }
+    }
 
     class EmailAlreadyExistsException extends RuntimeException {
         public EmailAlreadyExistsException(String message) {

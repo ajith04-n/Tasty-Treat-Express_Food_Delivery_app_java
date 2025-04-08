@@ -5,15 +5,23 @@ public class PasswordUpdateRequest {
     private String newPassword;
     private String confirmPassword;
 
+    public PasswordUpdateRequest(String oldPassword, String newPassword) {
+        this.oldPassword = oldPassword;
+        this.newPassword = newPassword;
+    }
+
     public PasswordUpdateRequest(String oldPassword, String newPassword, String confirmPassword) {
         this.oldPassword = oldPassword;
         this.newPassword = newPassword;
         this.confirmPassword = confirmPassword;
     }
 
-    public PasswordUpdateRequest(String oldPassword, String newPassword) {
+    public String getCurrentPassword() {
+        return oldPassword;
+    }
+
+    public void setCurrentPassword(String oldPassword) {
         this.oldPassword = oldPassword;
-        this.newPassword = newPassword;
     }
 
     public String getOldPassword() {
@@ -42,6 +50,10 @@ public class PasswordUpdateRequest {
 
     public boolean isValid() {
         return newPassword.equals(confirmPassword);
+    }
+
+    public PasswordUpdateRequest() {
+
     }
 
 }
