@@ -38,11 +38,20 @@ public class GlobalExceptionHandler {
     }
 
     // Handles User Not Found Exception
+    // @ExceptionHandler(UserNotFoundException.class)
+    // public ResponseEntity<Map<String, String>>
+    // handleUserNotFoundException(UserNotFoundException ex) {
+    // Map<String, String> error = new HashMap<>();
+    // error.put("error", ex.getMessage());
+    // return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    // }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // Handles all unexpected Runtime Exceptions
@@ -130,10 +139,20 @@ public class GlobalExceptionHandler {
     }
 
     // InvalidCredentialsException
+    // @ExceptionHandler(InvalidCredentialsException.class)
+    // public ResponseEntity<ErrorResponse>
+    // handleInvalidCredentialsException(InvalidCredentialsException ex) {
+    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    // .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(),
+    // LocalDateTime.now()));
+    // }
+
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(InvalidCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), LocalDateTime.now()));
+    public ResponseEntity<Map<String, String>> handleInvalidCredentialsException(InvalidCredentialsException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     // NoActiveSessionException
@@ -158,10 +177,28 @@ public class GlobalExceptionHandler {
     }
 
     // RestaurantNotFoundException
+    // @ExceptionHandler(RestaurantNotFoundException.class)
+    // public ResponseEntity<ErrorResponse>
+    // handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    // .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(),
+    // LocalDateTime.now()));
+    // }
+
     @ExceptionHandler(RestaurantNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now()));
+    public ResponseEntity<Map<String, String>> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // PasswordUpdateFailedException
+    @ExceptionHandler(PasswordUpdateFailedException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordUpdateFailedException(PasswordUpdateFailedException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
+                        LocalDateTime.now()));
     }
 
     // InvalidCouponException
@@ -177,6 +214,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now()));
     }
+
     // InvalidOrderStatusException
     @ExceptionHandler(InvalidOrderStatusException.class)
     public ResponseEntity<ErrorResponse> handleInvalidOrderStatusException(InvalidOrderStatusException ex) {
@@ -184,6 +222,12 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now()));
     }
 
-    
+    // EmailSendingException
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ErrorResponse> handleEmailSendingException(EmailSendingException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
+                        LocalDateTime.now()));
+    }
 
 }

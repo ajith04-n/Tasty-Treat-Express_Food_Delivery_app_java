@@ -1,39 +1,574 @@
-2025-04-02T01:10:01.913+05:30  INFO 10632 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 10632 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
-2025-04-02T01:10:01.922+05:30 DEBUG 10632 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
-2025-04-02T01:10:01.927+05:30  INFO 10632 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
-2025-04-02T01:10:02.043+05:30  INFO 10632 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2025-04-02T01:10:02.044+05:30  INFO 10632 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2025-04-02T01:10:04.124+05:30  INFO 10632 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-04-02T01:10:04.259+05:30  INFO 10632 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 117 ms. Found 6 JPA repository interfaces.
-2025-04-02T01:10:05.511+05:30  INFO 10632 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2025-04-02T01:10:05.536+05:30  INFO 10632 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2025-04-02T01:10:05.537+05:30  INFO 10632 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
-2025-04-02T01:10:05.611+05:30  INFO 10632 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2025-04-02T01:10:05.612+05:30  INFO 10632 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3566 ms
-2025-04-02T01:10:06.165+05:30  INFO 10632 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-04-02T01:10:06.284+05:30  INFO 10632 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.8.Final
-2025-04-02T01:10:06.355+05:30  INFO 10632 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-04-02T01:10:06.779+05:30  INFO 10632 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-04-02T01:10:06.831+05:30  INFO 10632 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2025-04-02T01:10:07.481+05:30  INFO 10632 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@9fadf9f
-2025-04-02T01:10:07.484+05:30  INFO 10632 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2025-04-02T01:10:07.650+05:30  INFO 10632 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+2025-04-08T00:02:34.611+05:30  WARN 2964 --- [http-nio-8080-exec-4] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: No _valueDeserializer assigned]
+2025-04-08T00:05:39.786+05:30  WARN 2964 --- [http-nio-8080-exec-3] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: No _valueDeserializer assigned]
+2025-04-08T00:19:50.088+05:30  WARN 2964 --- [http-nio-8080-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: No _valueDeserializer assigned]
+2025-04-08T00:22:27.617+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:22:27.924+05:30  INFO 2964 --- [Thread-158] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:22:28.864+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:22:29.211+05:30  INFO 2964 --- [Thread-158] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:29.411+05:30  INFO 2964 --- [Thread-158] com.zaxxer.hikari.HikariDataSource       : HikariPool-41 - Shutdown initiated...
+2025-04-08T00:22:29.637+05:30  INFO 2964 --- [Thread-158] com.zaxxer.hikari.HikariDataSource       : HikariPool-41 - Shutdown completed.
+2025-04-08T00:22:33.003+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:22:33.004+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:22:33.005+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:22:35.177+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:22:35.284+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 102 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:22:36.131+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:22:36.148+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:22:36.149+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:22:36.237+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:22:36.238+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3216 ms
+2025-04-08T00:22:36.959+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:22:36.967+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:22:37.026+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:22:37.031+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-42 - Starting...
+2025-04-08T00:22:37.072+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-42 - Added connection com.mysql.cj.jdbc.ConnectionImpl@12172eb8
+2025-04-08T00:22:37.073+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-42 - Start completed.
+2025-04-08T00:22:37.086+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-42)']
 	Database driver: undefined/unknown
 	Database version: 8.0.34
 	Autocommit mode: undefined/unknown
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-04-02T01:10:09.334+05:30  INFO 10632 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-04-02T01:10:09.604+05:30  INFO 10632 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-04-02T01:10:10.187+05:30  INFO 10632 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2025-04-02T01:10:11.461+05:30  WARN 10632 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-04-02T01:10:12.634+05:30  INFO 10632 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
-2025-04-02T01:10:12.738+05:30  INFO 10632 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2025-04-02T01:10:12.756+05:30  INFO 10632 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2025-04-02T01:10:12.897+05:30  INFO 10632 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2025-04-02T01:10:12.916+05:30  INFO 10632 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 11.761 seconds (process running for 12.991)
-2025-04-02T01:10:13.302+05:30  INFO 10632 --- [RMI TCP Connection(2)-127.0.0.1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-04-02T01:10:13.303+05:30  INFO 10632 --- [RMI TCP Connection(2)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2025-04-02T01:10:13.305+05:30  INFO 10632 --- [RMI TCP Connection(2)-127.0.0.1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-04-08T00:22:37.445+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:22:37.751+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:38.299+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:22:39.296+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:22:39.375+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:22:39.395+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:22:39.472+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:22:39.483+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 6.647 seconds (process running for 5355.154)
+2025-04-08T00:22:39.488+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:22:40.850+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:22:40.853+05:30  INFO 2964 --- [Thread-162] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:22:41.398+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:22:41.402+05:30  INFO 2964 --- [Thread-162] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:41.404+05:30  INFO 2964 --- [Thread-162] com.zaxxer.hikari.HikariDataSource       : HikariPool-42 - Shutdown initiated...
+2025-04-08T00:22:41.417+05:30  INFO 2964 --- [Thread-162] com.zaxxer.hikari.HikariDataSource       : HikariPool-42 - Shutdown completed.
+2025-04-08T00:22:41.712+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:22:41.712+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:22:41.713+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:22:42.206+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:22:42.263+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:22:42.473+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:22:42.474+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:22:42.476+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:22:42.506+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:22:42.506+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 790 ms
+2025-04-08T00:22:42.658+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:22:42.661+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:22:42.673+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:22:42.675+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-43 - Starting...
+2025-04-08T00:22:42.700+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-43 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3dc4b328
+2025-04-08T00:22:42.700+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-43 - Start completed.
+2025-04-08T00:22:42.703+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-43)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:22:42.995+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:22:43.153+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:43.859+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:22:44.371+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:22:44.408+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:22:44.416+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:22:44.455+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:22:44.464+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.783 seconds (process running for 5360.135)
+2025-04-08T00:22:44.467+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:22:48.968+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:22:48.971+05:30  INFO 2964 --- [Thread-166] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:22:49.432+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:22:49.435+05:30  INFO 2964 --- [Thread-166] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:49.436+05:30  INFO 2964 --- [Thread-166] com.zaxxer.hikari.HikariDataSource       : HikariPool-43 - Shutdown initiated...
+2025-04-08T00:22:49.442+05:30  INFO 2964 --- [Thread-166] com.zaxxer.hikari.HikariDataSource       : HikariPool-43 - Shutdown completed.
+2025-04-08T00:22:49.676+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:22:49.676+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:22:49.677+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:22:50.193+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:22:50.235+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:22:50.386+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:22:50.387+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:22:50.387+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:22:50.421+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:22:50.422+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 743 ms
+2025-04-08T00:22:50.568+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:22:50.572+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:22:50.591+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:22:50.593+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-44 - Starting...
+2025-04-08T00:22:50.617+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-44 - Added connection com.mysql.cj.jdbc.ConnectionImpl@41095493
+2025-04-08T00:22:50.618+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-44 - Start completed.
+2025-04-08T00:22:50.621+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-44)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:22:50.853+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:22:51.021+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:51.704+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:22:52.304+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:22:52.369+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:22:52.380+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:22:52.441+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:22:52.453+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.812 seconds (process running for 5368.124)
+2025-04-08T00:22:52.456+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:22:54.854+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:22:54.857+05:30  INFO 2964 --- [Thread-170] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:22:55.351+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:22:55.355+05:30  INFO 2964 --- [Thread-170] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:55.356+05:30  INFO 2964 --- [Thread-170] com.zaxxer.hikari.HikariDataSource       : HikariPool-44 - Shutdown initiated...
+2025-04-08T00:22:55.364+05:30  INFO 2964 --- [Thread-170] com.zaxxer.hikari.HikariDataSource       : HikariPool-44 - Shutdown completed.
+2025-04-08T00:22:55.611+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:22:55.612+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:22:55.612+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:22:56.079+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:22:56.128+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 47 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:22:56.350+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:22:56.351+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:22:56.352+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:22:56.393+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:22:56.394+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 778 ms
+2025-04-08T00:22:56.568+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:22:56.570+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:22:56.578+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:22:56.579+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-45 - Starting...
+2025-04-08T00:22:56.598+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-45 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1473cf4c
+2025-04-08T00:22:56.598+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-45 - Start completed.
+2025-04-08T00:22:56.600+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-45)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:22:56.754+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:22:56.877+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:22:57.222+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:22:57.738+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:22:57.776+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:22:57.785+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:22:57.819+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:22:57.827+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.246 seconds (process running for 5373.498)
+2025-04-08T00:22:57.829+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:14.910+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:23:14.916+05:30  INFO 2964 --- [Thread-174] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:23:15.415+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:23:15.419+05:30  INFO 2964 --- [Thread-174] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:15.420+05:30  INFO 2964 --- [Thread-174] com.zaxxer.hikari.HikariDataSource       : HikariPool-45 - Shutdown initiated...
+2025-04-08T00:23:15.428+05:30  INFO 2964 --- [Thread-174] com.zaxxer.hikari.HikariDataSource       : HikariPool-45 - Shutdown completed.
+2025-04-08T00:23:15.669+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:23:15.670+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:23:15.671+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:23:16.263+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:23:16.310+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 44 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:23:16.530+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:23:16.531+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:23:16.533+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:23:16.566+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:23:16.567+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 894 ms
+2025-04-08T00:23:16.730+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:23:16.733+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:23:16.749+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:23:16.751+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-46 - Starting...
+2025-04-08T00:23:16.772+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-46 - Added connection com.mysql.cj.jdbc.ConnectionImpl@476b980c
+2025-04-08T00:23:16.773+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-46 - Start completed.
+2025-04-08T00:23:16.776+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-46)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:23:16.964+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:23:17.092+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:17.495+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:23:17.976+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:23:18.016+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:23:18.025+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:23:18.065+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:23:18.076+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.438 seconds (process running for 5393.747)
+2025-04-08T00:23:18.079+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:22.582+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:23:22.585+05:30  INFO 2964 --- [Thread-178] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:23:23.005+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:23:23.008+05:30  INFO 2964 --- [Thread-178] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:23.009+05:30  INFO 2964 --- [Thread-178] com.zaxxer.hikari.HikariDataSource       : HikariPool-46 - Shutdown initiated...
+2025-04-08T00:23:23.014+05:30  INFO 2964 --- [Thread-178] com.zaxxer.hikari.HikariDataSource       : HikariPool-46 - Shutdown completed.
+2025-04-08T00:23:23.233+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:23:23.233+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:23:23.234+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:23:23.680+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:23:23.730+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 47 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:23:23.931+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:23:23.932+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:23:23.933+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:23:23.961+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:23:23.961+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 725 ms
+2025-04-08T00:23:24.121+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:23:24.124+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:23:24.135+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:23:24.137+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-47 - Starting...
+2025-04-08T00:23:24.182+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-47 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5b53d1c9
+2025-04-08T00:23:24.183+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-47 - Start completed.
+2025-04-08T00:23:24.185+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-47)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:23:24.304+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:23:24.406+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:24.739+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:23:25.187+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:23:25.225+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:23:25.235+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:23:25.268+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:23:25.278+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.08 seconds (process running for 5400.949)
+2025-04-08T00:23:25.281+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:27.736+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:23:27.738+05:30  INFO 2964 --- [Thread-182] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:23:28.199+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:23:28.201+05:30  INFO 2964 --- [Thread-182] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:28.204+05:30  INFO 2964 --- [Thread-182] com.zaxxer.hikari.HikariDataSource       : HikariPool-47 - Shutdown initiated...
+2025-04-08T00:23:28.211+05:30  INFO 2964 --- [Thread-182] com.zaxxer.hikari.HikariDataSource       : HikariPool-47 - Shutdown completed.
+2025-04-08T00:23:28.460+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:23:28.461+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:23:28.462+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:23:28.938+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:23:28.973+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 33 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:23:29.130+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:23:29.131+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:23:29.131+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:23:29.166+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:23:29.166+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 701 ms
+2025-04-08T00:23:29.316+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:23:29.317+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:23:29.326+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:23:29.327+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-48 - Starting...
+2025-04-08T00:23:29.346+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-48 - Added connection com.mysql.cj.jdbc.ConnectionImpl@569d4caf
+2025-04-08T00:23:29.346+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-48 - Start completed.
+2025-04-08T00:23:29.347+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-48)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:23:29.507+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:23:29.679+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:30.077+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:23:30.469+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:23:30.502+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:23:30.508+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:23:30.543+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:23:30.550+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.122 seconds (process running for 5406.222)
+2025-04-08T00:23:30.554+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:39.228+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:23:39.233+05:30  INFO 2964 --- [Thread-186] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:23:39.739+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:23:39.742+05:30  INFO 2964 --- [Thread-186] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:39.743+05:30  INFO 2964 --- [Thread-186] com.zaxxer.hikari.HikariDataSource       : HikariPool-48 - Shutdown initiated...
+2025-04-08T00:23:39.749+05:30  INFO 2964 --- [Thread-186] com.zaxxer.hikari.HikariDataSource       : HikariPool-48 - Shutdown completed.
+2025-04-08T00:23:39.993+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:23:39.993+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:23:39.993+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:23:40.367+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:23:40.408+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 39 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:23:40.568+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:23:40.569+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:23:40.569+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:23:40.601+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:23:40.602+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 606 ms
+2025-04-08T00:23:40.747+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:23:40.750+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:23:40.761+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:23:40.763+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-49 - Starting...
+2025-04-08T00:23:40.783+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-49 - Added connection com.mysql.cj.jdbc.ConnectionImpl@f85020e
+2025-04-08T00:23:40.784+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-49 - Start completed.
+2025-04-08T00:23:40.786+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-49)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:23:40.997+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:23:41.149+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:41.530+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:23:42.013+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:23:42.068+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:23:42.078+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:23:42.136+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:23:42.148+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.182 seconds (process running for 5417.82)
+2025-04-08T00:23:42.152+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:43.530+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:23:43.536+05:30  INFO 2964 --- [Thread-190] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:23:44.128+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:23:44.131+05:30  INFO 2964 --- [Thread-190] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:44.132+05:30  INFO 2964 --- [Thread-190] com.zaxxer.hikari.HikariDataSource       : HikariPool-49 - Shutdown initiated...
+2025-04-08T00:23:44.142+05:30  INFO 2964 --- [Thread-190] com.zaxxer.hikari.HikariDataSource       : HikariPool-49 - Shutdown completed.
+2025-04-08T00:23:44.384+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:23:44.385+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:23:44.385+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:23:44.811+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:23:44.847+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 34 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:23:45.016+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:23:45.017+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:23:45.018+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:23:45.052+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:23:45.053+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 666 ms
+2025-04-08T00:23:45.236+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:23:45.238+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:23:45.249+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:23:45.251+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-50 - Starting...
+2025-04-08T00:23:45.277+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-50 - Added connection com.mysql.cj.jdbc.ConnectionImpl@521c18b0
+2025-04-08T00:23:45.278+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-50 - Start completed.
+2025-04-08T00:23:45.281+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-50)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:23:45.415+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:23:45.516+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:23:46.004+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:23:46.405+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:23:46.436+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:23:46.443+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:23:46.480+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:23:46.490+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.137 seconds (process running for 5422.161)
+2025-04-08T00:23:46.493+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:23:57.285+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-04-08T00:23:57.287+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-08T00:23:57.294+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 7 ms
+2025-04-08T00:23:57.436+05:30  INFO 2964 --- [http-nio-8080-exec-1] c.t.b.t.services.OrderServiceImpl        : Checking stock for Raspberry milk shake : Requested: 1, Available: 200
+2025-04-08T00:25:03.573+05:30  INFO 2964 --- [http-nio-8080-exec-10] c.t.b.t.services.OrderServiceImpl        : Checking stock for Raspberry milk shake : Requested: 1, Available: 199
+2025-04-08T00:26:48.116+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:26:48.118+05:30  INFO 2964 --- [Thread-194] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:26:48.812+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:26:48.817+05:30  INFO 2964 --- [Thread-194] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:26:48.819+05:30  INFO 2964 --- [Thread-194] com.zaxxer.hikari.HikariDataSource       : HikariPool-50 - Shutdown initiated...
+2025-04-08T00:26:48.839+05:30  INFO 2964 --- [Thread-194] com.zaxxer.hikari.HikariDataSource       : HikariPool-50 - Shutdown completed.
+2025-04-08T00:26:49.267+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:26:49.268+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:26:49.268+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:26:49.871+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:26:49.936+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:26:50.127+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:26:50.128+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:26:50.129+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:26:50.161+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:26:50.162+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 890 ms
+2025-04-08T00:26:50.363+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:26:50.366+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:26:50.379+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:26:50.380+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-51 - Starting...
+2025-04-08T00:26:50.405+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-51 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7061b2e1
+2025-04-08T00:26:50.406+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-51 - Start completed.
+2025-04-08T00:26:50.408+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-51)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:26:50.560+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:26:50.695+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:26:51.143+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:26:51.556+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:26:51.590+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:26:51.596+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:26:51.628+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:26:51.636+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.407 seconds (process running for 5607.307)
+2025-04-08T00:26:51.639+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:26:59.302+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T00:26:59.305+05:30  INFO 2964 --- [Thread-198] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T00:26:59.846+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T00:26:59.850+05:30  INFO 2964 --- [Thread-198] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:26:59.851+05:30  INFO 2964 --- [Thread-198] com.zaxxer.hikari.HikariDataSource       : HikariPool-51 - Shutdown initiated...
+2025-04-08T00:26:59.857+05:30  INFO 2964 --- [Thread-198] com.zaxxer.hikari.HikariDataSource       : HikariPool-51 - Shutdown completed.
+2025-04-08T00:27:00.140+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T00:27:00.141+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T00:27:00.141+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T00:27:00.632+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T00:27:00.675+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 6 JPA repository interfaces.
+2025-04-08T00:27:00.835+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T00:27:00.836+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T00:27:00.838+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T00:27:00.866+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T00:27:00.867+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 723 ms
+2025-04-08T00:27:01.006+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T00:27:01.009+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T00:27:01.018+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T00:27:01.019+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-52 - Starting...
+2025-04-08T00:27:01.037+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-52 - Added connection com.mysql.cj.jdbc.ConnectionImpl@59848546
+2025-04-08T00:27:01.038+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-52 - Start completed.
+2025-04-08T00:27:01.039+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-52)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T00:27:01.170+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T00:27:01.291+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T00:27:01.676+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T00:27:02.097+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T00:27:02.123+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T00:27:02.131+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T00:27:02.158+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T00:27:02.167+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.073 seconds (process running for 5617.838)
+2025-04-08T00:27:02.171+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T00:27:23.799+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-04-08T00:27:23.800+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-08T00:27:23.801+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-04-08T00:28:26.434+05:30  INFO 2964 --- [http-nio-8080-exec-9] c.t.b.t.services.OrderServiceImpl        : Checking stock for Paneer Butter Masala: Requested: 1, Available: 30
+2025-04-08T00:53:44.115+05:30  INFO 2964 --- [http-nio-8080-exec-4] c.t.b.t.services.OrderServiceImpl        : Checking stock for Cheese Burger: Requested: 9, Available: 291
+2025-04-08T00:53:44.128+05:30  INFO 2964 --- [http-nio-8080-exec-4] c.t.b.t.services.OrderServiceImpl        : Checking stock for Veggie Burger: Requested: 15, Available: 283
+2025-04-08T00:53:44.132+05:30  INFO 2964 --- [http-nio-8080-exec-4] c.t.b.t.services.OrderServiceImpl        : Checking stock for Veggie Biryani: Requested: 15, Available: 285
+2025-04-08T02:10:11.876+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T02:10:12.245+05:30  INFO 2964 --- [Thread-202] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T02:10:12.929+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T02:10:13.154+05:30  INFO 2964 --- [Thread-202] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:13.289+05:30  INFO 2964 --- [Thread-202] com.zaxxer.hikari.HikariDataSource       : HikariPool-52 - Shutdown initiated...
+2025-04-08T02:10:13.464+05:30  INFO 2964 --- [Thread-202] com.zaxxer.hikari.HikariDataSource       : HikariPool-52 - Shutdown completed.
+2025-04-08T02:10:16.586+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T02:10:16.587+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T02:10:16.588+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T02:10:17.477+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T02:10:17.559+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 80 ms. Found 6 JPA repository interfaces.
+2025-04-08T02:10:17.907+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T02:10:17.911+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T02:10:17.912+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T02:10:17.956+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T02:10:17.956+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1359 ms
+2025-04-08T02:10:18.353+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T02:10:18.359+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T02:10:18.388+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T02:10:18.391+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-53 - Starting...
+2025-04-08T02:10:18.459+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-53 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5dabb651
+2025-04-08T02:10:18.460+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-53 - Start completed.
+2025-04-08T02:10:18.470+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-53)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T02:10:18.693+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T02:10:18.896+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:19.528+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T02:10:20.365+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T02:10:20.450+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T02:10:20.526+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T02:10:20.590+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T02:10:20.599+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 4.088 seconds (process running for 11816.27)
+2025-04-08T02:10:20.602+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T02:10:25.011+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T02:10:25.013+05:30  INFO 2964 --- [Thread-206] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T02:10:25.539+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T02:10:25.542+05:30  INFO 2964 --- [Thread-206] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:25.543+05:30  INFO 2964 --- [Thread-206] com.zaxxer.hikari.HikariDataSource       : HikariPool-53 - Shutdown initiated...
+2025-04-08T02:10:25.550+05:30  INFO 2964 --- [Thread-206] com.zaxxer.hikari.HikariDataSource       : HikariPool-53 - Shutdown completed.
+2025-04-08T02:10:25.820+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T02:10:25.822+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T02:10:25.822+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T02:10:26.334+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T02:10:26.389+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 6 JPA repository interfaces.
+2025-04-08T02:10:26.570+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T02:10:26.571+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T02:10:26.571+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T02:10:26.604+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T02:10:26.605+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 779 ms
+2025-04-08T02:10:26.825+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T02:10:26.829+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T02:10:26.843+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T02:10:26.844+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-54 - Starting...
+2025-04-08T02:10:26.864+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-54 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7dbccb79
+2025-04-08T02:10:26.865+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-54 - Start completed.
+2025-04-08T02:10:26.867+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-54)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T02:10:27.002+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T02:10:27.129+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:27.633+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T02:10:28.109+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T02:10:28.152+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T02:10:28.163+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T02:10:28.202+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T02:10:28.213+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.439 seconds (process running for 11823.885)
+2025-04-08T02:10:28.218+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T02:10:42.081+05:30  INFO 2964 --- [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-04-08T02:10:42.084+05:30  INFO 2964 --- [Thread-210] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T02:10:42.517+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T02:10:42.521+05:30  INFO 2964 --- [Thread-210] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:42.521+05:30  INFO 2964 --- [Thread-210] com.zaxxer.hikari.HikariDataSource       : HikariPool-54 - Shutdown initiated...
+2025-04-08T02:10:42.524+05:30  INFO 2964 --- [Thread-210] com.zaxxer.hikari.HikariDataSource       : HikariPool-54 - Shutdown completed.
+2025-04-08T02:10:42.785+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Starting TastytreatexpressApplication using Java 19.0.1 with PID 2964 (D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend\target\classes started by Allu Diwakar in D:\InfosysSpringboard\OurProject\Tasty-treat-express-backend-v2\tasty-treat-express-backend)
+2025-04-08T02:10:42.786+05:30 DEBUG 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Running with Spring Boot v3.4.3, Spring v6.2.3
+2025-04-08T02:10:42.786+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : No active profile set, falling back to 1 default profile: "default"
+2025-04-08T02:10:43.345+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-08T02:10:43.410+05:30  INFO 2964 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 63 ms. Found 6 JPA repository interfaces.
+2025-04-08T02:10:43.663+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-08T02:10:43.664+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-08T02:10:43.665+05:30  INFO 2964 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-04-08T02:10:43.695+05:30  INFO 2964 --- [restartedMain] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-04-08T02:10:43.696+05:30  INFO 2964 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 908 ms
+2025-04-08T02:10:43.847+05:30  INFO 2964 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-08T02:10:43.849+05:30  INFO 2964 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-08T02:10:43.859+05:30  INFO 2964 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-08T02:10:43.860+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-55 - Starting...
+2025-04-08T02:10:43.884+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-55 - Added connection com.mysql.cj.jdbc.ConnectionImpl@758043de
+2025-04-08T02:10:43.885+05:30  INFO 2964 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-55 - Start completed.
+2025-04-08T02:10:43.889+05:30  INFO 2964 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-55)']
+	Database driver: undefined/unknown
+	Database version: 8.0.34
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-08T02:10:44.090+05:30  INFO 2964 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-08T02:10:44.253+05:30  INFO 2964 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:10:44.740+05:30  WARN 2964 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-08T02:10:45.265+05:30  INFO 2964 --- [restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:mysql://localhost:3306/TTE_db?createDatabaseIfNotExist=true'
+2025-04-08T02:10:45.304+05:30  INFO 2964 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-04-08T02:10:45.313+05:30  INFO 2964 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-04-08T02:10:45.360+05:30  INFO 2964 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-08T02:10:45.370+05:30  INFO 2964 --- [restartedMain] c.t.b.t.TastytreatexpressApplication     : Started TastytreatexpressApplication in 2.625 seconds (process running for 11841.041)
+2025-04-08T02:10:45.374+05:30  INFO 2964 --- [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-04-08T02:11:08.213+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-7].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-04-08T02:11:08.213+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-08T02:11:08.215+05:30  INFO 2964 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2025-04-08T02:34:20.215+05:30  INFO 2964 --- [http-nio-8080-exec-2] c.t.b.t.services.OrderServiceImpl        : Checking stock for Pizza Margherita: Requested: 1, Available: 0
+2025-04-08T02:34:20.222+05:30 ERROR 2964 --- [http-nio-8080-exec-2] c.t.b.t.services.OrderServiceImpl        : Out of stock for Pizza Margherita: Requested: 1, Available: 0
+2025-04-08T02:34:20.300+05:30  WARN 2964 --- [http-nio-8080-exec-2] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [java.lang.RuntimeException: Item Pizza Margherita is out of stock. Available quantity: 0]
+2025-04-08T02:42:13.927+05:30  WARN 2964 --- [http-nio-8080-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass$NoActiveSessionException: No active session found!]
+2025-04-08T02:45:46.894+05:30  WARN 2964 --- [http-nio-8080-exec-5] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' is not supported]
+2025-04-08T02:48:02.964+05:30  INFO 2964 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-08T02:48:03.202+05:30  INFO 2964 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-08T02:48:03.210+05:30  INFO 2964 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-08T02:48:03.214+05:30  INFO 2964 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-55 - Shutdown initiated...
+2025-04-08T02:48:03.232+05:30  INFO 2964 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-55 - Shutdown completed.

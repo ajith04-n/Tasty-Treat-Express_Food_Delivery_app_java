@@ -1,23 +1,29 @@
 package com.tastytreat.backend.tasty_treat_express_backend.controllers;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.tastyTreatExpress.DTO.LoginRequest;
 import com.tastyTreatExpress.DTO.MenuItemDTO;
 import com.tastyTreatExpress.DTO.MenuItemMapper;
+import com.tastyTreatExpress.DTO.PasswordUpdateRequest;
 import com.tastyTreatExpress.DTO.RestaurantDTO;
 import com.tastyTreatExpress.DTO.RestaurantMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.DuplicateMenuItemException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.EmailAlreadyExistsException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidCredentialsException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
+import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidPasswordException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.NoActiveSessionException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.RestaurantNotFoundException;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.ReportNotFoundException;
@@ -30,6 +36,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.models.Restaurant;
 import com.tastytreat.backend.tasty_treat_express_backend.models.User;
 import com.tastytreat.backend.tasty_treat_express_backend.services.MenuItemServiceImpl;
 import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantService;
+import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantServiceImpl;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -39,7 +46,7 @@ import jakarta.validation.Valid;
 public class RestaurantController {
 
 	@Autowired
-	private RestaurantService restaurantService;
+	private RestaurantServiceImpl restaurantService;
 	@Autowired
 	private MenuItemServiceImpl menuItemService;
 
@@ -77,24 +84,61 @@ public class RestaurantController {
 	// }
 	// }
 
-	@PostMapping("/authenticate")
-	public ResponseEntity<SuccessResponse> authenticateRestaurant(@Valid @RequestBody LoginRequest loginRequest,
-			HttpSession session) {
+	// @PostMapping("/login")
+	// public ResponseEntity<SuccessResponse> authenticateRestaurant(@Valid
+	// @RequestBody LoginRequest loginRequest,
+	// HttpSession session) {
+	// if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty() ||
+	// loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+	// throw new InvalidCredentialsException("Email and password must be
+	// provided!");
+	// }
+	// if (!restaurantService.authenticateRestaurant(loginRequest.getEmail(),
+	// loginRequest.getPassword())) {
+	// throw new InvalidCredentialsException("Invalid email or password!");
+	// }
+	// Restaurant restaurant =
+	// restaurantService.findByEmail(loginRequest.getEmail());
+	// if (restaurant == null) {
+	// throw new RestaurantNotFoundException("Restaurant not found!");
+	// }
+	// session.setAttribute("restaurant", restaurant);
+	// session.setAttribute("authenticatedRest", true);
+
+	// return ResponseEntity.ok(new SuccessResponse("Restaurant authenticated
+	// successfully!", LocalDateTime.now()));
+	// }
+
+	// http://localhost:8080/api/restaurants/login
+	@PostMapping("/login")
+	public ResponseEntity<?> authenticateRestaurant(@RequestBody LoginRequest loginRequest, HttpSession session) {
+		// Check if email and password are provided
 		if (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty() ||
 				loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
 			throw new InvalidCredentialsException("Email and password must be provided!");
 		}
-		if (!restaurantService.authenticateRestaurant(loginRequest.getEmail(), loginRequest.getPassword())) {
-			throw new InvalidCredentialsException("Invalid email or password!");
-		}
+
 		Restaurant restaurant = restaurantService.findByEmail(loginRequest.getEmail());
 		if (restaurant == null) {
-			throw new RestaurantNotFoundException("Restaurant not found!");
+			throw new RestaurantNotFoundException("Email not found.");
 		}
+
+		if (!restaurantService.authenticateRestaurant(loginRequest.getEmail(), loginRequest.getPassword())) {
+			throw new InvalidCredentialsException("Invalid password.");
+		}
+
+		RestaurantDTO restaurantDTO = RestaurantMapper.toRestaurantDTO(restaurant);
+
 		session.setAttribute("restaurant", restaurant);
 		session.setAttribute("authenticatedRest", true);
 
-		return ResponseEntity.ok(new SuccessResponse("Restaurant authenticated successfully!", LocalDateTime.now()));
+		SuccessResponse successResponse = new SuccessResponse("Restaurant authenticated successfully!",
+				LocalDateTime.now());
+		successResponse.setResData(restaurantDTO);
+		System.out.println("Session ID: " + session.getId());
+		System.out.println("Session created for restaurant: " + restaurant.getName());
+		System.out.println("***************** " + successResponse.getResData());
+		return ResponseEntity.ok(successResponse);
 	}
 
 	@PostMapping("/logout")
@@ -282,4 +326,71 @@ public class RestaurantController {
 		List<Report> reports = restaurantService.getRestaurantReport(restaurantId);
 		return new ResponseEntity<>(reports, HttpStatus.OK);
 	}
+
+	@PostMapping("/forgotPassword/{email}")
+	public ResponseEntity<String> forgotPassword(@PathVariable("email") String email) {
+		try {
+			if (email == null || email.isEmpty()) {
+				return new ResponseEntity<>("Email must be provided!", HttpStatus.BAD_REQUEST);
+			}
+			if (!restaurantService.existsByEmail(email) || !restaurantService.existsByEmail(email)) {
+				return new ResponseEntity<>("Restaurant with this email does not exist!", HttpStatus.NOT_FOUND);
+			}
+			restaurantService.forgotPassword(email);
+			return new ResponseEntity<>("A temporary password has been sent to your email.", HttpStatus.OK);
+		} catch (UserNotFoundException ex) {
+			return new ResponseEntity<>("Restaurant with the provided email was not found.", HttpStatus.NOT_FOUND);
+		} catch (Exception ex) {
+			return new ResponseEntity<>("An error occurred while processing your request. Please try again later.",
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PutMapping("/updatePassword/{restaurantId}") // for security purposes
+	public ResponseEntity<Map<String, String>> updateUserPassword(
+			@PathVariable String restaurantId,
+			@Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest,
+			HttpSession session) {
+
+		if (passwordUpdateRequest.getOldPassword() == null || passwordUpdateRequest.getOldPassword().isEmpty() ||
+				passwordUpdateRequest.getNewPassword() == null || passwordUpdateRequest.getNewPassword().isEmpty() ||
+				passwordUpdateRequest.getConfirmPassword() == null
+				|| passwordUpdateRequest.getConfirmPassword().isEmpty()) {
+			throw new InvalidPasswordException("Old, new, and confirm passwords must be provided!");
+		}
+
+		if (!passwordUpdateRequest.getNewPassword().equals(passwordUpdateRequest.getConfirmPassword())) {
+			throw new InvalidPasswordException("New password and confirm password must match!");
+		}
+
+		Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+		if (restaurant == null) {
+			Map<String, String> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "User not found.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+		}
+
+		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		if (!passwordEncoder.matches(passwordUpdateRequest.getOldPassword(), restaurant.getPassword())) {
+			Map<String, String> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "Old password is incorrect.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+		}
+
+		try {
+			restaurantService.updateUserPassword(restaurantId, passwordUpdateRequest);
+			Map<String, String> successResponse = new HashMap<>();
+			successResponse.put("status", "success");
+			successResponse.put("message", "Password updated successfully.");
+			return ResponseEntity.ok(successResponse);
+		} catch (Exception e) {
+			Map<String, String> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "An unexpected error occurred while updating the password.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
+	}
+
 }
