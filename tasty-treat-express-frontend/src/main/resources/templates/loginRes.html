@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Tasty Treat Express</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            animation: gradientBackground 5s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Background Video */
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: blur(5px);
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+             display:flex;
+             justify-content: end;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 20px;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border-radius: 45px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .navbar a:hover {
+            background-color: rgba(224, 155, 112, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            color: #fff;
+            padding-top: 50px;
+            animation: heroTextSlideIn 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 50px;
+            font-weight: bold;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-top: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Form Styling */
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            width: 50%;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .login-box input {
+            width: 95%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-box input:focus {
+            border-color: #FF5722;
+            box-shadow: 0 0 8px rgba(255, 87, 34, 0.7);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 15px 30px;
+            background-color: #FF5722;
+            border: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .login-box button:hover {
+            background-color: #FF7043;
+            transform: scale(1.05);
+        }
+
+        /* Link Styling */
+        a {
+            color: #FF5722;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 20px;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #FF7043;
+        }
+
+        /* Keyframes for Animations */
+        @keyframes heroTextSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            }
+            50% {
+                background: linear-gradient(to bottom right, #6a82fb, #fc5c7d);
+            }
+            100% {
+                background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            }
+        }
+        .errorText{
+            color:rgb(152, 3, 3);
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <video autoplay loop muted class="background-video">
+        <source src="https://videos.pexels.com/video-files/3198159/3198159-hd_1920_1080_25fps.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+ 
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/restaurant/login">Login</a>
+        <a href="/restaurant/signup">Register</a>
+    </div>
+
+
+    <section class="hero">
+        <h1>Login</h1>
+        <p>Enter your credentials to access your restaurant account.</p>
+    </section>
+
+  
+    <div class="login-box">
+        <form th:action="@{/restaurants/login}" method="post" id="loginForm">
+          
+            <input type="email" id="restaurantEmail" name="email" placeholder="Email" required /><br />
+           <input type="password" id="restaurantPassword" name="password" placeholder="Password" required /><br />
+
+         
+            <button type="submit">Login</button>
+        </form>
+        <a href="/restaurant/signup">Don't have an account? Register here</a>
+        <p class="errorText" th:if="${error}" th:text="${error}"></p>
+    </div>
+
+</body>
+</html>

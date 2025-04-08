@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasty Treat Express - FAQ's</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg" />
+    <!-- Bootstrap CSS (optional) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Font: Poppins -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Base theme colors */
+        --primary: #ff5722; /* primary-orange */
+        --secondary: #ff8a65; /* soft-orange */
+        --bg-base: #f5f5f5; /* soft-white */
+        --neu-shadow-light: #ffffff;
+        --neu-shadow-dark: #b0bec5; /* light-gray */
+        --text-dark: #333333; /* neutral-gray */
+        --text-light: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.2);
+        /* Footer specific */
+        --footer-bg: #1a1a1a;
+        --icon-bg: #444444;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--bg-base);
+        color: var(--text-dark);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Navigation Bar */
+      .navbar {
+        padding: 1rem 2rem;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-base);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .navbar .logo-text {
+        font-size: 2.5rem;
+        color: var(--primary);
+        font-weight: bold;
+      }
+      .navbar .nav-links {
+        display: flex;
+        gap: 1.5rem; /* Even spacing between links */
+        align-items: center;
+      }
+      .navbar .nav-links a {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      .navbar .nav-links a:hover {
+        color: var(--text-dark);
+      }
+
+      /* Main Container (with extra top padding to offset the fixed navbar) */
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 120px 20px 20px; /* Top padding increased to clear the navbar */
+        flex-grow: 1;
+      }
+
+      /* Header section of FAQ page (optional additional branding) */
+      .header {
+        text-align: center;
+        padding: 40px 0;
+        background: var(--primary);
+        margin: 1rem 1rem 0;
+      }
+      .header img {
+        height: 50px;
+        transition: transform 0.3s ease;
+      }
+      .header img:hover {
+        transform: rotate(5deg);
+      }
+      .breadcrumbs {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        opacity: 0.8;
+      }
+
+      /* FAQ Section */
+      .faq-section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-align: center;
+        color: var(--primary);
+      }
+      .faq-item {
+        margin-bottom: 15px;
+      }
+      .faq-question {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 15px;
+        border-radius: 10px;
+        background: var(--bg-base);
+        box-shadow: 4px 4px 12px var(--neu-shadow-dark),
+          -4px -4px 12px var(--neu-shadow-light);
+        transition: all 0.3s ease;
+      }
+      .faq-question:hover {
+        box-shadow: 2px 2px 8px var(--neu-shadow-dark),
+          -2px -2px 8px var(--neu-shadow-light);
+        color: var(--secondary);
+      }
+      .faq-toggle {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+        color: var(--secondary);
+      }
+      .faq-answer {
+        display: none;
+        padding: 10px 20px 10px 40px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .faq-answer.show {
+        display: block;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--footer-bg);
+        padding: 3rem 2rem;
+        color: var(--text-light);
+      }
+      footer .footer-container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      footer .footer-column {
+        flex: 1;
+        min-width: 200px;
+      }
+      footer .footer-column .logo-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: var(--primary);
+      }
+      footer .footer-column p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+      footer .footer-column a {
+        color: #b0bec5;
+        text-decoration: none;
+        display: block;
+        margin: 0.5rem 0;
+      }
+      footer .footer-column a:hover {
+        color: var(--primary);
+      }
+      footer .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      footer .social-icons a {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        background: var(--icon-bg);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.3s ease;
+      }
+      footer .social-icons a:hover {
+        background: var(--primary);
+      }
+      footer .footer-bottom {
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1rem;
+      }
+      footer .footer-bottom p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+      footer .footer-bottom a {
+        color: #b0bec5;
+        text-decoration: none;
+        margin: 0 0.5rem;
+      }
+      footer .footer-bottom a:hover {
+        color: var(--primary);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 120px 15px 15px;
+        }
+        .navbar .nav-links {
+          flex-direction: column;
+          gap: 1rem;
+        }
+        footer {
+          padding: 20px 15px;
+          margin: 0 0 1rem;
+        }
+        footer .footer-container {
+          flex-direction: column;
+          text-align: left;
+        }
+        footer .footer-column {
+          margin-bottom: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="logo-text">TastyTreatExpress.</div>
+      <div class="nav-links">
+        <a
+          class="nav-link"
+          th:href="@{${session.userDTO != null or session.restaurantDTO != null} ? '/home' : '/'}"
+          ><i class="fas fa-home"></i> Home</a
+        >
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Optional additional header (can be removed if nav bar suffices) -->
+      <div class="header glass-panel">
+        <div class="breadcrumbs"><h2>FAQ's</h2></div>
+      </div>
+
+      <div class="faq-section">
+        <h2></h2>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>1. Who is a Tasty Treat Express Delivery Partner?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            Tasty Treat Express Delivery Partners are independent contractors
+            who pick up food or grocery orders from restaurants/outlets and
+            deliver them to customers. They use their own vehicles for
+            deliveries.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span
+              >2. How to become a Tasty Treat Express Delivery Partner?</span
+            >
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            Visit our website or app, navigate to the "Become a Delivery
+            Partner" section, and follow the registration process. Provide
+            necessary identification, vehicle details, and required documents.
+          </div>
+        </div>
+        <!-- Additional FAQ items follow similarly... -->
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span
+              >3. What are the requirements to become a Tasty Treat Express
+              Delivery Partner?</span
+            >
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            You need a valid ID, a two-wheeler or bicycle, a smartphone, and
+            flexible hours. A background check may be conducted.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>4. How can I track my order?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            You can track your order in real-time through our app or website. Go
+            to the "My Orders" section and click on the order to view its
+            current status.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>5. What should I do if my order is delayed?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            If your order is delayed, please check the tracking status for
+            updates. You can also contact our support team through the app or
+            website for assistance.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>6. Can I cancel my order?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes, you can cancel your order before it is prepared by the
+            restaurant. Go to the "My Orders" section, select the order, and
+            click on "Cancel Order." Cancellation policies may apply.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>7. What payment methods are accepted?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            We accept various payment methods, including credit/debit cards,
+            digital wallets, and cash on delivery. You can select your preferred
+            payment method at checkout.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>8. How do I report an issue with my order?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            If you encounter an issue with your order, go to the "Help" section
+            in the app or website and select the relevant order. You can report
+            the issue and our support team will assist you.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>9. Are there any delivery charges?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            Delivery charges may vary based on your location, the restaurant,
+            and the order value. The charges will be displayed at checkout
+            before you confirm your order.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>10. Can I schedule an order for later?</span>
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            Yes, you can schedule an order for a later time. During checkout,
+            select the "Schedule Order" option and choose your preferred
+            delivery time.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-column">
+          <div class="logo-text">TastyTreatExpress.</div>
+          <p>
+            Delivering delicious food from your favorite local restaurants
+            straight to your door.
+          </p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <a href="#">Home</a>
+          <a href="#">About Us</a>
+          <a href="#">Services</a>
+          <a href="#">Menu</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-column">
+          <h3>For Customers</h3>
+          <a href="#">Sign Up</a>
+          <a href="#">Login</a>
+          <a href="#">Order Food</a>
+          <a href="#">Payment Options</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <p>
+            <i class="fas fa-map-marker-alt"></i> 123 Food Street, Tasty City
+          </p>
+          <p>
+            <a href="tel:+1234567890"
+              ><i class="fas fa-phone"></i> +1 234 567 890</a
+            >
+          </p>
+          <p>
+            <a href="mailto:info@tastytreatexpress.com"
+              ><i class="fas fa-envelope"></i> info@tastytreatexpress.com</a
+            >
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 TastyTreatExpress. All rights reserved.</p>
+        <div>
+          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> |
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      function toggleFAQ(element) {
+        const answer = element.nextElementSibling;
+        const toggle = element.querySelector(".faq-toggle");
+        if (answer.classList.contains("show")) {
+          answer.classList.remove("show");
+          toggle.textContent = "+";
+        } else {
+          answer.classList.add("show");
+          toggle.textContent = "-";
+        }
+      }
+    </script>
+  </body>
+</html>
