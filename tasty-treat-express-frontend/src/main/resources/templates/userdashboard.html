@@ -820,10 +820,12 @@
                 // Separate active orders and order history
                 const activeOrders = data.filter(
                   (order) =>
-                    order.status === "Pending" || order.status === "Preparing"
+                    order.status === "Pending" ||
+                    order.status === "PREPARING" ||
+                    order.status === "SHIPPED"
                 );
                 const orderHistory = data.filter(
-                  (order) => order.status === "Delivered"
+                  (order) => order.status === "DELIVERED"
                 );
 
                 // Display active orders
@@ -1301,12 +1303,13 @@
             });
             path.setMap(map);
 
-            // Start moving the restaurant marker
+            /* Start moving the restaurant marker
             moveRestaurantMarker(
               restaurantMarker,
               orderData.restaurantLocation,
               orderData.deliveryLocation
             );
+            */
           }
 
           // Simulate the movement of restaurant marker towards the delivery address
@@ -1346,22 +1349,22 @@
             const orderElement = document.createElement("div");
             orderElement.classList.add("card");
             orderElement.innerHTML = `
-      <div class="order-header">
-        <div class="order-id">Order #${orderData.order.orderId}</div>
-        <div class="order-status status-${orderData.order.status.toLowerCase()}">${
+                <div class="order-header">
+                  <div class="order-id">Order #${orderData.order.orderId}</div>
+                  <div class="order-status status-${orderData.order.status.toLowerCase()}">${
               orderData.order.status
             }</div>
-      </div>
-      <div class="tracking-map" id="orderMap${
-        orderData.order.orderId
-      }" style="height: 400px;"></div>
-      <p><strong>Delivery Address:</strong> ${
-        orderData.order.deliveryAddress
-      }</p>
-      <p><strong>ETA:</strong> <span id="eta-${
-        orderData.order.orderId
-      }">25 minutes</span></p>
-    `;
+                </div>
+                <div class="tracking-map" id="orderMap${
+                  orderData.order.orderId
+                }" style="height: 400px;"></div>
+                <p><strong>Delivery Address:</strong> ${
+                  orderData.order.deliveryAddress
+                }</p>
+                <p><strong>ETA:</strong> <span id="eta-${
+                  orderData.order.orderId
+                }">25 minutes</span></p>
+              `;
             activeDeliveriesContainer.appendChild(orderElement);
           }
 
@@ -1384,11 +1387,18 @@
                   `http://localhost:8080/api/restaurants/${restaurantId}`
                 );
                 const restaurantData = await restaurantResponse.json();
+                const restaurantAddress = restaurantData.address;
+                const restaurantLocation = await getCoordinatesFromAddress(
+                  restaurantAddress
+                );
 
-                const restaurantLocation = {
-                  lat: restaurantData.latitude,
-                  lng: restaurantData.longitude,
-                };
+                console.log(restaurantLocation);
+                console.log(deliveryLocation);
+
+                // const restaurantLocation = {
+                //   lat: restaurantData.latitude,
+                //   lng: restaurantData.longitude,
+                // };
                 const orderData = {
                   order,
                   restaurantData,
@@ -1397,14 +1407,14 @@
                 };
 
                 updateTrackingUI(orderData);
-                setTimeout(() => initMap(orderData), 500); // Ensure DOM is ready before initializing map
+                setTimeout(() => initMap(orderData), 2000); // Ensure DOM is ready before initializing map
               }
             } catch (error) {
               console.error("Error fetching data:", error);
             }
           }
 
-          // Fetch order data
+          // Fetch order data with status based
           async function fetchOrderData2(userId) {
             try {
               const orderResponse = await fetch(
@@ -1414,7 +1424,7 @@
 
               // Filter out orders that are not SHIPPED
               const shippedOrders = orders.filter(
-                (order) => order.status.toLowerCase() === "pending"
+                (order) => order.status === "SHIPPED"
               );
 
               for (const order of shippedOrders) {
@@ -1433,6 +1443,9 @@
                   lat: restaurantData.latitude,
                   lng: restaurantData.longitude,
                 };
+
+                const restaurantAddress = restaurantData.address;
+
                 const orderData = {
                   order,
                   restaurantData,
@@ -1441,10 +1454,123 @@
                 };
 
                 updateTrackingUI(orderData);
-                setTimeout(() => initMap(orderData), 500); // Ensure DOM is ready before initializing map
+                setTimeout(() => initMap(orderData), 2000); // Ensure DOM is ready before initializing map
               }
             } catch (error) {
               console.error("Error fetching data:", error);
+            }
+          }
+
+          //-------------- deliverytime setup
+          // Function to get distance and estimated delivery time using Google Maps Distance Matrix API
+          async function getDeliveryTime(restaurantLocation, deliveryLocation) {
+            const origin = new google.maps.LatLng(
+              restaurantLocation.lat,
+              restaurantLocation.lng
+            );
+            const destination = new google.maps.LatLng(
+              deliveryLocation.lat,
+              deliveryLocation.lng
+            );
+
+            // Prepare the request for the Google Maps Distance Matrix API
+            const service = new google.maps.DistanceMatrixService();
+            const request = {
+              origins: [origin],
+              destinations: [destination],
+              travelMode: google.maps.TravelMode.DRIVING, // Can also use WALKING, BICYCLING, or TRANSIT
+            };
+
+            try {
+              const response = await new Promise((resolve, reject) => {
+                service.getDistanceMatrix(request, (response, status) => {
+                  if (status === google.maps.DistanceMatrixStatus.OK) {
+                    resolve(response);
+                  } else {
+                    reject("Distance Matrix failed: " + status);
+                  }
+                });
+              });
+
+              const distanceInMeters =
+                response.rows[0].elements[0].distance.value; // Distance in meters
+              const durationInSeconds =
+                response.rows[0].elements[0].duration.value; // Duration in seconds
+
+              // Calculate estimated delivery time (in minutes)
+              const distanceInKm = distanceInMeters / 1000; // Convert to kilometers
+              const durationInMinutes = Math.round(durationInSeconds / 60); // Convert to minutes
+
+              // Set delivery time as duration from the response
+              return {
+                distance: distanceInKm,
+                deliveryTime: durationInMinutes,
+              };
+            } catch (error) {
+              console.error("Error calculating delivery time:", error);
+              return { distance: 0, deliveryTime: 0 }; // Default value in case of error
+            }
+          }
+
+          // Example usage: Call this function when you fetch the order details
+          async function updateOrderDeliveryTime(orderData) {
+            const restaurantLocation = orderData.restaurantLocation;
+            const deliveryLocation = orderData.deliveryLocation;
+
+            // Get the delivery time based on the distance
+            const { distance, deliveryTime } = await getDeliveryTime(
+              restaurantLocation,
+              deliveryLocation
+            );
+
+            // Update the UI with the calculated delivery time
+            const etaElement = document.getElementById(
+              `eta-${orderData.order.orderId}`
+            );
+            if (etaElement) {
+              etaElement.textContent = `${deliveryTime} minutes (Distance: ${distance.toFixed(
+                2
+              )} km)`;
+            }
+          }
+
+          // Example: Update delivery time for an order
+          async function fetchOrderDataAndUpdateDeliveryTime(userId) {
+            try {
+              const orderResponse = await fetch(
+                `http://localhost:8080/api/orders/user/${userId}`
+              );
+              const orders = await orderResponse.json();
+
+              for (const order of orders) {
+                const restaurantId = order.restaurantId;
+                const deliveryAddress = order.deliveryAddress;
+
+                // Fetch restaurant and delivery coordinates
+                const deliveryLocation = await getCoordinatesFromAddress(
+                  deliveryAddress
+                );
+                const restaurantResponse = await fetch(
+                  `http://localhost:8080/api/restaurants/${restaurantId}`
+                );
+                const restaurantData = await restaurantResponse.json();
+
+                const restaurantLocation = {
+                  lat: restaurantData.latitude,
+                  lng: restaurantData.longitude,
+                };
+
+                const orderData = {
+                  order,
+                  restaurantData,
+                  deliveryLocation,
+                  restaurantLocation,
+                };
+
+                updateOrderDeliveryTime(orderData); // Update delivery time based on distance
+              }
+            } catch (error) {
+              console.error("Error fetching orders:", error);
             }
           }
 
@@ -1608,14 +1734,29 @@
 
             // Function to create HTML element for each favorite restaurant
             function createFavoriteRestaurantElement(restaurant, orderId) {
+              const restaurantImages = [
+                "https://images.pexels.com/photos/776538/pexels-photo-776538.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1581554/pexels-photo-1581554.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/941861/pexels-photo-941861.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/460537/pexels-photo-460537.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1310777/pexels-photo-1310777.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1449773/pexels-photo-1449773.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=600",
+              ];
               const favoriteItem = document.createElement("div");
               favoriteItem.classList.add("favorite-item");
 
               const favoriteImage = document.createElement("div");
               favoriteImage.classList.add("favorite-image");
+              const randomImage =
+                restaurantImages[
+                  Math.floor(Math.random() * restaurantImages.length)
+                ];
               const img = document.createElement("img");
-              img.src =
-                "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"; // Default image if not provided
+              img.src = randomImage; // "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"; // Default image if not provided-->
               img.alt = restaurant.name;
               favoriteImage.appendChild(img);
 
@@ -1650,6 +1791,11 @@
               const orderButton = document.createElement("button");
               orderButton.classList.add("btn", "order-btn");
               orderButton.textContent = "Order Now";
+              orderButton.addEventListener("click", () => {
+                // Get the restaurant ID and order ID from the hidden inputs
+                const restaurantId = restaurantIdInput.value;
+                window.location.href = `/user/placeOrder?restaurantId=${restaurantId}`;
+              });
 
               // Add the "Write Review" button
               const reviewButton = document.createElement("button");
@@ -1788,6 +1934,42 @@
             display: flex;
             gap: 20px; /* Add space between buttons */
             margin-top: 15px; /* Add spacing above buttons */
+          }
+
+          .favorite-item {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            margin: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 500px; /* Ensure the height is sufficient to fit content */
+          }
+
+          /* Hover effect for the card */
+          .favorite-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          }
+
+          /* Style for the image section */
+          .favorite-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+          }
+
+          .favorite-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the area while maintaining aspect ratio */
+            object-position: center;
           }
         </style>
 
@@ -2005,12 +2187,14 @@
               body: JSON.stringify(reviewData),
             }).then((response) => {
               if (response.ok) {
-                // show sweet alert success message
+                // show sweet alert success message reload the page
                 Swal.fire({
                   icon: "success",
                   title: "Review Submitted",
                   text: "Thank you for your feedback!",
                   confirmButtonText: "OK",
+                }).then(() => {
+                  window.location.reload();
                 });
                 closeReviewDialog();
                 return response.json();

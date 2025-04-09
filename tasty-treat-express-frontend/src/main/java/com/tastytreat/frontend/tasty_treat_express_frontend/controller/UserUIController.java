@@ -361,13 +361,14 @@ public class UserUIController {
             @RequestParam String name,
             @RequestParam String phoneNumber, Model model) {
 
-        System.out.println("Signup request to backend...");
+        System.out.println("User Signup request to backend...");
 
         UserDTO user = new UserDTO();
         user.setEmail(email);
         user.setPassword(password);
         user.setName(name);
         user.setPhoneNumber(phoneNumber);
+
 
         String url = "http://localhost:8080/api/users/register";
         try {
@@ -386,7 +387,7 @@ public class UserUIController {
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("status", "error");
-            errorResponse.put("message", "Registration failed: " + ex.getResponseBodyAsString());
+            errorResponse.put("message", ex.getResponseBodyAsString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (Exception ex) {
             Map<String, String> errorResponse = new HashMap<>();

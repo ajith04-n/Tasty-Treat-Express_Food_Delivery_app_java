@@ -2292,14 +2292,23 @@
         .getElementById("apply-promo")
         .addEventListener("click", function () {
           const promoCode = document.getElementById("promo").value;
-          applyPromoCode(promoCode);
+          console.log(promoCode);
+          code = promoCode;
+          if (code === "PROMOCODE") {
+            showNotification("Invalid promo code!", "error");
+          } else {
+            
+            showNotification("Promo code applied successfully!", "success");
+          }
+          //applyPromoCode(promoCode);
         });
 
       function applyPromoCode(code) {
+        console.log(code);
         if (code === "PROMOCODE") {
-          showNotification("Promo code applied successfully!", "success");
-        } else {
           showNotification("Invalid promo code!", "error");
+        } else {
+          showNotification("Promo code applied successfully!", "success");
         }
 
         /*
@@ -2750,8 +2759,8 @@
             return;
           }
 
-         // alert("Net Banking Payment Successful!");
-         processPayment("Net Banking");
+          // alert("Net Banking Payment Successful!");
+          processPayment("Net Banking");
         });
 
       document
@@ -2768,8 +2777,8 @@
               return;
             }
 
-           // alert("Payment processed successfully via Digital Wallet!");
-           processPayment("Digital Wallet");
+            // alert("Payment processed successfully via Digital Wallet!");
+            processPayment("Digital Wallet");
           });
         });
 
@@ -3061,7 +3070,7 @@
               restaurantId: restaurantId,
             };
 
-            console.log("Order req: ",orderRequestData);
+            console.log("Order req: ", orderRequestData);
             const url = `http://localhost:8080/api/orders/placeOrder/${userId}/${restaurantId}`;
 
             // Send the order request to the backend

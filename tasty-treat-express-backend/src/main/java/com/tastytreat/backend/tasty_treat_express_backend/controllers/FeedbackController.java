@@ -18,8 +18,11 @@ import com.tastyTreatExpress.DTO.FeedbackMapper;
 import com.tastytreat.backend.tasty_treat_express_backend.exceptions.MainExceptionClass.InvalidInputException;
 import com.tastytreat.backend.tasty_treat_express_backend.models.Feedback;
 import com.tastytreat.backend.tasty_treat_express_backend.services.FeedbackService;
+import com.tastytreat.backend.tasty_treat_express_backend.services.FeedbackServiceImpl;
 import com.tastytreat.backend.tasty_treat_express_backend.services.MenuItemService;
 import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantServiceImpl;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin(origins = "http://localhost:9213")
 @RestController
@@ -27,7 +30,7 @@ import com.tastytreat.backend.tasty_treat_express_backend.services.RestaurantSer
 public class FeedbackController {
 
     @Autowired
-    private FeedbackService feedbackService;
+    private FeedbackServiceImpl feedbackService;
 
     @Autowired
     private RestaurantServiceImpl restaurantService;
@@ -260,11 +263,25 @@ public class FeedbackController {
     // Thank user for positive feedback
     @PutMapping("/thank-user")
     public ResponseEntity<Map<String, String>> thankUserForPositiveFeedback(@RequestBody Feedback feedback) {
+
         feedbackService.thankUserForPositiveFeedback(feedback);
         Map<String, String> response = new HashMap<>();
+        System.out.println("message sent...." + feedback.getFeedbackId());
         response.put("message", "Thank you message sent to user.");
         return ResponseEntity.ok(response);
     }
+
+    // get all feedbacks
+    @GetMapping("/all")
+    public ResponseEntity<List<FeedbackDTO>> getAllFeedbacks() {
+        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+        List<FeedbackDTO> feedbackDTOs = feedbacks.stream()
+                .map(FeedbackMapper::toFeedbackDTO)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(feedbackDTOs);
+    }
+
 }
 
 // ** This is before restaurant integration code: **

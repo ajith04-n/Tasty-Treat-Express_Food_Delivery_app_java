@@ -330,7 +330,8 @@
                 <li><a href="#" onclick="showMenuSection()"><i class="fas fa-list"></i> Menu Management</a></li>
                 <li><a href="#" onclick="showFeedbackSection()"><i class="fas fa-comments"></i> Feedbacks</a></li>
                 <li><a href="#" onclick="showOrdersSection()"><i class="fas fa-receipt"></i> Orders</a></li>
-                <li><a href="#" onclick="showReportsSection()"><i class="fas fa-file-alt"></i> Reports</a></li>
+                <li><a href="/reports/generate" ><i class="fas fa-file-alt"></i> Reports</a></li>
+                <li><a href="/home" ><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </div>
@@ -343,6 +344,7 @@
                     <p><strong>Email:</strong> <span th:text="${restaurant.email}"></span></p>
                     <p><strong>Address:</strong> <span th:text="${restaurant.address}"></span></p>
                     <p><strong>Phone:</strong> <span th:text="${restaurant.phoneNumber}"></span></p>
+                    <input id="resId" type="hidden" th:value="${restaurant.restaurantId}" />
                 </div>
             </div>
             <div th:unless="${restaurant != null}">
@@ -504,12 +506,10 @@
                 
           
             <div id="reportContent" class="card" style="display: none;">
-                <!-- Report content will be displayed here -->
             </div>
         </div>
     </div>
-
-    <!-- Response Modal -->
+<!--
     <div class="modal" id="responseModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -524,7 +524,132 @@
             </div>
         </div>
     </div>
+-->
 
+<div class="modal" id="responseModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>💬 Respond to Feedback</h3>
+            <button class="close-modal" aria-label="Close Modal" onclick="closeResponseModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="responseText" placeholder="Share your thoughts here..." rows="5"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn submit-btn" onclick="submitResponse()">🚀 Send Response</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modal Container */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background: #fff;
+    border-radius: 8px;
+    width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: scaleUp 0.3s ease-in-out;
+}
+
+/* Header Styling */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Body Styling */
+.modal-body {
+    margin-top: 15px;
+}
+
+textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+    resize: none;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Footer Styling */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.submit-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+/* Animations */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+</style>
     <!-- Order Details Modal -->
     <div class="modal" id="orderDetailsModal">
         <div class="modal-content">
@@ -600,6 +725,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <script>
         // Global variable to store restaurant data
         let currentRestaurant = null;
@@ -632,7 +758,8 @@
                 return;
             }
 
-            fetch(`http://localhost:8080/api/menuItems/restaurant/${currentRestaurant.restaurantId}`)
+            const restaurantId = document.getElementById("resId").value;
+            fetch(`http://localhost:8080/api/menuItems/restaurant/${restaurantId}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Failed to fetch menu items');
                     return response.json();
@@ -646,7 +773,7 @@
                         row.innerHTML = `
                             <td>${item.name}</td>
                             <td>${item.description || ''}</td>
-                            <td>$${item.price.toFixed(2)}</td>
+                            <td>₹${item.price.toFixed(2)}</td>
                             <td>${item.quantity}</td>
                             <td>${item.category}</td>
                             <td>
@@ -1044,6 +1171,7 @@
 
         function submitResponse() {
             const responseText = document.getElementById('responseText').value;
+            console.log(responseText);
 
             if (!responseText) {
                 alert('Please enter a response before sending.');
@@ -1072,7 +1200,7 @@
                 loadFeedbacks();
                 const respondButton = document.querySelector(`button[data-feedback-id="${currentFeedbackId}"]`);
                 if (respondButton) {
-                    respondButton.disabled = true;
+                   // respondButton.disabled = true;
                     respondButton.style.backgroundColor = '#d3d3d3';
                     respondButton.style.color = '#a9a9a9';
                     respondButton.style.cursor = 'not-allowed';

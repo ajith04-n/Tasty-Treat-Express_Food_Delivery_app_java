@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Download Section with History</title>
+    <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              padding: 20px;
+            }
+
+            .report-section,
+            .history-section {
+              padding: 20px;
+              background-color: #fff;
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              max-width: 800px;
+              margin: 20px auto;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .report-type {
+              margin-bottom: 20px;
+            }
+
+            .report-type h3,
+            .history-section h2 {
+              margin-bottom: 10px;
+            }
+
+            label {
+              margin-right: 10px;
+            }
+
+            .download-options button {
+              margin: 5px;
+              padding: 10px 20px;
+              border: none;
+              background-color: #007bff;
+              color: white;
+              cursor: pointer;
+              border-radius: 5px;
+              transition: background-color 0.3s;
+            }
+
+            .download-options button:hover {
+              background-color: #0056b3;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+
+            table,
+            th,
+            td {
+              border: 1px solid #ddd;
+            }
+
+            th,
+            td {
+              padding: 10px;
+              text-align: center;
+            }
+
+            th {
+              background-color: #007bff;
+              color: white;
+            }
+
+            .action-button {
+              padding: 5px 10px;
+              border: none;
+              background-color: #28a745;
+              color: white;
+              cursor: pointer;
+              border-radius: 4px;
+              margin: 2px;
+            }
+
+            .action-button:hover {
+              background-color: #218838;
+            }
+
+            body {
+              font-family: "Roboto", sans-serif;
+              background: linear-gradient(to right, #8e44ad, #3498db);
+              margin: 0;
+              padding: 20px;
+              color: #333;
+            }
+
+            .container {
+              max-width: 900px;
+              margin: 0 auto;
+              background: #ffffff;
+              border-radius: 15px;
+              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+              overflow: hidden;
+              animation: fadeIn 0.7s ease-in-out;
+              padding: 20px;
+            }
+
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(-30px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            h1,
+            h2,
+            h3 {
+              text-align: center;
+              color: #4a69bd;
+            }
+
+            .report-section {
+              margin-bottom: 30px;
+            }
+
+            .report-type {
+              margin-bottom: 20px;
+            }
+
+            .report-type h3 {
+              color: #3498db;
+              font-size: 20px;
+              margin-bottom: 10px;
+            }
+
+            label {
+              display: block;
+              font-weight: bold;
+              margin: 8px 0;
+            }
+
+            input[type="date"] {
+              padding: 8px 10px;
+              border: 1px solid #ddd;
+              border-radius: 6px;
+              margin-bottom: 10px;
+              width: calc(50% - 10px);
+            }
+
+            .download-options {
+              display: flex;
+              gap: 15px;
+              justify-content: center;
+            }
+
+            button {
+              background-color: #3498db;
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              padding: 10px 20px;
+              font-size: 16px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              transition: all 0.3s;
+            }
+
+            button:hover {
+              background-color: #2980b9;
+              transform: scale(1.05);
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+
+            th,
+            td {
+              border: 1px solid #ddd;
+              padding: 10px;
+              text-align: center;
+            }
+
+            th {
+              background-color: #3498db;
+              color: white;
+            }
+
+            tr:nth-child(even) {
+              background-color: #f2f2f2;
+            }
+
+            .action-btn {
+              background-color: #27ae60;
+              color: white;
+              border: none;
+              padding: 8px 15px;
+              border-radius: 6px;
+              cursor: pointer;
+              transition: all 0.3s;
+            }
+
+            .action-btn:hover {
+              background-color: #1e8449;
+            }
+
+            .date-pickers {
+              display: block;
+              justify-content:"center"
+              flex-wrap: wrap;
+              gap: 20px;
+              align-items: center;
+              background: linear-gradient(135deg, #8e44ad, #3498db);
+              padding: 20px;
+              border-radius: 10px;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+              color: #fff;
+            }
+
+            .date-pickers label {
+              font-size: 16px;
+              font-weight: bold;
+              margin-bottom: 5px;
+              color: #f8f9fa;
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
+            .date-pickers input[type="date"] {
+              padding: 10px;
+              border: none;
+              border-radius: 6px;
+              font-size: 14px;
+              color: #333;
+              background: #f4f4f4;
+              box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+              transition: box-shadow 0.3s ease;
+            }
+
+            .date-pickers input[type="date"]:hover,
+            .date-pickers input[type="date"]:focus {
+              outline: none;
+              box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+            }
+
+            /* Modal Container */
+      .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 9999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+
+      /* Modal Content */
+      .modal-content {
+          background: #fff;
+          border-radius: 8px;
+          width: fit-content;
+          padding: 20px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Table Styling */
+      .styled-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+      }
+
+      .styled-table th,
+      .styled-table td {
+          border: 1px solid #ddd;
+          padding: 10px;
+          text-align: left;
+      }
+
+      .styled-table th {
+          font-weight: bold;
+      }
+
+      /* Close Button */
+      .close-modal {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #888;
+          transition: color 0.2s;
+      }
+
+      .close-modal:hover {
+          color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="report-section">
+      <h2>Download Reports</h2>
+      <input id="resId" type="hidden" th:value="${resId}" />
+      <div class="date-pickers">
+        <label for="orderStartDate">Start Date:</label>
+        <input type="date" id="orderStartDate" name="startDate" required />
+
+        <label for="orderEndDate">End Date:</label>
+        <input type="date" id="orderEndDate" name="endDate" required />
+      </div>
+      <!-- Orders Report Section -->
+      <div class="report-type">
+        <h3>Orders Report</h3>
+        <div class="download-options">
+          <button onclick="downloadReport('orders', 'csv')">
+            Download CSV
+          </button>
+          <button onclick="downloadReport('orders', 'pdf')">
+            Download PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback Report Section -->
+      <div class="report-type">
+        <h3>Feedback Report</h3>
+        <div class="download-options">
+          <button onclick="downloadReport('feedbacks', 'csv')">
+            Download CSV
+          </button>
+          <button onclick="downloadReport('feedbacks', 'pdf')">
+            Download PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu Items Report Section -->
+      <div class="report-type">
+        <h3>Menu Items Report</h3>
+        <div class="download-options">
+          <button onclick="downloadReport('menuItems', 'csv')">
+            Download CSV
+          </button>
+          <button onclick="downloadReport('menuItems', 'pdf')">
+            Download PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report History Section -->
+    <div class="history-section">
+      <h2>Report Download History</h2>
+      <table id="reportHistoryTable">
+        <thead>
+          <tr>
+            <th>Report ID</th>
+            <th>Type</th>
+            <th>Date Range</th>
+            <th>Generated On</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- History will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal" id="dataModal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Report Details</h3>
+          <button
+            class="close-modal"
+            aria-label="Close Modal"
+            onclick="closeDataModal()"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <table id="reportTable" class="styled-table">
+            <thead>
+              <tr>
+                <!-- Column headers will be populated dynamically -->
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Table content will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+      const restaurantId = document.getElementById("resId").value;
+      let reportHistory = []; // This will store the download history
+
+      function downloadReport(type, format) {
+        let apiUrl = "";
+
+        if (type === "orders") {
+          const startDate = document.getElementById("orderStartDate")?.value;
+          const endDate = document.getElementById("orderEndDate")?.value;
+
+          if (!startDate || !endDate) {
+            alert("Please select a date range for the orders report.");
+            return;
+          }
+          apiUrl = `http://localhost:8080/api/orders/restaurant/${restaurantId}?startDate=${startDate}&endDate=${endDate}`;
+        } else if (type === "feedbacks") {
+          apiUrl = `http://localhost:8080/api/feedbacks/restaurant/${restaurantId}`;
+        } else if (type === "menuItems") {
+          apiUrl = `http://localhost:8080/api/menuItems/restaurant/${restaurantId}`;
+        }
+
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            const reportId = reportHistory.length + 1;
+            const dateRange =
+              type === "orders"
+                ? `${document.getElementById("orderStartDate").value} to ${
+                    document.getElementById("orderEndDate").value
+                  }`
+                : "N/A";
+            const generatedOn = new Date().toLocaleString();
+
+            if (format === "csv") {
+              downloadCSV(data, `${type}_report.csv`);
+            } else {
+              downloadPDF(data, `${type}_report.pdf`);
+            }
+
+            // Add to history
+            reportHistory.push({ reportId, type, dateRange, generatedOn });
+            updateReportHistory();
+          })
+          .catch((error) => console.error("Error fetching report:", error));
+      }
+
+      function downloadCSV(data, filename) {
+        const csvRows = [];
+        const headers = Object.keys(data[0] || {}).join(",");
+        csvRows.push(headers);
+
+        data.forEach((row) => {
+          const values = Object.values(row)
+            .map((value) => `"${value}"`)
+            .join(",");
+          csvRows.push(values);
+        });
+
+        const csvString = csvRows.join("\n");
+        const blob = new Blob([csvString], { type: "text/csv" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+      }
+
+      /*
+      function downloadPDF(data, filename) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        if (data.length === 0) {
+          doc.text("No data available", 10, 10);
+          doc.save(filename);
+          return;
+        }
+
+        // Start a table at a certain Y position
+        let y = 10;
+        const margin = 10;
+        const cellPadding = 5;
+
+        // Add the table headers (first row)
+        const headers = Object.keys(data[0]);
+        const tableWidth = 190; // Adjust the width of the table to fit the page
+
+        // Calculate column widths based on the headers length
+        const columnWidth = tableWidth / headers.length;
+
+        // Draw headers
+        headers.forEach((header, index) => {
+          doc.setFont("helvetica", "bold");
+          doc.rect(margin + index * columnWidth, y, columnWidth, 10); // Draw header cells
+          doc.text(header, margin + index * columnWidth + cellPadding, y + 7);
+        });
+
+        y += 10; // Move down for the next row
+
+        // Draw the table rows
+        doc.setFont("helvetica", "normal");
+
+        data.forEach((row) => {
+          headers.forEach((header, index) => {
+            doc.rect(margin + index * columnWidth, y, columnWidth, 10); // Draw row cells
+            doc.text(
+              String(row[header] || ""),
+              margin + index * columnWidth + cellPadding,
+              y + 7
+            );
+          });
+          y += 10;
+        });
+
+        doc.save(filename);
+      }
+        */
+
+      /*
+      function downloadPDF(data, filename) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Check if data is empty
+        if (data.length === 0) {
+          doc.text("No data available", 10, 10);
+          doc.save(filename);
+          return;
+        }
+
+        let y = 20; 
+        const margin = 10; 
+        const cellPadding = 6; // Padding inside each cell
+        const tableWidth = 190; // Total table width
+        const columnCount = Object.keys(data[0]).length; // Number of columns
+
+        // Calculate column width based on the table width and number of columns
+        const columnWidth = tableWidth / columnCount;
+
+        // Draw the table header (first row)
+        const headers = Object.keys(data[0]);
+
+        // Set bold font for headers
+        doc.setFont("helvetica", "bold");
+
+        // Draw each header cell
+        headers.forEach((header, index) => {
+          doc.setFillColor(220, 220, 220); // Light gray background for headers
+          doc.rect(margin + index * columnWidth, y, columnWidth, 10, "F"); // Draw background
+          doc.text(header, margin + index * columnWidth + cellPadding, y + 7); // Add header text
+        });
+
+        y += 10; // Move down after the headers
+
+        // Set normal font for data rows
+        doc.setFont("helvetica", "normal");
+
+        // Draw the table rows
+        data.forEach((row) => {
+          headers.forEach((header, index) => {
+            doc.setFillColor(255, 255, 255); // White background for data rows
+            doc.rect(margin + index * columnWidth, y, columnWidth, 10, "F"); // Draw cell background
+            doc.text(
+              String(row[header] || ""),
+              margin + index * columnWidth + cellPadding,
+              y + 7
+            ); // Add data text
+          });
+          y += 10;
+
+          // Ensure the table fits within the page (if rows overflow, add a new page)
+          if (y > 270) {
+            doc.addPage();
+            y = 20; // Reset the Y position to start a new page
+          }
+        });
+
+        doc.save(filename); // Save the generated PDF
+      } */
+
+      function downloadPDF(data, filename) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Check if data is empty
+        if (data.length === 0) {
+          doc.text("No data available", 10, 10);
+          doc.save(filename);
+          return;
+        }
+
+        let y = 20; // Starting y position
+        const margin = 10; // Left margin
+        const cellPadding = 6; // Padding inside each cell
+        const tableWidth = 190; // Total table width (portrait mode)
+        const columnCount = Object.keys(data[0]).length; // Number of columns
+
+        // Calculate column width based on the table width and number of columns
+        const columnWidth = tableWidth / columnCount;
+
+        // Set font size for better fit
+        doc.setFontSize(7); // Reduced font size to fit the table in the page
+
+        // Draw the table header (first row)
+        const headers = Object.keys(data[0]);
+
+        // Set bold font for headers
+        doc.setFont("helvetica", "bold");
+
+        // Draw each header cell
+        headers.forEach((header, index) => {
+          doc.setFillColor(220, 220, 220); // Light gray background for headers
+          doc.rect(margin + index * columnWidth, y, columnWidth, 10, "F"); // Draw background
+          doc.text(header, margin + index * columnWidth + cellPadding, y + 7); // Add header text
+        });
+
+        y += 10; // Move down after the headers
+
+        // Set normal font for data rows
+        doc.setFont("helvetica", "normal");
+
+        data.forEach((row) => {
+          headers.forEach((header, index) => {
+            doc.setFillColor(255, 255, 255); // White background for data rows
+            doc.rect(margin + index * columnWidth, y, columnWidth, 10, "F"); // Draw cell background
+            doc.text(
+              String(row[header] || ""),
+              margin + index * columnWidth + cellPadding,
+              y + 7
+            );
+          });
+          y += 10;
+          if (y > 250) {
+            doc.addPage();
+            y = 20;
+          }
+        });
+        doc.save(filename);
+      }
+
+      function updateReportHistory() {
+        const tableBody = document
+          .getElementById("reportHistoryTable")
+          .querySelector("tbody");
+        tableBody.innerHTML = ""; // Clear existing history
+
+        reportHistory.forEach((report) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+          <td>${report.reportId}</td>
+          <td>${report.type}</td>
+          <td>${report.dateRange}</td>
+          <td>${report.generatedOn}</td>
+          <td>
+            <button class="action-button" onclick="viewReport(${report.reportId})">View</button>
+            <button class="action-button" onclick="downloadReport('${report.type}', 'csv')">Download</button>
+          </td>
+        `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function viewReport(reportId) {
+        const reportData = reportHistory[reportId - 1];
+        if (!reportData) {
+          alert("Report not found!");
+          return;
+        }
+
+        let apiUrl = "";
+
+        if (reportData.type === "orders") {
+          const startDate = document.getElementById("orderStartDate")?.value;
+          const endDate = document.getElementById("orderEndDate")?.value;
+          apiUrl = `http://localhost:8080/api/orders/restaurant/${restaurantId}?startDate=${startDate}&endDate=${endDate}`;
+        } else if (reportData.type === "feedbacks") {
+          apiUrl = `http://localhost:8080/api/feedbacks/restaurant/${restaurantId}`;
+        } else if (reportData.type === "menuItems") {
+          apiUrl = `http://localhost:8080/api/menuItems/restaurant/${restaurantId}`;
+        }
+
+        // Fetch the report data for the correct report type
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            const table = document.getElementById("reportTable");
+            const thead = table.querySelector("thead tr");
+            const tbody = table.querySelector("tbody");
+
+            // Clear existing table content
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            if (data.length > 0) {
+              // Populate headers
+              const headers = Object.keys(data[0]);
+              headers.forEach((header) => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                thead.appendChild(th);
+              });
+
+              // Populate rows
+              data.forEach((row) => {
+                const tr = document.createElement("tr");
+                Object.values(row).forEach((value) => {
+                  const td = document.createElement("td");
+                  td.textContent = value;
+                  tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+              });
+            } else {
+              const tr = document.createElement("tr");
+              const td = document.createElement("td");
+              td.setAttribute("colspan", "100%");
+              td.textContent = "No data available";
+              tr.appendChild(td);
+              tbody.appendChild(tr);
+            }
+
+            // Show modal
+            const modal = document.getElementById("dataModal");
+            modal.style.display = "flex";
+          })
+          .catch((error) => {
+            console.error("Error fetching report data:", error);
+            alert("Failed to fetch report data.");
+          });
+      }
+
+      function closeDataModal() {
+        const modal = document.getElementById("dataModal");
+        modal.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

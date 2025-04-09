@@ -525,6 +525,13 @@
                 th:value="${session.restaurantDTO.phoneNumber}"
                 required
               />
+              <label>Description</label>
+              <input
+                type="text-area"
+                name="description"
+                th:value="${session.restaurantDTO.description}"
+                required
+              />
               <button type="submit">Update Profile</button>
             </form>
           </div>

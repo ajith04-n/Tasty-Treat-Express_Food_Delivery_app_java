@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -109,7 +110,6 @@ public class RestaurantUIController {
                                 successResponse.put("message", "Restaurant registered successfully!");
                                 return ResponseEntity.ok(successResponse);
                         } else {
-
                                 Map<String, String> errorResponse = new HashMap<>();
                                 errorResponse.put("status", "error");
                                 errorResponse.put("message", "Error: " + response.getBody());
@@ -357,6 +357,50 @@ public class RestaurantUIController {
                         errorResponse.put("status", "error");
                         errorResponse.put("message", "An unexpected error occurred: " + ex.getMessage());
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+                }
+        }
+
+        @PostMapping("/res/updateProfile")
+        public String profileUpdate(@RequestParam String name, @RequestParam String email, @RequestParam String address,
+                        @RequestParam String phoneNumber, @RequestParam String description,  Model model, HttpSession session) {
+
+                RestaurantDTO restaurantDTO = new RestaurantDTO();
+                restaurantDTO.setName(name);
+                restaurantDTO.setEmail(email);
+                restaurantDTO.setAddress(address);
+                restaurantDTO.setPhoneNumber(phoneNumber);
+                restaurantDTO.setDescription(description);
+
+                String restaurantId = (String) session.getAttribute("restaurantId");
+
+                if (restaurantId == null) {
+                        model.addAttribute("error", "User not logged in. Please log in again.");
+                        return "redirect:/";
+                }
+
+                String url = "http://localhost:8080/api/restaurants/update/" + restaurantId;
+
+                try {
+
+                        ResponseEntity<RestaurantDTO> response = restTemplate.exchange(url, HttpMethod.PUT,
+                                        new HttpEntity<>(restaurantDTO),
+                                        RestaurantDTO.class);
+
+                        if (response.getStatusCode().is2xxSuccessful()) {
+                                RestaurantDTO updatedRestaurantDTO = response.getBody();
+
+                                session.setAttribute("restaurantDTO", updatedRestaurantDTO);
+                                session.setAttribute("restaurantId", updatedRestaurantDTO.getRestaurantId());
+                                session.setAttribute("address", updatedRestaurantDTO.getAddress());
+
+                                return "redirect:/res/profile";
+                        } else {
+                                model.addAttribute("error", "Error updating profile: " + response.getStatusCode());
+                                return "error";
+                        }
+                } catch (RestClientException e) {
+                        model.addAttribute("error", "Error updating profile: " + e.getMessage());
+                        return "error";
                 }
         }
 
