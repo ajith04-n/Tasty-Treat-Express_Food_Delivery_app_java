@@ -209,10 +209,22 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     public void thankUserForPositiveFeedback(Feedback feedback) {
-        if (feedback.getRating() >= 4) {
-            String message = "Thank you for your positive feedback! Your satisfaction means a lot to us.";
-            emailService.sendSimpleMessage(feedback.getUser().getEmail(), "Thank You for Your Feedback", message);
+        Optional<Feedback> dFeedback = feedbackRepository.findById(feedback.getFeedbackId());
+        if (dFeedback.isPresent()) {
+            Long uid = dFeedback.get().getUser().getId();
+            Optional<User> user = userRepository.findById(uid);
+            if (user.isPresent()) {
+                String comments = feedback.getComments();
+                String message = comments+ " Thank you for your feedback on our restaurant. We appreciate your support.Your satisfaction means a lot to us.";
+                emailService.sendSimpleMessage(user.get().getEmail(), "Thank You", message);
+                System.out.println(message + "****" + user.get().getEmail());
+            }
         }
+    }
+
+    public List<Feedback> getAllFeedbacks() {
+        return feedbackRepository.findAll().stream()
+                .collect(Collectors.toList());
     }
 
     public List<Feedback> getPersonalizedFeedbackDashboard(Long userId) {

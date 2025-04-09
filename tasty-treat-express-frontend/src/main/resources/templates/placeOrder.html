@@ -1191,7 +1191,7 @@
 /* Parent container */
 .main-container {
     display: flex; /* Use flexbox to arrange children horizontally */
-    justify-content: space-between; /* Space between the two sub-containers */
+    justify-content: space-around; /* Space between the two sub-containers */
     padding: 20px; /* Add padding for better spacing */
 }
 
@@ -1377,11 +1377,24 @@
         fetch('http://localhost:8080/api/menuItems/restaurant/'+restaurantId)
             .then(response => response.json())
             .then(menuItems => {
+                 const foodImages = [
+            "https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/2679501/pexels-photo-2679501.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/674574/pexels-photo-674574.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-crunchy-60616.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/17104944/pexels-photo-17104944/free-photo-of-puttu-served-on-leaf.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/10810653/pexels-photo-10810653.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/20422121/pexels-photo-20422121/free-photo-of-cone-bread-on-plate.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.pexels.com/photos/8395780/pexels-photo-8395780.jpeg?auto=compress&cs=tinysrgb&w=600"
+        ];
+
                 // Get the container where the menu items will be displayed
                 const menuContainer = document.getElementById('menu-items-container');
                 
                 // Loop through the menu items and create HTML for each
-                menuItems.forEach(menuItem => {
+                menuItems.forEach((menuItem,idx) => {
                     // Create the HTML structure for each menu item
                     const menuItemDiv = document.createElement('div');
                     menuItemDiv.classList.add('menu-item');
@@ -1389,7 +1402,10 @@
 
                     menuItemDiv.innerHTML = `
                         <div class="item-info">
-                            <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=500&auto=format&fit=crop" class="menu-item-image" />
+        
+                            <img 
+                            src="${foodImages[idx % foodImages.length]}" 
+                            class="menu-item-image" />
                             <div class="item-name">${menuItem.name}</div>
                             <div class="item-price">₹${menuItem.price}</div>
                             <div class="item-desc">${menuItem.description}</div>
@@ -1434,13 +1450,12 @@
                             quantity--;
                             quantitySpan.textContent = quantity;
                         }
-                        updateOrderSummary(); // Update the order summary when quantity changes
+                        updateOrderSummary(); 
                     });
 
                     checkbox.addEventListener('change', updateOrderSummary);
                 });
 
-                // Add event listeners to checkboxes to update the order summary
                 document.querySelectorAll('.menu-item-checkbox').forEach(checkbox => {
                     checkbox.addEventListener('change', updateOrderSummary);
                 });
@@ -1450,6 +1465,7 @@
             });
     });
 
+    
     function updateOrderSummary() {
     const selectedItemsContainer = document.getElementById('selected-items');
     const itemTotalElement = document.getElementById('item-total');

@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.tastytreat.frontend.tasty_treat_express_frontend.models.Report;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.util.List;
 
 @Controller
@@ -22,44 +24,44 @@ public class ReportController {
     @Autowired
     private RestTemplate restTemplate;
 
-   
     @GetMapping
     public String getAllReports(Model model) {
         ResponseEntity<List<Report>> response = restTemplate.exchange(
-                BASE_URL, HttpMethod.GET, null, new ParameterizedTypeReference<List<Report>>() {});
+                BASE_URL, HttpMethod.GET, null, new ParameterizedTypeReference<List<Report>>() {
+                });
         model.addAttribute("reports", response.getBody());
-        return "report_list"; 
+        return "report_list";
     }
 
-   
     @GetMapping("/{id}")
     public String getReportById(@PathVariable Long id, Model model) {
         Report report = restTemplate.getForObject(BASE_URL + "/" + id, Report.class);
         model.addAttribute("report", report);
-        return "report_detail"; 
+        return "report_detail";
     }
 
     @GetMapping("/generate")
-    public String showGenerateReportForm() {
-        return "generate_report"; 
+    public String showGenerateReportForm(Model model, HttpSession session) {
+        String resId = (String) session.getAttribute("restaurantId");
+        model.addAttribute("resId", resId);
+        return "report";
     }
 
     @PostMapping("/generate")
     public String generateReport(@ModelAttribute Report report) {
         restTemplate.postForObject(BASE_URL + "/generate", report, Report.class);
-        return "redirect:/reports"; 
+        return "redirect:/reports";
     }
-   
+
     @PostMapping("/delete/{id}")
     public String deleteReport(@PathVariable Long id) {
         restTemplate.delete(BASE_URL + "/delete/" + id);
         return "redirect:/reports"; // Redirect to report list after deletion
     }
 
-    
     @PostMapping("/deleteAll")
     public String deleteAllReports() {
         restTemplate.delete(BASE_URL + "/deleteAll");
-        return "redirect:/reports"; 
+        return "redirect:/reports";
     }
 }

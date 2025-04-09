@@ -97,6 +97,20 @@ public class RestaurantServiceImpl implements RestaurantService {
             existingRestaurant.setEmail(restaurantDTO.getEmail());
         if (restaurantDTO.getAddress() != null)
             existingRestaurant.setAddress(restaurantDTO.getAddress());
+        if (restaurantDTO.getDescription() != null)
+            existingRestaurant.setDescription(restaurantDTO.getDescription());
+        if (restaurantDTO.getPhoneNumber() != null) {
+            existingRestaurant.setPhoneNumber(restaurantDTO.getPhoneNumber());
+        }
+        if (restaurantDTO.getRating() != 0) {
+            existingRestaurant.setRating(restaurantDTO.getRating());
+        }
+        if (restaurantDTO.getLatitude() != 0) {
+            existingRestaurant.setLatitude(restaurantDTO.getLatitude());
+        }
+        if (restaurantDTO.getLongitude() != 0) {
+            existingRestaurant.setLongitude(restaurantDTO.getLongitude());
+        }
         try {
             return restaurantRepository.save(existingRestaurant);
         } catch (Exception e) {

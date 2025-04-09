@@ -685,6 +685,7 @@
         }
 
         .hero-bg {
+          height: 100vh;
           padding-left: 2rem;
           padding-top: 60px;
           justify-content: center;
@@ -1268,7 +1269,6 @@
         </div>
 
         <script>
-          // Real-time validation function
           document
             .getElementById("name")
             .addEventListener("input", validateName);
@@ -1287,9 +1287,10 @@
 
           // Validate Name
           function validateName() {
-            const name = document.getElementById("name").value;
+            const name = document.getElementById("name").value.trim();
             const errorElement = document.getElementById("name-error");
-            if (name.trim() === "") {
+            console.log(name);
+            if (name.length === 0 || name === null || name.trim() === "") {
               errorElement.textContent = "Name is required.";
               errorElement.style.opacity = "1";
             } else {
@@ -1422,44 +1423,66 @@
           async function submitUserSignup(event) {
             event.preventDefault();
 
-            const formData = new FormData(
-              document.getElementById("user-signup-form")
-            );
-
-            try {
-              const response = await fetch(
-                "http://localhost:9213/user/signup",
-                {
-                  method: "POST",
-                  body: formData,
-                }
+            if (validateUserSignup()) {
+              const formData = new FormData(
+                document.getElementById("user-signup-form")
               );
-              const result = await response.json();
-              if (response.ok && result.status === "success") {
-                Swal.fire({
-                  icon: "success",
-                  title: "Signup Successful!",
-                  text: result.message,
-                  confirmButtonText: "Great!",
-                }).then(() => {
-                  window.location.href = "/";
-                });
-              } else {
+
+              const email = formData.get("email").trim();
+              const password = formData.get("password").trim();
+              const name = formData.get("name").trim();
+              const phoneNumber = formData.get("phoneNumber").trim();
+
+              if (!email || !password || !name || !phoneNumber) {
+                //  alert("Please fill in all fields.");
+
                 Swal.fire({
                   icon: "error",
-                  title: "Signup Failed!",
-                  text:
-                    result.message || "Something went wrong. Please try again.",
-                  confirmButtonText: "Retry",
+                  title: "Oops...",
+                  text: "Name shouldn't be Empty. Please fill in all fields.",
+                  confirmButtonText: "Got it!",
+                });
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  "http://localhost:9213/user/signup",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                const result = await response.json();
+                console.log(result);
+                if (response.ok && result.status === "success") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Signup Successful!",
+                    text: result.message,
+                    confirmButtonText: "Great!",
+                  }).then(() => {
+                    window.location.href = "/";
+                  });
+                } else {
+                  const parsedMessage = JSON.parse(result.message);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Signup Failed!",
+                    text:
+                      parsedMessage.message ||
+                      "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops!",
+                  text: "There was an error processing your request. Please try again later.",
+                  confirmButtonText: "OK",
                 });
               }
-            } catch (error) {
-              Swal.fire({
-                icon: "error",
-                title: "Oops!",
-                text: "There was an error processing your request. Please try again later.",
-                confirmButtonText: "OK",
-              });
             }
           }
         </script>
@@ -2133,44 +2156,73 @@
           async function submitRestaurantSignup(event) {
             event.preventDefault();
 
-            const formData = new FormData(
-              document.getElementById("restaurant-signup-form")
-            );
-
-            try {
-              const response = await fetch(
-                "http://localhost:9213/restaurant/signup",
-                {
-                  method: "POST",
-                  body: formData,
-                }
+            if (validateRestaurantSignup()) {
+              const formData = new FormData(
+                document.getElementById("restaurant-signup-form")
               );
-              const result = await response.json();
-              if (response.ok && result.status === "success") {
-                Swal.fire({
-                  icon: "success",
-                  title: "Signup Successful!",
-                  text: result.message,
-                  confirmButtonText: "Great!",
-                }).then(() => {
-                  window.location.href = "/home";
-                });
-              } else {
+
+              const email = formData.get("email").trim();
+              const password = formData.get("password").trim();
+              const name = formData.get("name").trim();
+              const phoneNumber = formData.get("phoneNumber").trim();
+              const address = formData.get("address").trim();
+
+              if (!email || !password || !name || !phoneNumber || !address) {
+                //  alert("Please fill in all fields.");
                 Swal.fire({
                   icon: "error",
-                  title: "Signup Failed!",
-                  text:
-                    result.message || "Something went wrong. Please try again.",
-                  confirmButtonText: "Retry",
+                  title: "Oops...",
+                  text: "Name shouldn't be Empty. Please fill in all fields.",
+                  confirmButtonText: "Got it!",
+                });
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  "http://localhost:9213/restaurant/signup",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                const result = await response.json();
+                console.log(result);
+                if (response.ok && result.status === "success") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Signup Successful!",
+                    text: result.message,
+                    confirmButtonText: "Great!",
+                  }).then(() => {
+                    window.location.href = "/home";
+                  });
+                } else {
+                  let errorMessage = result.message;
+                  try {
+                    const parsedError = JSON.parse(errorMessage);
+                    if (parsedError.name) {
+                      errorMessage = parsedError.name;
+                    }
+                  } catch (e) {
+                    console.error("Error parsing message:", e);
+                  }
+                  Swal.fire({
+                    icon: "error",
+                    title: "Signup Failed!",
+                    text:
+                      errorMessage || "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops!",
+                  text: "There was an error processing your request. Please try again later.",
+                  confirmButtonText: "OK",
                 });
               }
-            } catch (error) {
-              Swal.fire({
-                icon: "error",
-                title: "Oops!",
-                text: "There was an error processing your request. Please try again later.",
-                confirmButtonText: "OK",
-              });
             }
           }
         </script>

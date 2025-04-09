@@ -193,6 +193,8 @@ public class RestaurantController {
 	@PutMapping("/update/{restaurantId}")
 	public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
 			@Valid @RequestBody Restaurant restaurant) {
+				System.out.println("update req---");
+				
 		if (restaurantId == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
