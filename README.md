@@ -1,97 +1,115 @@
-# Tasty Treat Express - Online Food Ordering Platform
+# 🍔 Tasty Treat Express - Online Food Ordering Platform
 
-## Overview
-**Tasty Treat Express** is a dynamic and user-friendly online food ordering platform designed to provide a seamless experience for both customers and restaurant owners. The system allows customers to browse menus, place orders, rate restaurants, and track deliveries, while restaurant owners can manage menus, handle orders, and view reports. This project was developed using an Agile methodology and focuses on creating an engaging and efficient platform for all users.
+[![View Presentation](https://img.shields.io/badge/Project%20Presentation-Prezi-blue?style=for-the-badge&logo=prezi)](https://prezi.com/view/cIiSn0JAZuczMYCRpCTK/)
 
-[**View Project Presentation**](https://prezi.com/view/cIiSn0JAZuczMYCRpCTK/)
+**Tasty Treat Express** is a dynamic and user-friendly online food ordering platform designed to provide a seamless experience for both customers and restaurant owners. Developed using Agile methodology and Spring Boot, it aims to deliver performance, ease of use, and real-time functionality.
 
-## Features
+---
 
-### 1. **User Management**
-   - **User Registration**: New users can register by providing basic details like name, contact information, and delivery address.
-   - **Account Updates**: Users can update their personal details, such as contact information and delivery address.
-   - **Account Deactivation**: Users can deactivate their accounts, preventing them from placing orders or accessing the platform.
-   - **Order History**: Users can view and manage their order history and preferences.
+## 🚀 Features
 
-### 2. **Restaurant Menu Management**
-   - **Menu Creation**: Restaurants can create and manage their menus, adding details like dish names, descriptions, prices, and availability.
-   - **Real-time Menu Updates**: Restaurants can update their menu in real-time, including adding, removing, or editing items based on availability.
-   - **Menu Item Deletion**: Restaurants can delete items that are no longer offered or are out of stock.
-   - **Detailed Item Information**: Restaurants can view detailed information about each menu item, including description, price, and availability.
+### 👥 1. User Management
+- **User Registration**: Sign up with name, contact info, and address.
+- **Account Updates**: Modify contact or delivery details.
+- **Account Deactivation**: Temporarily deactivate accounts.
+- **Order History**: View and manage past orders.
 
-### 3. **Order Management**
-   - **Order Placement**: Customers can browse the menu, select items, and place orders. A unique order ID is generated for each order.
-   - **Order Modification**: Customers can modify their orders before final confirmation (e.g., adding or removing items).
-   - **Order Management for Restaurants**: Restaurant owners can view and manage incoming orders, including accepting, preparing, and dispatching them.
-   - **Order Cancellation**: Orders can be canceled or modified based on certain conditions (e.g., if the order hasn’t been prepared).
+---
 
-### 4. **Feedback Management**
-   - **Customer Reviews**: Customers can leave written reviews and ratings, providing valuable feedback to restaurants and platform administrators.
-   - **Restaurant Responses**: Restaurants can respond to customer reviews, addressing concerns or thanking for positive feedback.
-   - **Editable Feedback**: Customers can edit their reviews and ratings after submitting them.
-   - **Average Rating**: Each restaurant has an average rating displayed, helping customers make informed decisions.
+### 🍽️ 2. Restaurant Menu Management
+- **Menu Creation & Updates**: Add, edit, or remove dishes in real time.
+- **Item Deletion**: Remove outdated or unavailable items.
+- **Detailed Information**: Full description, price, and availability for each item.
 
-### 5. **Reports Management**
-   - **Menu Reports**: Restaurants can view their entire menu in a list format, showing all items, prices, and availability.
-   - **Order Reports**: The system generates daily, weekly, and monthly reports showing total orders, order status (completed, pending, canceled), and order value.
-   - **Customer Activity Reports**: Administrators can view reports on customer activity, including the total number of customers and their frequency of orders.
-   - **Data Management**: Restaurants can delete outdated or irrelevant reports related to customer preferences or other data analysis.
+---
 
-### 6. **Additional Features**
-   - **Email Triggers**: Automated email notifications are sent for order confirmation, status updates, and account activities such as password recovery.
-   - **Live Location Tracking**: Integrated with **Google Maps API**, customers can track the live location of the delivery for accurate ETA.
-   - **Multiple Payment Methods**: Supports various payment methods, including credit/debit cards, net banking, and wallets, for seamless transactions.
-   - **User and Restaurant Dashboards**: Both users and restaurant owners have personalized dashboards to manage their activities and monitor performance.
-   - **CSV and PDF Reports**: Downloadable reports in **CSV** and **PDF** formats with customizable date ranges for easy data analysis.
+### 🛒 3. Order Management
+- **Order Placement**: Browse menu and place orders with unique Order ID.
+- **Order Modification**: Edit order before final confirmation.
+- **Restaurant Order Dashboard**: Accept, prepare, and dispatch orders.
+- **Order Cancellation**: Cancel unprepared orders based on set conditions.
 
-### 7. **User Engagement Features**
-   - **SweetAlert Library**: **SweetAlert** is integrated for displaying elegant success and error dialogs, making the user experience more engaging and interactive.
-   - **Error Handling and Validations**: The frontend provides clear validation error messages for form inputs, ensuring users are guided with proper feedback. Error messages are shown using **SweetAlert** for a smoother experience.
-   - **STS (Spring Tool Suite)**: Development was done using **Spring Tool Suite (STS)**, providing an efficient and effective environment for building the Spring Boot-based backend services.
+---
 
-     
-future scopes !!
+### ✍️ 4. Feedback Management
+- **Customer Reviews & Ratings**: Leave and edit feedback.
+- **Restaurant Replies**: Engage with customer feedback.
+- **Average Ratings**: Displayed on restaurant profiles.
 
+---
 
-###8. Discount and Coupon Management
-Promotional Coupons: Customers can apply promotional codes during checkout to receive discounts on their orders.
+### 📊 5. Reports Management
+- **Menu Reports**: Overview of menu items, availability, and pricing.
+- **Order Reports**: Daily, weekly, and monthly reports with filters.
+- **Customer Activity Reports**: Track user engagement and frequency.
+- **Data Deletion**: Remove old reports or irrelevant data.
 
-Restaurant-Specific Offers: Restaurants can create custom deals and discounts to attract more customers.
+---
 
-Usage Limits and Validity: Coupons can have configurable expiry dates, usage limits, and minimum order requirements for better control.
+### 🛠️ 6. Additional Features
+- **Email Triggers**: Automated emails for order status, registration, and password recovery.
+- **Live Location Tracking**: Integrated with Google Maps API for real-time delivery tracking.
+- **Multiple Payment Options**: Credit/debit cards, net banking, and wallets.
+- **User & Restaurant Dashboards**: Personalized interfaces for managing activities.
+- **CSV/PDF Export**: Download reports in preferred formats with date filters.
 
-###9. Delivery Partner Module
-Partner Registration and Login: Delivery personnel can register and log in to view and manage their delivery assignments.
+---
 
-Order Assignment and Tracking: Orders are auto-assigned or manually assigned to available delivery partners, who can update the order status in real time.
+### 💡 7. User Engagement
+- **SweetAlert Integration**: Elegant popups for confirmations and errors.
+- **Form Validation**: Frontend error handling using SweetAlert.
+- **Built with STS**: Developed in Spring Tool Suite for streamlined backend development.
 
-Earnings Dashboard: Delivery partners can track their daily deliveries, earnings, and performance metrics through a personalized dashboard.
+---
 
-## Technology Stack
+## 🔮 Future Scope
 
-- **Backend**:
-  - **Java**
-  - **Spring Boot** (Data JPA, REST Services)
-  - **MySQL** (Database)
-  - **Email Service** (For notifications and password recovery)
-  - **Spring Tool Suite (STS)** (For backend development)
+### 🎁 8. Discount & Coupon Management
+- **Promo Codes**: Apply during checkout for discounts.
+- **Restaurant-Specific Offers**: Custom deals to increase reach.
+- **Validity & Usage Rules**: Set expiry, limits, and min. order values.
 
-- **Frontend**:
-  - **Thymeleaf** (For rendering dynamic web pages)
-  - **HTML/CSS** (For responsive web design)
-  - **JavaScript** (For frontend interactivity)
-  - **SweetAlert** (For user-friendly error and success messages)
-  - **Google Maps API** (For location tracking)
+### 🛵 9. Delivery Partner Module
+- **Partner Registration/Login**: View delivery assignments.
+- **Real-Time Order Updates**: Accept, deliver, and update status.
+- **Earnings Dashboard**: Track daily income and delivery stats.
 
-## Getting Started
+---
 
-### Prerequisites
-To run this project locally, you'll need to have the following installed:
+## 🧰 Technology Stack
 
-- **Java 11 or higher**
-- **Maven**
-- **MySQL**
-- **IDE** (e.g., IntelliJ IDEA, Eclipse, Spring Tool Suite)
-- **Google Maps API Key** for location tracking
-  
+### 🔧 Backend
+- Java
+- Spring Boot (REST, Data JPA)
+- MySQL
+- Email Service
+- Spring Tool Suite (STS)
 
+### 🎨 Frontend
+- Thymeleaf
+- HTML / CSS
+- JavaScript
+- SweetAlert
+- Google Maps API
+
+---
+
+## 📦 Getting Started
+
+### ✅ Prerequisites
+Before you begin, make sure you have the following installed:
+
+- Java 11 or higher
+- Maven
+- MySQL
+- IDE (Eclipse / IntelliJ / Spring Tool Suite)
+- Google Maps API Key
+
+---
+
+### 🛠️ How to Run Locally
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SpringBoardMentor-443/Tasty-Treat-Express_Java.git
+   cd Tasty-Treat-Express_Java
