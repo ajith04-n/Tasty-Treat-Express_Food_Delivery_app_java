@@ -49,6 +49,24 @@
    - **Error Handling and Validations**: The frontend provides clear validation error messages for form inputs, ensuring users are guided with proper feedback. Error messages are shown using **SweetAlert** for a smoother experience.
    - **STS (Spring Tool Suite)**: Development was done using **Spring Tool Suite (STS)**, providing an efficient and effective environment for building the Spring Boot-based backend services.
 
+     
+future scopes !!
+
+
+###8. Discount and Coupon Management
+Promotional Coupons: Customers can apply promotional codes during checkout to receive discounts on their orders.
+
+Restaurant-Specific Offers: Restaurants can create custom deals and discounts to attract more customers.
+
+Usage Limits and Validity: Coupons can have configurable expiry dates, usage limits, and minimum order requirements for better control.
+
+###9. Delivery Partner Module
+Partner Registration and Login: Delivery personnel can register and log in to view and manage their delivery assignments.
+
+Order Assignment and Tracking: Orders are auto-assigned or manually assigned to available delivery partners, who can update the order status in real time.
+
+Earnings Dashboard: Delivery partners can track their daily deliveries, earnings, and performance metrics through a personalized dashboard.
+
 ## Technology Stack
 
 - **Backend**:
