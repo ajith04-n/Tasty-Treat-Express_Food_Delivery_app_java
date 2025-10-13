@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Payment Section</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      /* General Container Styling */
+      .container {
+        font-family: "Roboto", sans-serif;
+        background-color: #f7fafc;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 1200px;
+        margin: auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Payment Wrapper */
+      .payment-wrapper {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      /* Order Summary Section */
+      .order-summary {
+        flex: 1 1 40%;
+        background-color: #1a202c;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .order-summary h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+      }
+
+      .order-items .order-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .order-total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-top: 20px;
+      }
+
+      .promo-code {
+        margin-top: 20px;
+      }
+
+      .promo-code .promo-input {
+        display: flex;
+        gap: 10px;
+      }
+
+      .promo-code input {
+        flex: 1;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .promo-code button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #48bb78;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .promo-code button:hover {
+        background-color: #38a169;
+      }
+
+      .secure-badge {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #9fdbad;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* Support Info */
+      .support-info p {
+        margin: 5px 0;
+        font-size: 0.9rem;
+        color: #e2e8f0;
+      }
+
+      /* Payment Form Section */
+      .payment-form {
+        flex: 1 1 60%;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .payment-form h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .payment-form p {
+        font-size: 1rem;
+        color: #4a5568;
+        margin-bottom: 20px;
+      }
+
+      /* Payment Options */
+      .payment-options {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .payment-option {
+        flex: 1;
+        background-color: #edf2f7;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+
+      .payment-option:hover {
+        background-color: #e2e8f0;
+        transform: scale(1.05);
+      }
+
+      .payment-option.active {
+        background-color: #4299e1;
+        color: #ffffff;
+      }
+
+      .payment-option img {
+        max-width: 40px;
+        margin-bottom: 10px;
+      }
+
+      .payment-section {
+        display: none;
+      }
+
+      .payment-section.active {
+        display: block;
+      }
+
+      /* QR Code Payment */
+      .qr-code {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .qr-code img {
+        max-width: 200px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .qr-scanner-animation {
+        width: 100px;
+        height: 5px;
+        background-color: #4299e1;
+        animation: scannerAnimation 2s linear infinite;
+        margin: 10px auto;
+      }
+
+      @keyframes scannerAnimation {
+        0% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(10px);
+        }
+      }
+
+      .qr-instructions {
+        text-align: left;
+        font-size: 1rem;
+        color: #4a5568;
+      }
+
+      .qr-instructions h3 {
+        font-size: 1.2rem;
+        color: #2d3748;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      /* Net Banking Section */
+      .popular-banks {
+        margin-bottom: 15px;
+      }
+
+      .popular-banks h3 {
+        font-size: 1.5rem;
+        color: #2d3748;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .bank-select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #e2e8f0;
+        font-size: 1rem;
+      }
+
+      .bank-form {
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #edf2f7;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .bank-form input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 10px;
+      }
+
+      .btn-send-otp,
+      .btn-proceed-bank {
+        background-color: #4299e1;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-send-otp:hover,
+      .btn-proceed-bank:hover {
+        background-color: #3182ce;
+      }
+
+      /* Wallet Section */
+      .wallet-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .wallet-option {
+        text-align: center;
+        flex: 1 1 30%;
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+      }
+
+      .wallet-option:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .wallet-option img {
+        max-width: 80px;
+        margin-bottom: 10px;
+      }
+
+      .wallet-form {
+        display: none;
+        margin-top: 10px;
+      }
+
+      .wallet-form input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .btn-verify-upi,
+      .btn-verify-wallet {
+        background-color: #48bb78;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-verify-upi:hover,
+      .btn-verify-wallet:hover {
+        background-color: #38a169;
+      }
+
+      .wallet-balance {
+        margin-top: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #4299e1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="payment-wrapper">
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <!-- Content Goes Here -->
+        </div>
+
+        <!-- Payment Form -->
+        <div class="payment-form">
+          <h1>Complete Your Payment</h1>
+          <p>Select your preferred payment method below:</p>
+
+          <!-- Payment Options -->
+          <div class="payment-options">
+            <div class="payment-option active" data-target="credit-card">
+              <img
+                src="https://img.icons8.com/color/48/credit-card.png"
+                alt="Card Payment"
+              />
+              <div>Credit/Debit Card</div>
+            </div>
+            <div class="payment-option" data-target="qr-code">
+              <img
+                src="https://img.icons8.com/color/48/qr-code.png"
+                alt="QR Code Payment"
+              />
+              <div>QR Code</div>
+            </div>
+            <div class="payment-option" data-target="net-banking">
+              <img
+                src="https://img.icons8.com/color/48/bank-building.png"
+                alt="Net Banking"
+              />
+              <div>Net Banking</div>
+            </div>
+            <div class="payment-option" data-target="wallet">
+              <img
+                src="https://img.icons8.com/color/48/wallet.png"
+                alt="Digital Wallet"
+              />
+              <div>Digital Wallet</div>
+            </div>
+          </div>
+
+          <!-- Credit/Debit Card Section -->
+          <div id="credit-card" class="payment-section active">
+            <h2>Card Details</h2>
+            <form id="card-form">
+              <div class="form-group">
+                <label for="cardholder">Cardholder Name</label>
+                <input
+                  type="text"
+                  id="cardholder"
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="cardnumber">Card Number</label>
+                <input
+                  type="text"
+                  id="cardnumber"
+                  placeholder="1234 5678 9012 3456"
+                  maxlength="19"
+                  required
+                />
+              </div>
+              <div class="card-inputs">
+                <div class="form-group">
+                  <label for="expiry">Expiry Date</label>
+                  <input
+                    type="text"
+                    id="expiry"
+                    placeholder="MM/YY"
+                    maxlength="5"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="cvv">CVV</label>
+                  <input
+                    type="text"
+                    id="cvv"
+                    placeholder="123"
+                    maxlength="4"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn">Pay Now</button>
+            </form>
+          </div>
+
+          <!-- QR Code Section -->
+          <div id="qr-code" class="payment-section">
+            <h2>Scan QR Code</h2>
+            <div class="qr-code">
+              <img src="https://via.placeholder.com/200" alt="QR Code" />
+              <div class="qr-scanner-animation"></div>
+            </div>
+            <div class="qr-instructions">
+              <h3>How to pay:</h3>
+              <p>1. Open your mobile banking app.</p>
+              <p>2. Select "Scan QR Code" option.</p>
+              <p>3. Scan the QR code above.</p>
+              <p>4. Confirm payment details.</p>
+            </div>
+          </div>
+
+          <!-- Net Banking Section -->
+          <div id="net-banking" class="payment-section">
+            <h2>Net Banking</h2>
+            <div class="popular-banks">
+              <h3>Select Your Bank</h3>
+              <select id="bank-dropdown">
+                <option value="" disabled selected>Select your bank</option>
+                <option value="hdfc">HDFC Bank</option>
+                <option value="sbi">SBI Bank</option>
+                <option value="icici">ICICI Bank</option>
+                <option value="axis">Axis Bank</option>
+                <option value="pnb">Punjab National Bank</option>
+              </select>
+            </div>
+            <div id="bank-form" class="bank-form" style="display: none">
+              <input type="text" placeholder="User ID/Customer ID" />
+              <input type="password" placeholder="Password" />
+              <div>
+                <input type="text" placeholder="OTP" />
+                <button class="btn-send-otp">Send OTP</button>
+              </div>
+              <button class="btn-proceed-bank">Login & Pay</button>
+            </div>
+          </div>
+
+          <!-- Digital Wallet Section -->
+          <div id="wallet" class="payment-section">
+            <h2>Digital Wallets</h2>
+            <div class="wallet-grid">
+              <div class="wallet-option">
+                <img
+                  src="https://img.icons8.com/color/80/google-pay.png"
+                  alt="Google Pay"
+                />
+                <div>Google Pay</div>
+              </div>
+              <div class="wallet-option">
+                <img
+                  src="https://img.icons8.com/color/80/phonepe.png"
+                  alt="PhonePe"
+                />
+                <div>PhonePe</div>
+              </div>
+              <div class="wallet-option">
+                <img
+                  src="https://img.icons8.com/color/80/paytm.png"
+                  alt="Paytm"
+                />
+                <div>Paytm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Payment Option Toggle
+      const paymentOptions = document.querySelectorAll(".payment-option");
+      const paymentSections = document.querySelectorAll(".payment-section");
+      paymentOptions.forEach((option) => {
+        option.addEventListener("click", () => {
+          paymentOptions.forEach((opt) => opt.classList.remove("active"));
+          option.classList.add("active");
+          paymentSections.forEach((section) =>
+            section.classList.remove("active")
+          );
+          const target = document.getElementById(
+            option.getAttribute("data-target")
+          );
+          target.classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

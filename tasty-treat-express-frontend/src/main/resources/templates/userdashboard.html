@@ -1,0 +1,2882 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard - TastyTreatExpress</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDK5Hx8gZb9ZK4yPobbmKMARZDV0qq9Cy8&libraries=places&callback=initAutocomplete"
+      async
+      defer
+    ></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-orange: #ff5722;
+        --soft-orange: #ff8a65;
+        --thyme-green: #388e3c;
+        --neutral-gray: #333333;
+        --soft-white: #f5f5f5;
+        --light-gray: #b0bec5;
+        --card-bg: #ffffff;
+        --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --footer-bg: #1a1a1a;
+        --icon-bg: #444444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: var(--soft-white);
+        color: var(--neutral-gray);
+        line-height: 1.6;
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 250px;
+        background-color: var(--card-bg);
+        box-shadow: var(--shadow);
+        padding: 20px 0;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .sidebar-header h2 {
+        font-size: 18px;
+        color: var(--primary-orange);
+      }
+
+      .sidebar-menu {
+        list-style: none;
+      }
+
+      .sidebar-menu li {
+        margin-bottom: 5px;
+      }
+
+      .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: var(--neutral-gray);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-menu a:hover,
+      .sidebar-menu a.active {
+        background-color: var(--soft-white);
+        color: var(--primary-orange);
+      }
+
+      .sidebar-menu a i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content Styles */
+      .main-content {
+        flex: 1;
+        padding: 20px;
+      }
+
+      .page {
+        display: none;
+        padding: 20px;
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .page-header {
+        margin-bottom: 20px;
+      }
+
+      .page-header h2 {
+        font-size: 22px;
+        color: var(--neutral-gray);
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--light-gray);
+        border-radius: 4px;
+      }
+
+      .form-group textarea {
+        height: 120px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: var(--primary-orange);
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background-color: var(--soft-orange);
+      }
+
+      /* Card Styles */
+      .card {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      /* Order List Styles */
+      .order-filters {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .order-filters select {
+        padding: 8px 12px;
+        border: 1px solid var(--light-gray);
+        border-radius: 4px;
+      }
+
+      .order-card {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid var(--primary-orange);
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .order-id {
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      .order-status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: 500;
+      }
+
+      .status-new {
+        background-color: var(--soft-white);
+        color: var(--primary-orange);
+      }
+
+      .status-preparing {
+        background-color: var(--soft-white);
+        color: var(--soft-orange);
+      }
+
+      .status-ready {
+        background-color: var(--soft-white);
+        color: var(--thyme-green);
+      }
+
+      .status-delivered {
+        background-color: var(--soft-white);
+        color: var(--thyme-green);
+      }
+
+      .status-canceled {
+        background-color: var(--soft-white);
+        color: var(--neutral-gray);
+      }
+
+      .status-failed {
+        background-color: var(--soft-white);
+        color: var(--neutral-gray);
+      }
+
+      .order-details {
+        margin-top: 10px;
+      }
+
+      .order-customer {
+        margin-bottom: 10px;
+      }
+
+      .order-items {
+        margin-bottom: 10px;
+      }
+
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px dashed #eee;
+      }
+
+      .order-summary {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+      }
+
+      .order-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-menu {
+          display: flex;
+          flex-wrap: wrap;
+        }
+
+        .sidebar-menu li {
+          margin: 5px;
+        }
+      }
+
+      /* Dashboard Styles */
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .stat-card {
+        background-color: var(--card-bg);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-card h4 {
+        margin-bottom: 10px;
+      }
+
+      .stat-card .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--primary-orange);
+      }
+
+      /* Order Tracking Styles */
+      .tracking-map {
+        height: 300px;
+        background-color: var(--soft-white);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Favorites Styles */
+      .favorites-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .favorite-item {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .favorite-item:hover {
+        transform: translateY(-5px);
+      }
+
+      .favorite-image {
+        height: 150px;
+        overflow: hidden;
+      }
+
+      .favorite-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .favorite-details {
+        padding: 15px;
+      }
+
+      .favorite-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .favorite-rating {
+        color: var(--primary-orange);
+        margin-bottom: 10px;
+      }
+
+      /* Reviews Styles */
+      .review-card {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: var(--shadow);
+      }
+
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .review-restaurant {
+        font-weight: bold;
+      }
+
+      .review-rating {
+        color: var(--primary-orange);
+      }
+
+      .review-date {
+        color: var(--light-gray);
+        font-size: 0.9rem;
+      }
+
+      /* Edit Review Form */
+      #editReviewFormContainer {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>TastyTreatExpress.</h2>
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#dashboard" class="active"
+              ><i class="fas fa-tachometer-alt"></i> Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="#orders"
+              ><i class="fas fa-shopping-basket"></i> My Orders</a
+            >
+          </li>
+          <li>
+            <a href="#tracking"><i class="fas fa-truck"></i> Order Tracking</a>
+          </li>
+          <li>
+            <a href="#favorites"><i class="fas fa-heart"></i> Favorites</a>
+          </li>
+          <li>
+            <a href="#reviews"><i class="fas fa-star"></i> My Reviews</a>
+          </li>
+          <li>
+            <a href="#logout" onclick="handleLogout(event)" id="logout-button"
+              ><i class="fas fa-sign-out-alt"></i> Logout</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+          <div class="page-header">
+            <h2>Dashboard</h2>
+          </div>
+
+          <div class="card">
+            <h3 th:text="'Welcome back, ' + ${session.userDTO.name}">
+              Welcome back
+            </h3>
+            <input type="hidden" th:value="${session.userDTO.id}" id="userId" />
+            <p>Check out your latest orders and stats.</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="card">
+            <h3>Quick Stats</h3>
+            <div class="stats-container">
+              <div class="stat-card">
+                <h4>Orders This Month</h4>
+                <div class="stat-value" th:text="${ordersThisMonth}">5</div>
+              </div>
+              <div class="stat-card">
+                <h4>Total Spent</h4>
+                <div class="stat-value" th:text="₹+${totalSpent}">₹125.75</div>
+              </div>
+              <div class="stat-card">
+                <h4>Avg Delivery Time</h4>
+                <div class="stat-value" th:text="${avgDeliveryTime}">
+                  22 mins
+                </div>
+              </div>
+              <div class="stat-card">
+                <h4>Favorite Restaurant</h4>
+                <div class="stat-value" th:text="${favoriteRestaurant}">
+                  Green Garden
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            th:if="${mostRecentOrder != null}"
+            class="card"
+            style="
+              padding: 20px;
+              background: #f9fafb;
+              border-radius: 10px;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <h3
+              style="
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.8rem;
+                color: #2d3748;
+                text-align: center;
+                margin-bottom: 20px;
+              "
+            >
+              🍽️ Your Recent Order
+            </h3>
+            <div
+              id="recentOrders"
+              style="display: flex; flex-direction: column; gap: 15px"
+            >
+              <div
+                class="order-card"
+                style="
+                  border: 1px solid #e2e8f0;
+                  border-radius: 8px;
+                  padding: 15px;
+                  background: #ffffff;
+                "
+              >
+                <div
+                  class="order-header"
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <div
+                    class="order-id"
+                    th:text="'Order #' + ${mostRecentOrder.orderId}"
+                    style="font-size: 1.2rem; font-weight: bold; color: #3182ce"
+                  >
+                    Order #1001
+                  </div>
+                  <div
+                    class="order-status"
+                    style="
+                      background: #ecc94b;
+                      padding: 5px 10px;
+                      border-radius: 5px;
+                      color: #1a202c;
+                      font-weight: bold;
+                    "
+                  >
+                    <span>Preparing</span>
+                  </div>
+                </div>
+                <div class="order-details" style="line-height: 1.6">
+                  <p style="margin: 5px 0; color: #4a5568">
+                    <strong>Restaurant:</strong>
+                    <span
+                      th:text="${mostRecentOrder.restaurantId}"
+                      style="color: #2d3748"
+                      >Restaurant Name</span
+                    >
+                  </p>
+                  <p style="margin: 5px 0; color: #4a5568">
+                    <strong>Estimated Delivery:</strong>
+                    <span style="color: #2d3748">25-35 minutes</span>
+                  </p>
+                  <p style="margin: 5px 0; color: #4a5568">
+                    <strong>Total Amount:</strong>
+                    <span
+                      th:text="₹+${mostRecentOrder.totalAmount}"
+                      style="color: #2d3748"
+                      >Amount</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders 
+          <div th:if="${mostRecentOrder != null}" class="card">
+            <h3>Recent Orders</h3>
+            <div id="recentOrders">
+              <div class="order-card">
+                <div class="order-header">
+                  <div
+                    class="order-id"
+                    th:text="'Order #' + ${mostRecentOrder.orderId}"
+                  >
+                    Order #1001
+                  </div>
+                  <div class="order-status">
+                    <span>Preparing</span>
+                  </div>
+                </div>
+                <div class="order-details">
+                  <p>
+                    <strong>Restaurant:</strong>
+                    <span th:text="${mostRecentOrder.restaurantId}"
+                      >Restaurant Name</span
+                    >
+                  </p>
+                  <p>
+                    <strong>Estimated Delivery:</strong>
+                    <span>25-35 minutes</span>
+                  </p>
+
+                  <p>
+                    <strong>Total Amount:</strong>
+                    <span th:text="₹+${mostRecentOrder.totalAmount}"
+                      >Amount</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div> -->
+        </div>
+
+        <!-- Orders Page 
+            <div id="orders" class="page">
+                <div class="page-header">
+                    <h2>My Orders</h2>
+                </div>
+                
+                <div class="card">
+                    <h3>Active Orders</h3>
+                    <div id="activeOrders">
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">Order #1001</div>
+                                <div class="order-status status-preparing">Preparing</div>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Restaurant:</strong> Burger Barn</p>
+                                <p><strong>Estimated Delivery:</strong> 25-35 minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Order History</h3>
+                    <div id="orderHistory">
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">Order #1000</div>
+                                <div class="order-status status-delivered">Delivered</div>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Restaurant:</strong> Green Garden</p>
+                                <p><strong>Delivered on:</strong> 2023-05-15</p>
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">Order #999</div>
+                                <div class="order-status status-delivered">Delivered</div>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Restaurant:</strong> Sushi Spot</p>
+                                <p><strong>Delivered on:</strong> 2023-05-10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        -->
+
+        <div id="orders" class="page">
+          <div class="page-header">
+            <h2>My Orders</h2>
+          </div>
+
+          <!-- Active Orders -->
+          <div class="card">
+            <h3>Active Orders</h3>
+            <div id="activeOrders">
+              <!-- Active orders will be dynamically inserted here -->
+            </div>
+          </div>
+
+          <!-- Order History -->
+          <div class="card">
+            <h3>Order History</h3>
+            <div id="orderHistory">
+              <!-- Delivered orders will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
+
+        <!--
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Fetch all orders for the user
+        const userId = document.getElementById('userId').value;  // Get user ID from hidden input
+        // http://localhost:8080/api/orders/user/{userId}
+
+        fetch(`http://localhost:8080/api/orders/user/${userId}`)  // Use actual user ID here
+            .then(response => response.json())
+            .then(data => {
+                // Separate active orders and order history
+                const activeOrders = data.filter(order => order.status === 'Pending' || order.status === 'Preparing');
+                const orderHistory = data.filter(order => order.status === 'Delivered');
+
+                // Display active orders
+                const activeOrdersContainer = document.getElementById('activeOrders');
+                activeOrders.forEach((order, index) => {
+                    fetchRestaurantName(order.restaurantId)  // Fetch restaurant name by ID
+                        .then(restaurantName => {
+                            const orderElement = createOrderElement(order, index + 1, restaurantName); // Pass restaurant name
+                            activeOrdersContainer.appendChild(orderElement);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching restaurant data:', error);
+                        });
+                });
+
+                // Display order history
+                const orderHistoryContainer = document.getElementById('orderHistory');
+                orderHistory.forEach((order, index) => {
+                    fetchRestaurantName(order.restaurantId)  // Fetch restaurant name by ID
+                        .then(restaurantName => {
+                            const orderElement = createOrderElement(order, index + 1, restaurantName); // Pass restaurant name
+                            orderHistoryContainer.appendChild(orderElement);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching restaurant data:', error);
+                        });
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+            });
+        
+        // Function to create HTML elements for orders
+        function createOrderElement(order, serialNumber, restaurantName) {
+            const orderCard = document.createElement('div');
+            orderCard.classList.add('order-card');
+            
+            const orderHeader = document.createElement('div');
+            orderHeader.classList.add('order-header');
+            
+            const orderId = document.createElement('div');
+            orderId.classList.add('order-id');
+            orderId.textContent = `Order #${serialNumber}`; // Use serial number instead of order ID
+            
+            const orderStatus = document.createElement('div');
+            orderStatus.classList.add('order-status', `status-${order.status.toLowerCase()}`);
+            orderStatus.textContent = order.status;
+            
+            orderHeader.appendChild(orderId);
+            orderHeader.appendChild(orderStatus);
+            
+            const orderDetails = document.createElement('div');
+            orderDetails.classList.add('order-details');
+            
+            const restaurant = document.createElement('p');
+            restaurant.innerHTML = `<strong>Restaurant:</strong> ${restaurantName}`;
+            
+            const deliveryAddress = document.createElement('p');
+            deliveryAddress.innerHTML = `<strong>Delivery Address:</strong> ${order.deliveryAddress}`;
+            
+            const orderDate = document.createElement('p');
+            orderDate.innerHTML = `<strong>Order Date:</strong> ${formatDate(order.orderDate)}`;
+
+            const totalAmount = document.createElement('p');
+            totalAmount.innerHTML = `<strong>Total Amount:</strong> $${order.totalAmount.toFixed(2)}`;
+            
+            const deliveryTime = document.createElement('p');
+            if (order.status === 'Delivered') {
+                deliveryTime.innerHTML = `<strong>Delivered on:</strong> ${formatDate(order.deliveryTime)}`;
+            } else {
+                deliveryTime.innerHTML = `<strong>Estimated Delivery:</strong> ${formatDate(order.deliveryTime)}`;
+            }
+
+            orderDetails.appendChild(restaurant);
+            orderDetails.appendChild(deliveryAddress);
+            orderDetails.appendChild(orderDate);
+            orderDetails.appendChild(totalAmount);
+            orderDetails.appendChild(deliveryTime);
+
+            orderCard.appendChild(orderHeader);
+            orderCard.appendChild(orderDetails);
+
+            return orderCard;
+        }
+
+        // Function to fetch restaurant name by ID
+        function fetchRestaurantName(restaurantId) {
+            // http://localhost:8080/api/restaurants/{restaurantId}
+            return fetch(`http://localhost:8080/api/restaurants/${restaurantId}`)
+                .then(response => response.json())
+                .then(restaurant => {
+                    return restaurant.name;  
+                });
+        }
+
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString(); // Converts date to a readable format like "3/4/2025, 3:50:27 PM"
+        }
+    });
+</script>
+-->
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            const userId = document.getElementById("userId").value; // Get user ID from hidden input
+
+            // Fetch all orders for the user
+            fetch(`http://localhost:8080/api/orders/user/${userId}`)
+              .then((response) => response.json())
+              .then((data) => {
+                data.sort(
+                  (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+                );
+                const mostRecentOrder = data[0];
+
+                // Separate active orders and order history
+                const activeOrders = data.filter(
+                  (order) =>
+                    order.status === "Pending" ||
+                    order.status === "PREPARING" ||
+                    order.status === "SHIPPED"
+                );
+                const orderHistory = data.filter(
+                  (order) => order.status === "DELIVERED"
+                );
+
+                // Display active orders
+                const activeOrdersContainer =
+                  document.getElementById("activeOrders");
+                activeOrders.forEach((order, index) => {
+                  fetchRestaurantName(order.restaurantId) // Fetch restaurant name by ID
+                    .then((restaurantName) => {
+                      const orderElement = createOrderElement(
+                        order,
+                        index + 1,
+                        restaurantName
+                      ); // Pass restaurant name
+                      activeOrdersContainer.appendChild(orderElement);
+                    })
+                    .catch((error) => {
+                      console.error("Error fetching restaurant data:", error);
+                    });
+                });
+
+                // Display order history
+                const orderHistoryContainer =
+                  document.getElementById("orderHistory");
+                orderHistory.forEach((order, index) => {
+                  fetchRestaurantName(order.restaurantId) // Fetch restaurant name by ID
+                    .then((restaurantName) => {
+                      const orderElement = createOrderElement(
+                        order,
+                        index + 1,
+                        restaurantName
+                      ); // Pass restaurant name
+                      orderHistoryContainer.appendChild(orderElement);
+                    })
+                    .catch((error) => {
+                      console.error("Error fetching restaurant data:", error);
+                    });
+                });
+              })
+              .catch((error) => {
+                console.error("Error fetching orders:", error);
+              });
+
+            // Function to create HTML elements for orders
+            function createOrderElement(order, serialNumber, restaurantName) {
+              const orderCard = document.createElement("div");
+              orderCard.classList.add("order-card");
+
+              const orderHeader = document.createElement("div");
+              orderHeader.classList.add("order-header");
+
+              const orderId = document.createElement("div");
+              orderId.classList.add("order-id");
+              orderId.textContent = `Order #${serialNumber}`; // Use serial number instead of order ID
+
+              const orderStatus = document.createElement("div");
+              orderStatus.classList.add(
+                "order-status",
+                `status-${order.status.toLowerCase()}`
+              );
+              orderStatus.textContent = order.status;
+
+              orderHeader.appendChild(orderId);
+              orderHeader.appendChild(orderStatus);
+
+              const orderDetails = document.createElement("div");
+              orderDetails.classList.add("order-details");
+
+              const restaurant = document.createElement("p");
+              restaurant.innerHTML = `<strong>Restaurant:</strong> ${restaurantName}`;
+
+              const deliveryAddress = document.createElement("p");
+              deliveryAddress.innerHTML = `<strong>Delivery Address:</strong> ${order.deliveryAddress}`;
+
+              const orderDate = document.createElement("p");
+              orderDate.innerHTML = `<strong>Order Date:</strong> ${formatDate(
+                order.orderDate
+              )}`;
+
+              const totalAmount = document.createElement("p");
+              totalAmount.innerHTML = `<strong>Total Amount:</strong> ₹${order.totalAmount.toFixed(
+                2
+              )}`;
+
+              const deliveryTime = document.createElement("p");
+              if (order.status === "Delivered") {
+                deliveryTime.innerHTML = `<strong>Delivered on:</strong> ${formatDate(
+                  order.deliveryTime
+                )}`;
+              } else {
+                deliveryTime.innerHTML = `<strong>Estimated Delivery:</strong> ${formatDate(
+                  order.deliveryTime
+                )}`;
+              }
+
+              orderDetails.appendChild(restaurant);
+              orderDetails.appendChild(deliveryAddress);
+              orderDetails.appendChild(orderDate);
+              orderDetails.appendChild(totalAmount);
+              orderDetails.appendChild(deliveryTime);
+
+              orderCard.appendChild(orderHeader);
+              orderCard.appendChild(orderDetails);
+
+              // Add click event to show the menu items in a dialog
+              orderCard.addEventListener("click", function () {
+                showOrderMenuDialog(order.menuItemIds); // Show menu items in dialog
+              });
+
+              return orderCard;
+            }
+
+            // Function to fetch restaurant name by ID
+            function fetchRestaurantName(restaurantId) {
+              return fetch(
+                `http://localhost:8080/api/restaurants/${restaurantId}`
+              )
+                .then((response) => response.json())
+                .then((restaurant) => {
+                  return restaurant.name;
+                });
+            }
+
+            // Function to format date
+            function formatDate(dateString) {
+              const date = new Date(dateString);
+              return date.toLocaleString(); // Converts date to a readable format like "3/4/2025, 3:50:27 PM"
+            }
+
+            // Function to fetch menu items and show in dialog
+            function showOrderMenuDialog(menuItemIds) {
+              const menuItemsContainer =
+                document.getElementById("menuItemsContainer");
+              menuItemsContainer.innerHTML = ""; // Clear previous menu items
+
+              // Fetch details for each menu item
+              menuItemIds.forEach((menuItemId) => {
+                fetchMenuItem(menuItemId)
+                  .then((menuItem) => {
+                    const menuItemElement = createMenuItemElement(menuItem);
+                    menuItemsContainer.appendChild(menuItemElement);
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching menu item:", error);
+                  });
+              });
+
+              // Show the dialog
+              const menuDialog = document.getElementById("menuDialog");
+              menuDialog.style.display = "block";
+            }
+
+            // Function to fetch menu item details by ID
+            function fetchMenuItem(menuItemId) {
+              return fetch(
+                `http://localhost:8080/api/menuItems/${menuItemId}`
+              ).then((response) => response.json());
+            }
+
+            // Function to create menu item elements for the dialog
+            function createMenuItemElement(menuItem) {
+              const menuItemElement = document.createElement("div");
+              menuItemElement.classList.add("menu-item");
+
+              const menuItemName = document.createElement("h4");
+              menuItemName.textContent = menuItem.name;
+
+              const menuItemDescription = document.createElement("p");
+              menuItemDescription.textContent = menuItem.description;
+
+              const menuItemPrice = document.createElement("p");
+              menuItemPrice.innerHTML = `<strong>Price:</strong> ₹${menuItem.price.toFixed(
+                2
+              )}`;
+
+              menuItemElement.appendChild(menuItemName);
+              menuItemElement.appendChild(menuItemDescription);
+              menuItemElement.appendChild(menuItemPrice);
+
+              return menuItemElement;
+            }
+
+            // Close dialog function
+            function closeDialog() {
+              const menuDialog = document.getElementById("menuDialog");
+              menuDialog.style.display = "none";
+            }
+
+            // Add event listener to close the dialog
+            document
+              .getElementById("closeDialogButton")
+              .addEventListener("click", closeDialog);
+          });
+        </script>
+
+        <!-- Dialog HTML for Menu Items -->
+        <div
+          id="menuDialog"
+          style="
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+          "
+        >
+          <div class="dialog-content">
+            <h3
+              style="
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+                color: #2d3748;
+                font-weight: bold;
+              "
+            >
+              🍴 Menu Items
+            </h3>
+            <div
+              id="menuItemsContainer"
+              style="
+                margin: 10px 0;
+                max-height: 300px;
+                overflow-y: auto;
+                padding-right: 5px;
+                text-align: left;
+              "
+            ></div>
+            <button
+              id="closeDialogButton"
+              style="
+                margin-top: 20px;
+                padding: 10px 20px;
+                font-size: 1rem;
+                color: #ffffff;
+                background-color: #4299e1;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              "
+              onclick="closeDialog()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+
+        <style>
+          /* General Card Styling */
+          .order-card {
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+          }
+
+          .order-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          /* Header Styling */
+          .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+          }
+
+          .order-id {
+            font-weight: bold;
+            color: rgb(240, 114, 35);
+          }
+
+          .order-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+          }
+
+          /* Dynamic Status Colors */
+          .status-pending {
+            background-color: #4299e1; /* Blue for Pending */
+            color: #ffffff;
+          }
+
+          .status-preparing {
+            background-color: #ecc94b; /* Yellow for Preparing */
+            color: #1a202c;
+          }
+
+          .status-delivered {
+            background-color: #48bb78; /* Green for Delivered */
+            color: #ffffff;
+          }
+
+          /* Details Styling */
+          .order-details p {
+            margin: 5px 0;
+            color: #4a5568;
+          }
+
+          .order-details strong {
+            color: #2d3748;
+          }
+
+          #menuItemsContainer .menu-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px;
+          }
+
+          #menuItemsContainer .menu-item h4 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+          }
+
+          #menuItemsContainer .menu-item p {
+            margin: 0;
+            color: #4a5568;
+          }
+
+          /* Close Dialog Button */
+          #closeDialogButton {
+            padding: 10px 20px;
+            background-color: #4299e1;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+          }
+          #closeDialogButton:hover {
+            background-color: #3182ce;
+          }
+
+          /* Loader Styling */
+          #loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+          }
+
+          .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #4299e1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+          }
+
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+          <style > .card {
+            margin: 15px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          }
+          .tracking-map {
+            width: 100%;
+            height: 400px;
+          }
+          .order-header {
+            font-size: 18px;
+            font-weight: bold;
+          }
+        </style>
+
+        <!-- Order Tracking Page -->
+        <div id="tracking" class="page">
+          <div class="page-header">
+            <h2>Order Tracking</h2>
+          </div>
+
+          <div class="card">
+            <h3>Active Deliveries</h3>
+            <div id="activeDeliveries">
+              <!-- Multiple orders will be dynamically added here -->
+            </div>
+          </div>
+        </div>
+
+        <script>
+          let map;
+          const userId = document.getElementById("userId").value;
+
+          // Function to get coordinates from an address using Geocoding
+          async function getCoordinatesFromAddress(address) {
+            try {
+              const geocoder = new google.maps.Geocoder();
+              const results = await new Promise((resolve, reject) => {
+                geocoder.geocode({ address }, (results, status) => {
+                  if (status === "OK") {
+                    resolve(results[0].geometry.location);
+                  } else {
+                    reject("Geocode failed: " + status);
+                  }
+                });
+              });
+              return { lat: results.lat(), lng: results.lng() };
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          }
+
+          // Initialize the map for each order
+          function initMap(orderData) {
+            const mapElement = document.getElementById(
+              `orderMap${orderData.order.orderId}`
+            );
+            if (!mapElement) {
+              console.error("Map container not found!");
+              return;
+            }
+
+            const mapOptions = {
+              center: orderData.restaurantLocation,
+              zoom: 14,
+            };
+
+            // Create the map
+            map = new google.maps.Map(mapElement, mapOptions);
+
+            // Add a marker for the restaurant with a custom icon and label
+            const restaurantMarker = new google.maps.Marker({
+              position: orderData.restaurantLocation,
+              map: map,
+              title: `Restaurant: ${orderData.restaurantData.name}`,
+              icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Red for restaurant
+              label: "Restaurant",
+            });
+
+            // Add a marker for the delivery address with a different custom icon and label
+            const deliveryMarker = new google.maps.Marker({
+              position: orderData.deliveryLocation,
+              map: map,
+              title: `Delivery Address`,
+              icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blue for delivery address
+              label: "Delivery",
+            });
+
+            // Draw a line (polyline) connecting the restaurant and delivery address
+            const pathCoordinates = [
+              orderData.restaurantLocation,
+              orderData.deliveryLocation,
+            ];
+            const path = new google.maps.Polyline({
+              path: pathCoordinates,
+              geodesic: true,
+              strokeColor: "#FF0000",
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+            });
+            path.setMap(map);
+
+            /* Start moving the restaurant marker
+            moveRestaurantMarker(
+              restaurantMarker,
+              orderData.restaurantLocation,
+              orderData.deliveryLocation
+            );
+            */
+          }
+
+          // Simulate the movement of restaurant marker towards the delivery address
+          function moveRestaurantMarker(
+            restaurantMarker,
+            startLocation,
+            endLocation
+          ) {
+            let currentPosition = { ...startLocation }; // Start position at the restaurant
+            const stepSize = 0.00001; // Increment to move the marker closer each time
+            const moveInterval = setInterval(() => {
+              if (currentPosition.lat < endLocation.lat) {
+                currentPosition.lat += stepSize;
+              }
+              if (currentPosition.lng < endLocation.lng) {
+                currentPosition.lng += stepSize;
+              }
+
+              // Update marker position on the map
+              restaurantMarker.setPosition(currentPosition);
+
+              // If the restaurant has reached the delivery address, stop the movement
+              if (
+                Math.abs(currentPosition.lat - endLocation.lat) < stepSize &&
+                Math.abs(currentPosition.lng - endLocation.lng) < stepSize
+              ) {
+                clearInterval(moveInterval);
+              }
+            }, 1000); // Update every second
+          }
+
+          // Update the UI with order details and the map
+          function updateTrackingUI(orderData) {
+            const activeDeliveriesContainer =
+              document.getElementById("activeDeliveries");
+
+            const orderElement = document.createElement("div");
+            orderElement.classList.add("card");
+            orderElement.innerHTML = `
+                <div class="order-header">
+                  <div class="order-id">Order #${orderData.order.orderId}</div>
+                  <div class="order-status status-${orderData.order.status.toLowerCase()}">${
+              orderData.order.status
+            }</div>
+                </div>
+                <div class="tracking-map" id="orderMap${
+                  orderData.order.orderId
+                }" style="height: 400px;"></div>
+                <p><strong>Delivery Address:</strong> ${
+                  orderData.order.deliveryAddress
+                }</p>
+                <p><strong>ETA:</strong> <span id="eta-${
+                  orderData.order.orderId
+                }">25 minutes</span></p>
+              `;
+            activeDeliveriesContainer.appendChild(orderElement);
+          }
+
+          // Fetch order data
+          async function fetchOrderData(userId) {
+            try {
+              const orderResponse = await fetch(
+                `http://localhost:8080/api/orders/user/${userId}`
+              );
+              const orders = await orderResponse.json();
+
+              for (const order of orders) {
+                const restaurantId = order.restaurantId;
+                const deliveryAddress = order.deliveryAddress;
+                const deliveryLocation = await getCoordinatesFromAddress(
+                  deliveryAddress
+                );
+
+                const restaurantResponse = await fetch(
+                  `http://localhost:8080/api/restaurants/${restaurantId}`
+                );
+                const restaurantData = await restaurantResponse.json();
+                const restaurantAddress = restaurantData.address;
+                const restaurantLocation = await getCoordinatesFromAddress(
+                  restaurantAddress
+                );
+
+                console.log(restaurantLocation);
+                console.log(deliveryLocation);
+
+                // const restaurantLocation = {
+                //   lat: restaurantData.latitude,
+                //   lng: restaurantData.longitude,
+                // };
+                const orderData = {
+                  order,
+                  restaurantData,
+                  deliveryLocation,
+                  restaurantLocation,
+                };
+
+                updateTrackingUI(orderData);
+                setTimeout(() => initMap(orderData), 2000); // Ensure DOM is ready before initializing map
+              }
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+          }
+
+          // Fetch order data with status based
+          async function fetchOrderData2(userId) {
+            try {
+              const orderResponse = await fetch(
+                `http://localhost:8080/api/orders/user/${userId}`
+              );
+              const orders = await orderResponse.json();
+
+              // Filter out orders that are not SHIPPED
+              const shippedOrders = orders.filter(
+                (order) => order.status === "SHIPPED"
+              );
+
+              for (const order of shippedOrders) {
+                const restaurantId = order.restaurantId;
+                const deliveryAddress = order.deliveryAddress;
+                const deliveryLocation = await getCoordinatesFromAddress(
+                  deliveryAddress
+                );
+
+                const restaurantResponse = await fetch(
+                  `http://localhost:8080/api/restaurants/${restaurantId}`
+                );
+                const restaurantData = await restaurantResponse.json();
+
+                const restaurantLocation = {
+                  lat: restaurantData.latitude,
+                  lng: restaurantData.longitude,
+                };
+
+                const restaurantAddress = restaurantData.address;
+
+                const orderData = {
+                  order,
+                  restaurantData,
+                  deliveryLocation,
+                  restaurantLocation,
+                };
+
+                updateTrackingUI(orderData);
+                setTimeout(() => initMap(orderData), 2000); // Ensure DOM is ready before initializing map
+              }
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+          }
+
+          //-------------- deliverytime setup
+          // Function to get distance and estimated delivery time using Google Maps Distance Matrix API
+          async function getDeliveryTime(restaurantLocation, deliveryLocation) {
+            const origin = new google.maps.LatLng(
+              restaurantLocation.lat,
+              restaurantLocation.lng
+            );
+            const destination = new google.maps.LatLng(
+              deliveryLocation.lat,
+              deliveryLocation.lng
+            );
+
+            // Prepare the request for the Google Maps Distance Matrix API
+            const service = new google.maps.DistanceMatrixService();
+            const request = {
+              origins: [origin],
+              destinations: [destination],
+              travelMode: google.maps.TravelMode.DRIVING, // Can also use WALKING, BICYCLING, or TRANSIT
+            };
+
+            try {
+              const response = await new Promise((resolve, reject) => {
+                service.getDistanceMatrix(request, (response, status) => {
+                  if (status === google.maps.DistanceMatrixStatus.OK) {
+                    resolve(response);
+                  } else {
+                    reject("Distance Matrix failed: " + status);
+                  }
+                });
+              });
+
+              const distanceInMeters =
+                response.rows[0].elements[0].distance.value; // Distance in meters
+              const durationInSeconds =
+                response.rows[0].elements[0].duration.value; // Duration in seconds
+
+              // Calculate estimated delivery time (in minutes)
+              const distanceInKm = distanceInMeters / 1000; // Convert to kilometers
+              const durationInMinutes = Math.round(durationInSeconds / 60); // Convert to minutes
+
+              // Set delivery time as duration from the response
+              return {
+                distance: distanceInKm,
+                deliveryTime: durationInMinutes,
+              };
+            } catch (error) {
+              console.error("Error calculating delivery time:", error);
+              return { distance: 0, deliveryTime: 0 }; // Default value in case of error
+            }
+          }
+
+          // Example usage: Call this function when you fetch the order details
+          async function updateOrderDeliveryTime(orderData) {
+            const restaurantLocation = orderData.restaurantLocation;
+            const deliveryLocation = orderData.deliveryLocation;
+
+            // Get the delivery time based on the distance
+            const { distance, deliveryTime } = await getDeliveryTime(
+              restaurantLocation,
+              deliveryLocation
+            );
+
+            // Update the UI with the calculated delivery time
+            const etaElement = document.getElementById(
+              `eta-${orderData.order.orderId}`
+            );
+            if (etaElement) {
+              etaElement.textContent = `${deliveryTime} minutes (Distance: ${distance.toFixed(
+                2
+              )} km)`;
+            }
+          }
+
+          // Example: Update delivery time for an order
+          async function fetchOrderDataAndUpdateDeliveryTime(userId) {
+            try {
+              const orderResponse = await fetch(
+                `http://localhost:8080/api/orders/user/${userId}`
+              );
+              const orders = await orderResponse.json();
+
+              for (const order of orders) {
+                const restaurantId = order.restaurantId;
+                const deliveryAddress = order.deliveryAddress;
+
+                // Fetch restaurant and delivery coordinates
+                const deliveryLocation = await getCoordinatesFromAddress(
+                  deliveryAddress
+                );
+                const restaurantResponse = await fetch(
+                  `http://localhost:8080/api/restaurants/${restaurantId}`
+                );
+                const restaurantData = await restaurantResponse.json();
+
+                const restaurantLocation = {
+                  lat: restaurantData.latitude,
+                  lng: restaurantData.longitude,
+                };
+
+                const orderData = {
+                  order,
+                  restaurantData,
+                  deliveryLocation,
+                  restaurantLocation,
+                };
+
+                updateOrderDeliveryTime(orderData); // Update delivery time based on distance
+              }
+            } catch (error) {
+              console.error("Error fetching orders:", error);
+            }
+          }
+
+          // Initialize the tracking process (this would be called once the page loads)
+          fetchOrderData2(userId);
+        </script>
+
+        <!-- Favorites Page 
+            <div id="favorites" class="page">
+                <div class="page-header">
+                    <h2>Favorite Restaurants</h2>
+                </div>
+                
+                <div class="favorites-grid">
+                    <div class="favorite-item">
+                        <div class="favorite-image">
+                            <img src="https://images.unsplash.com/photo-1565299507190-23c9450c58cd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fHww" alt="Burger Barn">
+                        </div>
+                        <div class="favorite-details">
+                            <h3 class="favorite-name">Burger Barn</h3>
+                            <div class="favorite-rating">4.5 ★</div>
+                            <p>Burgers, Fries</p>
+                            <button class="btn">Order Now</button>
+                        </div>
+                    </div>
+                    <div class="favorite-item">
+                        <div class="favorite-image">
+                            <img src="https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=500&auto=format&fit=crop" alt="Green Garden">
+                        </div>
+                        <div class="favorite-details">
+                            <h3 class="favorite-name">Green Garden</h3>
+                            <div class="favorite-rating">4.7 ★</div>
+                            <p>Vegetarian, Stir Fry</p>
+                            <button class="btn">Order Now</button>
+                        </div>
+                    </div>
+                    <div class="favorite-item">
+                        <div class="favorite-image">
+                            <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?q=80&w=2952&auto=format&fit=crop" alt="Sushi Spot">
+                        </div>
+                        <div class="favorite-details">
+                            <h3 class="favorite-name">Sushi Spot</h3>
+                            <div class="favorite-rating">4.9 ★</div>
+                            <p>Japanese, Sushi</p>
+                            <button class="btn">Order Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+        <!-- Favorites Page -->
+        <div id="favorites" class="page">
+          <div
+            class="page-header"
+            style="text-align: center; margin-bottom: 20px"
+          >
+            <h2
+              style="
+                font-family: 'Roboto', sans-serif;
+                font-size: 2.5rem;
+                color: #2d3748;
+              "
+            >
+              🌟 Your Favorite Restaurants
+            </h2>
+            <p style="color: #718096; font-size: 1rem">
+              These are your most-ordered spots! Enjoy exploring.
+            </p>
+          </div>
+
+          <div
+            id="favoritesGrid"
+            class="favorites-grid"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 20px;
+              padding: 20px;
+            "
+          >
+            <!-- Favorite restaurants will be dynamically injected here -->
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            const userId = document.getElementById("userId").value;
+            const restaurantOrderMap = new Map();
+
+            fetch(`http://localhost:8080/api/orders/user/${userId}`)
+              .then((response) => response.json())
+              .then((orders) => {
+                orders.forEach((order) => {
+                  const { restaurantId, orderId } = order;
+
+                  if (!restaurantOrderMap.has(restaurantId)) {
+                    restaurantOrderMap.set(restaurantId, []);
+                  }
+
+                  // Add the orderId to the array of orderIds for the given restaurantId
+                  restaurantOrderMap.get(restaurantId).push(orderId);
+                });
+                const restaurantFrequency = countRestaurantFrequency(orders);
+
+                // Sort restaurants by frequency (most frequent first)
+                const sortedRestaurants = Object.entries(
+                  restaurantFrequency
+                ).sort((a, b) => b[1] - a[1]);
+
+                // Fetch restaurant details and display them
+                const favoritesGrid = document.getElementById("favoritesGrid");
+                sortedRestaurants.forEach(([restaurantId, frequency]) => {
+                  fetchRestaurantDetails(restaurantId)
+                    .then((restaurant) => {
+                      if (restaurant) {
+                        const orderIds =
+                          restaurantOrderMap.get(restaurantId) || [];
+
+                        const order = orders.find(
+                          (o) => o.restaurantId == restaurantId
+                        );
+                        const orderId = order ? order.orderId : orderIds[0];
+
+                        console.log(restaurantId, frequency, orderId); // Debugging line
+                        const restaurantElement =
+                          createFavoriteRestaurantElement(restaurant, orderId);
+                        favoritesGrid.appendChild(restaurantElement);
+                      }
+
+                      // const restaurantElement = createFavoriteRestaurantElement(restaurant);
+                      // favoritesGrid.appendChild(restaurantElement);
+                    })
+                    .catch((error) =>
+                      console.error("Error fetching restaurant details:", error)
+                    );
+                });
+              })
+              .catch((error) => console.error("Error fetching orders:", error));
+
+            // Function to count how many times each restaurant is ordered
+            function countRestaurantFrequency(orders) {
+              const frequency = {};
+              orders.forEach((order) => {
+                const restaurantId = order.restaurantId;
+                frequency[restaurantId] = (frequency[restaurantId] || 0) + 1;
+              });
+              return frequency;
+            }
+
+            // Function to fetch restaurant details by restaurantId
+            function fetchRestaurantDetails(restaurantId) {
+              return fetch(
+                `http://localhost:8080/api/restaurants/${restaurantId}`
+              )
+                .then((response) => response.json())
+                .then((data) => data) // Return restaurant data
+                .catch((error) => {
+                  console.error("Error fetching restaurant:", error);
+                  return null; // Return null if there's an error
+                });
+            }
+
+            // Function to create HTML element for each favorite restaurant
+            function createFavoriteRestaurantElement(restaurant, orderId) {
+              const restaurantImages = [
+                "https://images.pexels.com/photos/776538/pexels-photo-776538.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1581554/pexels-photo-1581554.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/941861/pexels-photo-941861.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/460537/pexels-photo-460537.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1310777/pexels-photo-1310777.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1449773/pexels-photo-1449773.jpeg?auto=compress&cs=tinysrgb&w=600",
+                "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=600",
+              ];
+              const favoriteItem = document.createElement("div");
+              favoriteItem.classList.add("favorite-item");
+
+              const favoriteImage = document.createElement("div");
+              favoriteImage.classList.add("favorite-image");
+              const randomImage =
+                restaurantImages[
+                  Math.floor(Math.random() * restaurantImages.length)
+                ];
+              const img = document.createElement("img");
+              img.src = randomImage; // "https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"; // Default image if not provided-->
+              img.alt = restaurant.name;
+              favoriteImage.appendChild(img);
+
+              const favoriteDetails = document.createElement("div");
+              favoriteDetails.classList.add("favorite-details");
+
+              const favoriteName = document.createElement("h3");
+              favoriteName.classList.add("favorite-name");
+              favoriteName.textContent = restaurant.name;
+
+              const restaurantIdInput = document.createElement("input");
+              restaurantIdInput.type = "hidden";
+              restaurantIdInput.value = restaurant.restaurantId;
+
+              const orderIdInput = document.createElement("input");
+              orderIdInput.id = "orderId";
+              orderIdInput.type = "hidden";
+              orderIdInput.value = orderId; // Attach orderId as hidden input
+
+              const favoriteRating = document.createElement("div");
+              favoriteRating.classList.add("favorite-rating");
+              // if restaurant.rating is 0 set a default value of some random number between 1 and 3
+              if (restaurant.rating === 0) {
+                restaurant.rating = Math.floor(Math.random() * 3) + 1; // Random number between 1 and 3
+              }
+              // favoriteRating.textContent = `Rating: ${restaurant.rating}/5`;
+              favoriteRating.textContent = `${restaurant.rating} ★`;
+
+              const cuisineType = document.createElement("p");
+              cuisineType.textContent = `${restaurant.description}`;
+
+              const orderButton = document.createElement("button");
+              orderButton.classList.add("btn", "order-btn");
+              orderButton.textContent = "Order Now";
+              orderButton.addEventListener("click", () => {
+                // Get the restaurant ID and order ID from the hidden inputs
+                const restaurantId = restaurantIdInput.value;
+                window.location.href = `/user/placeOrder?restaurantId=${restaurantId}`;
+              });
+
+              // Add the "Write Review" button
+              const reviewButton = document.createElement("button");
+              reviewButton.classList.add("btn", "review-btn");
+              reviewButton.textContent = "Write Review";
+
+              // Add event listener to open a review modal or navigate to a review section (you can customize this part)
+              reviewButton.addEventListener("click", () => {
+                openReviewDialog(
+                  restaurant.name,
+                  orderId,
+                  restaurant.restaurantId
+                );
+              });
+
+              const buttonContainer = document.createElement("div");
+              buttonContainer.classList.add("btn-container"); // Add a container for buttons
+
+              buttonContainer.appendChild(orderButton);
+              buttonContainer.appendChild(reviewButton);
+
+              favoriteDetails.appendChild(buttonContainer); // Append container to favorite details
+
+              favoriteDetails.appendChild(favoriteName);
+              favoriteDetails.appendChild(favoriteRating);
+              favoriteDetails.appendChild(cuisineType);
+              favoriteDetails.appendChild(orderButton);
+              favoriteDetails.appendChild(reviewButton); // Append the review button
+
+              favoriteItem.appendChild(favoriteImage);
+              favoriteItem.appendChild(favoriteDetails);
+
+              return favoriteItem;
+            }
+          });
+        </script>
+
+        <style>
+          .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+          }
+
+          .favorite-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+            transition: transform 0.3s ease;
+          }
+
+          .favorite-item:hover {
+            transform: translateY(-5px);
+          }
+
+          .favorite-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+          }
+
+          .favorite-details {
+            padding: 15px;
+          }
+
+          .favorite-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+
+          .favorite-rating {
+            font-size: 1rem;
+            color: #f39c12;
+            margin-bottom: 10px;
+          }
+
+          .favorite-details p {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+          }
+
+          .btn {
+            background-color: #f39c12;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+
+          .btn:hover {
+            background-color: #e67e22;
+          }
+
+          .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 10px; /* Add some spacing */
+          }
+
+          .order-btn {
+            background-color: #f39c12; /* Green for "Order Now" */
+            color: white;
+          }
+
+          .order-btn:hover {
+            background-color: #e67e22; /* Darker green on hover */
+            transform: scale(1.05); /* Slight zoom effect on hover */
+          }
+
+          .review-btn {
+            background-color: #008cba; /* Blue for "Write Review" */
+            color: white;
+          }
+
+          .review-btn:hover {
+            background-color: #007bb5; /* Darker blue on hover */
+            transform: scale(1.05); /* Slight zoom effect on hover */
+          }
+
+          .favorite-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .btn-container {
+            display: flex;
+            gap: 20px; /* Add space between buttons */
+            margin-top: 15px; /* Add spacing above buttons */
+          }
+
+          .favorite-item {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            margin: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 500px; /* Ensure the height is sufficient to fit content */
+          }
+
+          /* Hover effect for the card */
+          .favorite-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          }
+
+          /* Style for the image section */
+          .favorite-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+          }
+
+          .favorite-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the area while maintaining aspect ratio */
+            object-position: center;
+          }
+        </style>
+
+        <!-- Review Dialog -->
+        <div id="reviewDialog" class="neu-dialog">
+          <div class="neu-card">
+            <h3 id="review-form-title">Write a Review</h3>
+            <p>
+              Share your thoughts about
+              <span id="restaurantName">[Restaurant Name]</span>.
+            </p>
+
+            <form id="reviewForm" onsubmit="submitReview(event)">
+              <input
+                type="hidden"
+                id="userId"
+                name="userId"
+                th:value="${userDTO.id}"
+              />
+              <!-- Hidden input for user ID -->
+              <input
+                type="hidden"
+                id="restaurantId"
+                name="restaurantId"
+                th:value="${restaurantId}"
+              />
+              <!-- Hidden input for restaurant ID -->
+              <input type="hidden" id="orderId" name="orderId" />
+              <!-- Hidden input for order ID -->
+              <div class="form-group">
+                <label for="reviewerName" id="reviewer-labe">Your Name</label>
+                <input
+                  type="text"
+                  id="reviewerName"
+                  name="reviewerName"
+                  placeholder="Enter your name"
+                  th:if="${userDTO != null}"
+                  th:value="${userDTO.name}"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="rating">Rating</label>
+                <select id="rating" name="rating" required>
+                  <option value="" disabled selected>Select a rating</option>
+                  <option value="5">5 ★★★★★ - Excellent</option>
+                  <option value="4">4 ★★★★ - Good</option>
+                  <option value="3">3 ★★★ - Average</option>
+                  <option value="2">2 ★★ - Poor</option>
+                  <option value="1">1 ★ - Terrible</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="review">Your Review</label>
+                <textarea
+                  id="review"
+                  name="review"
+                  rows="5"
+                  placeholder="Write your feedback..."
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="neu-btn">Submit</button>
+              <button
+                type="button"
+                class="neu-btn cancel-btn"
+                onclick="closeReviewDialog()"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <style>
+          /* Neumorphism dialog style */
+          .neu-dialog {
+            /* Hidden by default */
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+          }
+
+          .neu-card {
+            background: #e0e5ec;
+            border-radius: 20px;
+            padding: 30px;
+            width: 400px;
+            box-shadow: 8px 8px 15px #a3b1c6, -8px -8px 15px #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .neu-card h3 {
+            text-align: center;
+            color: #2d3436;
+          }
+
+          .neu-card p {
+            color: #636e72;
+            text-align: center;
+          }
+
+          .form-group {
+            margin-bottom: 15px;
+          }
+
+          label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+          }
+
+          input,
+          select,
+          textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background: #e0e5ec;
+            box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff;
+            color: #2d3436;
+            font-size: 16px;
+          }
+
+          textarea {
+            resize: vertical;
+          }
+
+          .neu-btn {
+            background: #e0e5ec;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px #a3b1c6, -2px -2px 5px #ffffff;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+          }
+
+          .neu-btn:hover {
+            background: #d1d9e6;
+          }
+
+          .cancel-btn {
+            background: #f39c12;
+            color: white;
+          }
+
+          .cancel-btn:hover {
+            background: #e67e22;
+          }
+        </style>
+
+        <script>
+          function openReviewDialog(restaurantName, orderId, restaurantId) {
+            const dialog = document.getElementById("reviewDialog");
+            const restaurantNameElement =
+              document.getElementById("restaurantName");
+            restaurantNameElement.textContent = restaurantName;
+            const orderIdElement = document.getElementById("orderId");
+            orderIdElement.value = orderId;
+            const restaurantIdElement = document.getElementById("restaurantId");
+            restaurantIdElement.value = restaurantId;
+
+            dialog.style.display = "flex";
+          }
+          function closeReviewDialog() {
+            const dialog = document.getElementById("reviewDialog");
+            dialog.style.display = "none"; // Hide the dialog
+          }
+
+          function submitReview(event) {
+            event.preventDefault();
+
+            const reviewerName = document.getElementById("reviewerName").value;
+            const rating = document.getElementById("rating").value;
+            const review = document.getElementById("review").value;
+            const restaurantName =
+              document.getElementById("restaurantName").textContent;
+            /*
+            const reviewData = {
+                reviewerName,
+                rating,
+                review,
+                restaurantName
+            };*/
+            const reviewData = {
+              userId: document.getElementById("userId").value,
+              rating: rating,
+              comments: review,
+              feedbackDate: new Date().toISOString(),
+            };
+            // http://localhost:8080/api/feedbacks/orderid/restaurantId
+            const restaurantId = document.getElementById("restaurantId").value;
+            //const orderIds = restaurantOrderMap.get(restaurantId) || [];
+            const orderId = document.getElementById("orderId").value;
+
+            const url = `http://localhost:8080/api/feedbacks/${orderId}/${restaurantId}`;
+            fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(reviewData),
+            }).then((response) => {
+              if (response.ok) {
+                // show sweet alert success message reload the page
+                Swal.fire({
+                  icon: "success",
+                  title: "Review Submitted",
+                  text: "Thank you for your feedback!",
+                  confirmButtonText: "OK",
+                }).then(() => {
+                  window.location.reload();
+                });
+                closeReviewDialog();
+                return response.json();
+              } else {
+                // show sweet alert error message
+                Swal.fire({
+                  icon: "error",
+                  title: "Error Submitting Review",
+                  text: "Please try again later.",
+                  confirmButtonText: "OK",
+                });
+
+                // throw new Error("Network response was not ok");
+              }
+            });
+            console.log("Review submitted:", reviewData);
+            closeReviewDialog();
+            document.getElementById("reviewForm").reset();
+          }
+        </script>
+
+        <!-- Reviews Page 
+        <div id="reviews" class="page">
+          <div class="page-header">
+            <h2>My Reviews</h2>
+          </div>
+
+         
+          <div class="card">
+            <button class="btn" id="addNewReviewBtn">
+              <i class="fas fa-plus"></i> Add New Review
+            </button>
+          </div>
+
+         
+          <div id="newReviewFormContainer" class="card" style="display: none">
+            <h3>Add New Review</h3>
+            <form id="newReviewForm">
+              
+            </form>
+          </div>
+
+         
+          <div class="card" id="reviewsListContainer">
+            
+          </div>
+        </div>
+    -->
+        <!-- Reviews Page -->
+        <div
+          id="reviews"
+          class="page"
+          style="padding: 20px; font-family: 'Roboto', sans-serif"
+        >
+          <div
+            class="page-header"
+            style="text-align: center; margin-bottom: 20px"
+          >
+            <h2 style="font-size: 2.5rem; color: #2d3748">💬 My Reviews</h2>
+            <p style="color: #718096; font-size: 1rem">
+              Your thoughts help us grow!
+            </p>
+          </div>
+
+          <!-- Add New Review Button -->
+          <div
+            class="card"
+            style="text-align: center; margin-bottom: 20px; display: none"
+          >
+            <button class="btn add-review-btn" id="addNewReviewBtn">
+              <i class="fas fa-plus"></i> Add New Review
+            </button>
+          </div>
+
+          <!-- New Review Form -->
+          <div
+            id="newReviewFormContainer"
+            class="card"
+            style="display: none; padding: 20px; border-radius: 10px"
+          >
+            <h3 style="font-size: 1.5rem; margin-bottom: 10px">
+              Add New Review
+            </h3>
+            <form id="newReviewForm">
+              <!-- Form Content -->
+            </form>
+          </div>
+
+          <!-- Existing Reviews -->
+          <div
+            id="reviewsListContainer"
+            class="card"
+            style="padding: 20px; border-radius: 10px"
+          >
+            <!-- Reviews will be dynamically populated here -->
+          </div>
+        </div>
+
+        <div
+          id="logout"
+          class="page"
+          style="
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(to right, #f3f4f6, #e2e8f0);
+          "
+        >
+          <div class="page-header" style="margin-bottom: 20px">
+            <h2
+              style="
+                font-family: 'Roboto', sans-serif;
+                font-size: 2rem;
+                color: #4a5568;
+              "
+            >
+              🌟 Welcome Back! 🌟
+            </h2>
+          </div>
+          <p style="font-size: 1.2rem; color: #2d3748">
+            We’re thrilled to have you here again!
+          </p>
+          <p style="font-size: 1rem; color: #4a5568">
+            Your experience matters to us. Let us know your thoughts anytime.
+          </p>
+          <button
+            class="btn"
+            id="homeBtn"
+            onclick="window.location.href='http://localhost:9213/home'"
+            style="
+              padding: 10px 20px;
+              margin-top: 20px;
+              font-size: 1rem;
+              color: #fff;
+              background-color: #3182ce;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              transition: background-color 0.3s;
+            "
+          >
+            Go to Home
+          </button>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            const userId = document.getElementById("userId").value;
+
+            // Fetch reviews for the user
+            fetch(`http://localhost:8080/api/feedbacks/user/${userId}`)
+              .then((response) => response.json())
+              .then((reviews) => {
+                const reviewsListContainer = document.getElementById(
+                  "reviewsListContainer"
+                );
+
+                // Check if reviews are available
+                if (reviews && reviews.length > 0) {
+                  reviews.forEach((review) => {
+                    //const reviewCard = createReviewCard(review);
+                    //reviewsListContainer.appendChild(reviewCard);
+                    fetchRestaurantDetails(review.restaurantId).then(
+                      (restaurant) => {
+                        createReviewCard(review, restaurant);
+                      }
+                    );
+                  });
+                } else {
+                  reviewsListContainer.innerHTML = "<p>No reviews found.</p>";
+                }
+              })
+              .catch((error) =>
+                console.error("Error fetching reviews:", error)
+              );
+
+            function createReviewCard(review, restaurant) {
+              const reviewCard = document.createElement("div");
+              reviewCard.classList.add("review-card");
+              reviewCard.setAttribute("data-review-id", review.feedbackId);
+
+              const reviewHeader = document.createElement("div");
+              reviewHeader.classList.add("review-header");
+
+              const restaurantName = document.createElement("div");
+              restaurantName.classList.add("review-restaurant");
+              restaurantName.textContent = `Restaurant: ${restaurant.name}`; // You might want to fetch restaurant details to show the name
+
+              const reviewRating = document.createElement("div");
+              reviewRating.classList.add("review-rating");
+              // reviewRating.textContent = `${review.rating} ★`;
+              for (let i = 0; i < review.rating; i++) {
+                const star = document.createElement("i");
+                star.classList.add("fas", "fa-star", "star-icon");
+                reviewRating.appendChild(star);
+              }
+
+              reviewHeader.appendChild(restaurantName);
+              reviewHeader.appendChild(reviewRating);
+
+              const reviewText = document.createElement("p");
+              reviewText.classList.add("review-text");
+              reviewText.textContent = review.comments;
+
+              const reviewDate = document.createElement("p");
+              reviewDate.classList.add("review-date");
+              const date = new Date(review.feedbackDate);
+              reviewDate.textContent = date.toLocaleDateString(); // Format the date
+
+              const orderId = document.createElement("input");
+              orderId.type = "hidden";
+              orderId.id = "orderId";
+              orderId.value = review.orderId;
+
+              const editReviewButton = document.createElement("button");
+              editReviewButton.classList.add("btn", "edit-review-btn");
+              editReviewButton.textContent = "Edit";
+              editReviewButton.setAttribute(
+                "data-review-id",
+                review.feedbackId
+              );
+
+              reviewCard.appendChild(reviewHeader);
+              reviewCard.appendChild(reviewText);
+              reviewCard.appendChild(reviewDate);
+              reviewCard.appendChild(editReviewButton);
+
+              // Edit button functionality
+              editReviewButton.addEventListener("click", function () {
+                showEditForm(review, restaurant);
+              });
+
+              document
+                .getElementById("reviewsListContainer")
+                .appendChild(reviewCard);
+            }
+
+            function fetchRestaurantDetails(restaurantId) {
+              return fetch(
+                `http://localhost:8080/api/restaurants/${restaurantId}`
+              )
+                .then((response) => response.json())
+                .catch((error) => {
+                  console.error("Error fetching restaurant:", error);
+                  return null;
+                });
+            }
+
+            // Show the Review Dialog with the review data for editing
+            function showEditForm(review, restaurant) {
+              document.getElementById("restaurantName").textContent =
+                restaurant.name;
+              document.getElementById("restaurantId").value =
+                review.restaurantId;
+              // document.getElementById("feedbackId").value = review.feedbackId;
+              // document.getElementById("reviewerName").value = restaurant.name;
+              // change label to "Edit Review"
+              document.getElementById("review-form-title").textContent =
+                "Edit Review";
+              document.getElementById("orderId").value = review.orderId;
+
+              document.getElementById("review").value = review.comments;
+              document.getElementById("rating").value = review.rating;
+              document.getElementById("reviewDialog").style.display = "flex";
+            }
+
+            // Close the Review Dialog
+            function closeReviewDialog() {
+              document.getElementById("reviewDialog").style.display = "none";
+              document.getElementById("reviewsListContainer").style.display =
+                "block";
+            }
+
+            // Event listener for adding new review
+            document
+              .getElementById("addNewReviewBtn")
+              .addEventListener("click", function () {
+                /* Show the "Add New Review" form and hide the review list
+                document.getElementById(
+                  "newReviewFormContainer"
+                ).style.display = "block";
+                document.getElementById("reviewsListContainer").style.display =
+                  "none";*/
+              });
+
+            // Event listener for canceling new review form
+            document
+              .getElementById("cancelNewReview")
+              .addEventListener("click", function () {
+                // Hide the "Add New Review" form and show the review list
+                document.getElementById(
+                  "newReviewFormContainer"
+                ).style.display = "none";
+                document.getElementById("reviewsListContainer").style.display =
+                  "block";
+              });
+          });
+        </script>
+
+        <style>
+          /* General Page Styles */
+          .page {
+            padding: 20px;
+            font-family: "Roboto", sans-serif;
+          }
+
+          .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+
+          .page-header h2 {
+            font-size: 2.5rem;
+            color: #2d3748;
+          }
+
+          .page-header p {
+            font-size: 1rem;
+            color: #718096;
+          }
+
+          /* Cards */
+          .card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+          }
+
+          .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+          }
+
+          /* Buttons */
+          .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+          }
+
+          .add-review-btn {
+            background-color: #48bb78; /* Green */
+          }
+
+          .add-review-btn:hover {
+            background-color: #38a169;
+          }
+
+          .edit-review-btn {
+            background-color: #4299e1; /* Blue */
+          }
+
+          .edit-review-btn:hover {
+            background-color: #3182ce;
+          }
+
+          /* Reviews List */
+          .review-card {
+            background-color: #f9fafb;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+          }
+
+          .review-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+          }
+
+          .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+          }
+
+          .review-restaurant {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+          }
+
+          .review-rating {
+            display: flex;
+            gap: 5px;
+            color: #f6ad55; /* Gold stars */
+          }
+
+          .review-text {
+            font-size: 1rem;
+            color: #4a5568;
+            margin: 10px 0;
+          }
+
+          .review-date {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            text-align: right;
+          }
+        </style>
+
+        <!-- Order History Page -->
+        <div id="history" class="page">
+          <div class="page-header">
+            <h2>Order History</h2>
+          </div>
+
+          <div class="card">
+            <h3>Filter Orders</h3>
+            <div class="order-filters">
+              <select id="filterStatus">
+                <option value="all">All Orders</option>
+                <option value="delivered">Delivered</option>
+                <option value="canceled">Canceled</option>
+              </select>
+              <select id="filterDate">
+                <option value="all">All Time</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Search orders..."
+                id="searchOrders"
+              />
+              <button class="btn" id="searchOrdersBtn">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Order History</h3>
+            <div id="orderHistoryList">
+              <div class="order-card">
+                <div class="order-header">
+                  <div class="order-id">Order #1000</div>
+                  <div class="order-status status-delivered">Delivered</div>
+                </div>
+                <div class="order-details">
+                  <p><strong>Restaurant:</strong> Green Garden</p>
+                  <p><strong>Amount:</strong> $35.75</p>
+                  <p><strong>Delivered on:</strong> 2023-05-15</p>
+                </div>
+              </div>
+              <div class="order-card">
+                <div class="order-header">
+                  <div class="order-id">Order #999</div>
+                  <div class="order-status status-delivered">Delivered</div>
+                </div>
+                <div class="order-details">
+                  <p><strong>Restaurant:</strong> Sushi Spot</p>
+                  <p><strong>Amount:</strong> $45.25</p>
+                  <p><strong>Delivered on:</strong> 2023-05-10</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Navigation handling
+        const navLinks = document.querySelectorAll(".sidebar-menu a");
+        const pages = document.querySelectorAll(".page");
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Remove active class from all links
+            navLinks.forEach((l) => l.classList.remove("active"));
+
+            // Add active class to clicked link
+            this.classList.add("active");
+
+            // Hide all pages
+            pages.forEach((page) => {
+              page.classList.remove("active");
+            });
+
+            // Show the selected page
+            const targetId = this.getAttribute("href").substring(1);
+            document.getElementById(targetId).classList.add("active");
+          });
+        });
+
+        // Filter orders by status
+        document
+          .getElementById("filterStatus")
+          .addEventListener("change", function () {
+            const status = this.value;
+            const orderRows = document.querySelectorAll(
+              "#orderHistoryList .order-card"
+            );
+
+            orderRows.forEach((row) => {
+              const orderStatus = row
+                .querySelector(".order-status")
+                .textContent.toLowerCase();
+              if (status === "all" || orderStatus === status) {
+                row.style.display = "block";
+              } else {
+                row.style.display = "none";
+              }
+            });
+          });
+
+        // Filter orders by date
+        document
+          .getElementById("filterDate")
+          .addEventListener("change", function () {
+            const dateFilter = this.value;
+            const orderRows = document.querySelectorAll(
+              "#orderHistoryList .order-card"
+            );
+
+            // Implement date filtering logic here
+            orderRows.forEach((row) => {
+              row.style.display = "block"; // Reset visibility
+            });
+          });
+
+        // Search functionality
+        document
+          .getElementById("searchOrdersBtn")
+          .addEventListener("click", function () {
+            const searchTerm = document
+              .getElementById("searchOrders")
+              .value.toLowerCase();
+            const orderRows = document.querySelectorAll(
+              "#orderHistoryList .order-card"
+            );
+
+            orderRows.forEach((row) => {
+              const orderId = row
+                .querySelector(".order-id")
+                .textContent.toLowerCase();
+              const restaurant =
+                row
+                  .querySelector(".restaurant-name")
+                  ?.textContent.toLowerCase() || "";
+
+              if (
+                orderId.includes(searchTerm) ||
+                restaurant.includes(searchTerm)
+              ) {
+                row.style.display = "block";
+              } else {
+                row.style.display = "none";
+              }
+            });
+          });
+
+        // Auto-trigger search on input
+        document
+          .getElementById("searchOrders")
+          .addEventListener("input", function () {
+            document.getElementById("searchOrdersBtn").click();
+          });
+
+        // Edit Review Button Click
+        document.addEventListener("click", function (e) {
+          if (e.target.classList.contains("edit-review-btn")) {
+            const reviewId = e.target.getAttribute("data-review-id");
+            const reviewCard = e.target.closest(".review-card");
+
+            // Hide the review card and show the edit form
+            // reviewCard.style.display = "none";
+            document.getElementById("editReviewFormContainer").style.display =
+              "block";
+
+            // Populate the form with existing data
+            document.getElementById("editReviewId").value = reviewId;
+            document.getElementById("editReviewRating").value =
+              reviewCard.querySelector(".review-rating").textContent.length;
+            document.getElementById("editReviewText").value =
+              reviewCard.querySelector(".review-text").textContent;
+          }
+        });
+
+        // Cancel Edit
+        document
+          .getElementById("cancelEdit")
+          .addEventListener("click", function () {
+            document.getElementById("editReviewFormContainer").style.display =
+              "none";
+            document.querySelectorAll(".review-card").forEach((card) => {
+              card.style.display = "block";
+            });
+          });
+
+        // Save Edited Review
+        document
+          .getElementById("editReviewForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const reviewId = document.getElementById("editReviewId").value;
+            const rating = document.getElementById("editReviewRating").value;
+            const reviewText = document.getElementById("editReviewText").value;
+
+            // Find the review card to update
+            const reviewCard = document.querySelector(
+              `.review-card[data-review-id="${reviewId}"]`
+            );
+
+            // Update the review card with new data
+            reviewCard.querySelector(".review-rating").textContent =
+              "★".repeat(rating) + "☆".repeat(5 - rating);
+            reviewCard.querySelector(".review-text").textContent = reviewText;
+
+            // Hide the edit form and show the updated review card
+            document.getElementById("editReviewFormContainer").style.display =
+              "none";
+            reviewCard.style.display = "block";
+
+            // Simulate API call
+            console.log("Review updated:", { reviewId, rating, reviewText });
+            alert("Review updated successfully!");
+          });
+      });
+    </script>
+
+    <script>
+      function handleLogout(event) {
+        event.preventDefault(); // Prevent default anchor behavior
+
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: "btn btn-success",
+            cancelButton: "btn btn-danger",
+          },
+          buttonsStyling: false,
+        });
+
+        swalWithBootstrapButtons
+          .fire({
+            title: "Are you sure you want to logout?",
+            text: "You will need to log in again to access your account.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, log me out!",
+            cancelButtonText: "No, stay logged in!",
+            reverseButtons: true,
+          })
+          .then((result) => {
+            if (result.isConfirmed) {
+              // Logic for logging out (e.g., redirect to logout endpoint)
+
+              sessionStorage.clear();
+              localStorage.clear();
+              swalWithBootstrapButtons
+                .fire({
+                  title: "Logged Out!",
+                  text: "You have been successfully logged out.",
+                  icon: "success",
+                })
+                .then(() => {
+                  window.location.href = "/logoutReq";
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              swalWithBootstrapButtons.fire({
+                title: "Cancelled",
+                text: "You are still logged in!",
+                icon: "error",
+              });
+            }
+          });
+      }
+    </script>
+  </body>
+</html>

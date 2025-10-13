@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TastyTreatExpress - Restaurant Management</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+      /* Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 250px;
+        background-color: #fff;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        padding: 20px 0;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .sidebar-header h2 {
+        font-size: 18px;
+        color: #007bff;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+      }
+
+      .sidebar-menu li {
+        margin-bottom: 5px;
+      }
+
+      .sidebar-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #666;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-menu a:hover,
+      .sidebar-menu a.active {
+        background-color: #f0f5ff;
+        color: #007bff;
+      }
+
+      .sidebar-menu a i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content Styles */
+      .main-content {
+        flex: 1;
+        padding: 20px;
+      }
+
+      .page {
+        display: none;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .page-header {
+        margin-bottom: 20px;
+      }
+
+      .page-header h2 {
+        font-size: 22px;
+        color: #333;
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .form-group textarea {
+        height: 120px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn:hover {
+        background-color: #0069d9;
+      }
+
+      /* Table Styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table th,
+      table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+
+      table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+      }
+
+      /* Card Styles */
+      .card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      /* Order List Styles */
+      .order-filters {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .order-filters select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .order-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #007bff;
+      }
+
+      .order-card.status-new {
+        border-left-color: #007bff;
+      }
+
+      .order-card.status-preparing {
+        border-left-color: #ffc107;
+      }
+
+      .order-card.status-ready {
+        border-left-color: #28a745;
+      }
+
+      .order-card.status-delivered {
+        border-left-color: #28a745;
+      }
+
+      .order-card.status-canceled {
+        border-left-color: #dc3545;
+      }
+
+      .order-card.status-failed {
+        border-left-color: #dc3545;
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .order-id {
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      .order-status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: 500;
+      }
+
+      .status-new {
+        background-color: #e3f2fd;
+        color: #007bff;
+      }
+
+      .status-preparing {
+        background-color: #fff8e1;
+        color: #ffc107;
+      }
+
+      .status-ready {
+        background-color: #e8f5e9;
+        color: #28a745;
+      }
+
+      .status-delivered {
+        background-color: #e8f5e9;
+        color: #28a745;
+      }
+
+      .status-canceled {
+        background-color: #f8d7da;
+        color: #dc3545;
+      }
+
+      .status-failed {
+        background-color: #f8d7da;
+        color: #dc3545;
+      }
+
+      .order-details {
+        margin-top: 10px;
+      }
+
+      .order-customer {
+        margin-bottom: 10px;
+      }
+
+      .order-items {
+        margin-bottom: 10px;
+      }
+
+      .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px dashed #eee;
+      }
+
+      .order-summary {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+      }
+
+      .order-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .btn-success {
+        background-color: #28a745;
+        color: white;
+      }
+
+      /* Kitchen Integration Styles */
+      .kitchen-display {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .kitchen-stations {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .kitchen-station {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+      }
+
+      .prep-timer {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+
+      /* Delivery Tracking Styles */
+      .delivery-tracking {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      .map-container {
+        height: 300px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        margin-bottom: 15px;
+      }
+
+      .delivery-status {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+      }
+
+      /* Notifications Styles */
+      .notifications {
+        margin-top: 20px;
+      }
+
+      .notification {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+
+      .notification-icon {
+        margin-right: 10px;
+        font-size: 1.2em;
+      }
+
+      .notification-new {
+        color: #007bff;
+      }
+
+      .notification-warning {
+        color: #ffc107;
+      }
+
+      .notification-danger {
+        color: #dc3545;
+      }
+
+      /* Analytics Styles */
+      .chart-container {
+        margin-top: 20px;
+      }
+
+      /* Profile Styles */
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      /* Menu Management Styles */
+      .menu-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .menu-item {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+
+      .menu-item:hover {
+        transform: translateY(-5px);
+      }
+
+      .item-image {
+        height: 180px;
+        overflow: hidden;
+      }
+
+      .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .item-details {
+        padding: 15px;
+      }
+
+      .item-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .item-category {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .item-description {
+        color: #555;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        line-height: 1.4;
+      }
+
+      .item-price {
+        font-weight: 600;
+        color: #4caf50;
+        font-size: 1.1rem;
+      }
+
+      .item-status {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        margin-right: 10px;
+      }
+
+      .status-popular {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .status-regular {
+        background-color: #2196f3;
+        color: white;
+      }
+
+      .status-lowDemand {
+        background-color: #ffc107;
+        color: #333;
+      }
+
+      .item-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+        gap: 10px;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-menu {
+          display: flex;
+          flex-wrap: wrap;
+        }
+
+        .sidebar-menu li {
+          margin: 5px;
+        }
+      }
+
+      /* Incoming Orders Styles */
+      .hero {
+        text-align: center;
+        padding: 50px 20px;
+        background: linear-gradient(45deg, #d50000, #ff5722);
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .order-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 30px;
+        margin: 20px auto;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .order-details {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin: 15px 0;
+      }
+
+      .customer-info {
+        margin-bottom: 20px;
+      }
+
+      .order-item-card {
+        display: flex;
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .item-image {
+        width: 120px;
+        height: 120px;
+        margin-right: 15px;
+      }
+
+      .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .item-details {
+        flex: 1;
+      }
+
+      .item-meta {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      .order-summary {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #dee2e6;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .summary-row.total {
+        font-weight: bold;
+        font-size: 1.2em;
+        border-top: 1px solid #dee2e6;
+        padding-top: 10px;
+        margin-top: 10px;
+      }
+    </style>
+
+  </head>
+  
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>TastyTreatExpress</h2>
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#dashboard" class="active"
+              ><i class="fas fa-tachometer-alt"></i> Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="#orders"><i class="fas fa-shopping-basket"></i> Orders</a>
+          </li>
+          <li>
+            <a href="#kitchen"><i class="fas fa-utensils"></i> Kitchen</a>
+          </li>
+          <li>
+            <a href="#delivery"><i class="fas fa-truck"></i> Delivery</a>
+          </li>
+          <li>
+            <a href="#notifications"
+              ><i class="fas fa-bell"></i> Notifications</a
+            >
+          </li>
+          <li>
+            <a href="#analytics"><i class="fas fa-chart-line"></i> Analytics</a>
+          </li>
+          <li>
+            <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+          </li>
+          <li>
+            <a href="#menu"><i class="fas fa-list"></i> Menu Management</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+          <div class="page-header">
+            <h2>Dashboard</h2>
+          </div>
+
+          <div class="card">
+            <h3>Quick Stats</h3>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+                margin-top: 20px;
+              "
+            >
+              <div
+                style="
+                  background-color: #f0f5ff;
+                  padding: 15px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <h4>Total Restaurants</h4>
+                <p
+                  id="totalRestaurants"
+                  th:text="${stats.totalRestaurants}"
+                  style="font-size: 24px; font-weight: bold; color: #007bff"
+                >
+                  0
+                </p>
+              </div>
+              <div
+                style="
+                  background-color: #f0f5ff;
+                  padding: 15px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <h4>Total Orders</h4>
+                <p
+                  id="totalOrders"
+                  th:text="${stats.totalOrders}"
+                  style="font-size: 24px; font-weight: bold; color: #007bff"
+                >
+                  0
+                </p>
+              </div>
+              <div
+                style="
+                  background-color: #f0f5ff;
+                  padding: 15px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <h4>Avg Rating</h4>
+                <p
+                  id="avgRating"
+                  th:text="${stats.avgRating}"
+                  style="font-size: 24px; font-weight: bold; color: #007bff"
+                >
+                  0
+                </p>
+              </div>
+              <div
+                style="
+                  background-color: #f0f5ff;
+                  padding: 15px;
+                  border-radius: 8px;
+                  text-align: center;
+                "
+              >
+                <h4>Revenue</h4>
+                <p
+                  id="totalRevenue"
+                  th:text="${stats.totalRevenue}"
+                  style="font-size: 24px; font-weight: bold; color: #007bff"
+                >
+                  $0
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Recent Orders</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Restaurant</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrders">
+                <tr th:each="order : ${recentOrders}">
+                  <td th:text="${order.id}">Order ID</td>
+                  <td th:text="${order.restaurantName}">Restaurant Name</td>
+                  <td th:text="${order.status}">Status</td>
+                  <td th:text="${order.amount}">$0.00</td>
+                  <td th:text="${order.date}">Date</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Orders Page -->
+        <div id="orders" class="page">
+          <div class="page-header">
+            <h2>Order Management</h2>
+          </div>
+
+          <div class="card">
+            <h3>Active Orders</h3>
+            <div class="order-list">
+              <div th:each="order : ${activeOrders}" class="order-card">
+                <div class="order-header">
+                  <div class="order-id" th:text="'Order #' + ${order.id}">
+                    Order #1001
+                  </div>
+                  <div class="order-status" th:text="${order.status}">
+                    Pending
+                  </div>
+                </div>
+
+                <div class="order-details">
+                  <div class="customer-info">
+                    <h4>Customer Details</h4>
+                    <p>
+                      <strong>Name:</strong>
+                      <span th:text="${order.customerName}">John Doe</span>
+                    </p>
+                    <p>
+                      <strong>Phone:</strong>
+                      <span th:text="${order.customerPhone}">+1234567890</span>
+                    </p>
+                    <p>
+                      <strong>Address:</strong>
+                      <span th:text="${order.deliveryAddress}"
+                        >123 Main St</span
+                      >
+                    </p>
+                  </div>
+
+                  <div class="order-items">
+                    <h4>Order Items</h4>
+                    <div
+                      th:each="item : ${order.items}"
+                      class="order-item-card"
+                    >
+                      <div class="item-image">
+                        <img th:src="${item.imageUrl}" alt="Food Item Image" />
+                      </div>
+                      <div class="item-details">
+                        <h5 th:text="${item.name}">Item Name</h5>
+                        <p
+                          class="item-description"
+                          th:text="${item.description}"
+                        >
+                          Item Description
+                        </p>
+                        <div class="item-meta">
+                          <span class="quantity"
+                            >Qty:
+                            <span th:text="${item.quantity}">1</span></span
+                          >
+                          <span class="price"
+                            >$<span th:text="${item.price}">10.99</span></span
+                          >
+                        </div>
+                        <div
+                          class="item-customization"
+                          th:if="${item.specialInstructions}"
+                        >
+                          <p><strong>Special Instructions:</strong></p>
+                          <p th:text="${item.specialInstructions}">
+                            No onions, extra cheese
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="order-summary">
+                    <h4>Order Summary</h4>
+                    <div class="summary-row">
+                      <span>Subtotal:</span>
+                      <span
+                        >$<span th:text="${order.subtotal}">32.97</span></span
+                      >
+                    </div>
+                    <div class="summary-row">
+                      <span>Tax:</span>
+                      <span>$<span th:text="${order.tax}">2.63</span></span>
+                    </div>
+                    <div class="summary-row">
+                      <span>Delivery Fee:</span>
+                      <span
+                        >$<span th:text="${order.deliveryFee}">5.00</span></span
+                      >
+                    </div>
+                    <div class="summary-row total">
+                      <span>Total:</span>
+                      <span>$<span th:text="${order.total}">40.60</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="order-actions">
+                  <button
+                    class="btn btn-success"
+                    onclick="acceptOrder(this)"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-check"></i> Accept
+                  </button>
+
+                  <button
+                    class="btn btn-danger"
+                    onclick="showDeclineModal(this)"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-times"></i> Decline
+                  </button>
+
+                  <button
+                    class="btn btn-primary"
+                    onclick="updateOrderStatus(this, 'preparing')"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-utensils"></i> Preparing
+                  </button>
+
+                  <button
+                    class="btn btn-info"
+                    onclick="updateOrderStatus(this, 'ready')"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-check-circle"></i> Ready
+                  </button>
+
+                  <button
+                    class="btn btn-warning"
+                    onclick="updateOrderStatus(this, 'dispatched')"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-truck"></i> Dispatched
+                  </button>
+
+                  <button
+                    class="btn btn-success"
+                    onclick="updateOrderStatus(this, 'delivered')"
+                    th:data-orderid="${order.id}"
+                  >
+                    <i class="fas fa-flag-checkered"></i> Delivered
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kitchen Integration Page -->
+        <div id="kitchen" class="page">
+          <div class="page-header">
+            <h2>Kitchen Management</h2>
+          </div>
+
+          <div class="kitchen-display">
+            <h3>Kitchen Display System (KDS)</h3>
+            <div class="kitchen-stations">
+              <div class="kitchen-station">
+                <h4>Grill</h4>
+                <div th:each="order : ${kitchenOrders}">
+                  <div class="order-card status-${order.status}">
+                    <div class="order-header">
+                      <div class="order-id" th:text="'Order #' + ${order.id}">
+                        Order #1001
+                      </div>
+                      <div
+                        class="order-status status-${order.status}"
+                        th:text="${order.status}"
+                      >
+                        Preparing
+                      </div>
+                    </div>
+                    <div class="order-items">
+                      <div class="order-item">
+                        <div>
+                          <div th:text="${order.items[0].name}">
+                            Margherita Pizza
+                          </div>
+                          <small th:text="${order.items[0].customizations}"
+                            >No onions, extra cheese</small
+                          >
+                        </div>
+                        <div th:text="${order.items[0].quantity}">1</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="kitchen-station">
+                <h4>Prep</h4>
+                <div th:each="order : ${prepOrders}">
+                  <div class="order-card status-${order.status}">
+                    <div class="order-header">
+                      <div class="order-id" th:text="'Order #' + ${order.id}">
+                        Order #1002
+                      </div>
+                      <div
+                        class="order-status status-${order.status}"
+                        th:text="${order.status}"
+                      >
+                        Preparing
+                      </div>
+                    </div>
+                    <div class="order-items">
+                      <div class="order-item">
+                        <div>
+                          <div th:text="${order.items[0].name}">
+                            Chicken Salad
+                          </div>
+                          <small th:text="${order.items[0].customizations}"
+                            >No dressing</small
+                          >
+                        </div>
+                        <div th:text="${order.items[0].quantity}">1</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prep-timer">
+            <h3>Prep Timers</h3>
+            <div th:each="timer : ${prepTimers}">
+              <div class="order-card">
+                <div class="order-header">
+                  <div class="order-id" th:text="'Order #' + ${timer.orderId}">
+                    Order #1001
+                  </div>
+                  <div class="timer-countdown" th:text="${timer.remainingTime}">
+                    10:30
+                  </div>
+                </div>
+                <div class="order-items">
+                  <div class="order-item">
+                    <div>
+                      <div th:text="${timer.itemName}">Margherita Pizza</div>
+                      <small>Grill Station</small>
+                    </div>
+                    <div th:text="${timer.quantity}">1</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Tracking Page -->
+        <div id="delivery" class="page">
+          <div class="page-header">
+            <h2>Delivery Tracking</h2>
+          </div>
+
+          <div class="delivery-tracking">
+            <h3>Active Deliveries</h3>
+            <div th:each="delivery : ${activeDeliveries}">
+              <div class="order-card">
+                <div class="order-header">
+                  <div
+                    class="order-id"
+                    th:text="'Order #' + ${delivery.orderId}"
+                  >
+                    Order #1001
+                  </div>
+                  <div
+                    class="delivery-status-text"
+                    th:text="${delivery.status}"
+                  >
+                    In Transit
+                  </div>
+                </div>
+                <div class="map-container">
+                  <div
+                    id="map"
+                    style="
+                      height: 100%;
+                      background-color: #e9ecef;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <i
+                      class="fas fa-map-marked-alt"
+                      style="font-size: 2em; color: #007bff"
+                    ></i>
+                  </div>
+                </div>
+                <div class="delivery-details">
+                  <p>
+                    <strong>Delivery Person:</strong>
+                    <span th:text="${delivery.personnel.name}">John Smith</span>
+                  </p>
+                  <p>
+                    <strong>ETA:</strong>
+                    <span th:text="${delivery.eta}">15 minutes</span>
+                  </p>
+                  <p>
+                    <strong>Current Location:</strong>
+                    <span th:text="${delivery.currentLocation}"
+                      >Main St & 5th Ave</span
+                    >
+                  </p>
+                </div>
+                <div class="delivery-actions">
+                  <button
+                    class="btn btn-primary"
+                    th:onclick="'updateDelivery(' + ${delivery.id} + ')'"
+                  >
+                    Update Location
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    th:onclick="'confirmDelivery(' + ${delivery.id} + ')'"
+                  >
+                    Confirm Delivery
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Page -->
+        <div id="notifications" class="page">
+          <div class="page-header">
+            <h2>Notifications</h2>
+          </div>
+
+          <div class="notifications">
+            <div th:each="notification : ${notifications}">
+              <div class="notification" th:classappend="${notification.type}">
+                <div class="notification-icon">
+                  <i th:class="${notification.icon}"></i>
+                </div>
+                <div class="notification-content">
+                  <p th:text="${notification.message}">
+                    New order received: Order #1001
+                  </p>
+                  <small th:text="${notification.time}">5 minutes ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div id="analytics" class="page">
+          <div class="page-header">
+            <h2>Analytics</h2>
+          </div>
+
+          <div class="card chart-container">
+            <h3>Sales Overview</h3>
+            <canvas id="salesChart" height="300"></canvas>
+          </div>
+
+          <div class="card chart-container">
+            <h3>Popular Items</h3>
+            <canvas id="popularItemsChart" height="300"></canvas>
+          </div>
+
+          <div class="card chart-container">
+            <h3>Customer Satisfaction</h3>
+            <canvas id="satisfactionChart" height="300"></canvas>
+          </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="page">
+          <div class="page-header">
+            <h2>Restaurant Partner Profile</h2>
+          </div>
+
+          <div class="card profile-card">
+            <h3 class="profile-title">Restaurant Information</h3>
+            <form id="updateProfileForm" class="profile-form">
+              <div class="profile-grid">
+                <div class="form-group">
+                  <label for="restaurantName">Restaurant Name</label>
+                  <input
+                    type="text"
+                    id="restaurantName"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="ownerName">Owner Name</label>
+                  <input
+                    type="text"
+                    id="ownerName"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="contactEmail">Contact Email</label>
+                  <input
+                    type="email"
+                    id="contactEmail"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="contactPhone">Contact Phone</label>
+                  <input
+                    type="tel"
+                    id="contactPhone"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+                <div class="form-group full-width">
+                  <label for="restaurantAddress">Restaurant Address</label>
+                  <textarea
+                    id="restaurantAddress"
+                    class="profile-textarea"
+                    required
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="cuisine">Cuisine Type</label>
+                  <select id="cuisine" class="profile-select" required>
+                    <option value="">Select Cuisine</option>
+                    <option value="indian">Indian</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="italian">Italian</option>
+                    <option value="mexican">Mexican</option>
+                    <option value="american">American</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="openingHours">Opening Hours</label>
+                  <input
+                    type="text"
+                    id="openingHours"
+                    class="profile-input"
+                    placeholder="e.g. 9:00 AM - 10:00 PM"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="deliveryRadius">Delivery Radius (km)</label>
+                  <input
+                    type="number"
+                    id="deliveryRadius"
+                    class="profile-input"
+                    min="1"
+                    max="50"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="license">Restaurant License Number</label>
+                  <input
+                    type="text"
+                    id="license"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="taxId">Tax ID</label>
+                  <input
+                    type="text"
+                    id="taxId"
+                    class="profile-input"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="profile-btn">Update Profile</button>
+            </form>
+          </div>
+
+          <style>
+            .profile-card {
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              padding: 2rem;
+              margin: 1rem 0;
+            }
+
+            .profile-title {
+              color: #2c3e50;
+              font-size: 1.5rem;
+              margin-bottom: 1.5rem;
+              padding-bottom: 0.5rem;
+              border-bottom: 2px solid #e9ecef;
+            }
+
+            .profile-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 1.5rem;
+              margin-bottom: 2rem;
+            }
+
+            .profile-form label {
+              display: block;
+              margin-bottom: 0.5rem;
+              color: #4a5568;
+              font-weight: 500;
+            }
+
+            .profile-input,
+            .profile-select,
+            .profile-textarea {
+              width: 100%;
+              padding: 0.75rem;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              background-color: #f8fafc;
+              transition: all 0.3s ease;
+              font-size: 0.95rem;
+            }
+
+            .profile-input:focus,
+            .profile-select:focus,
+            .profile-textarea:focus {
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+              background-color: white;
+            }
+
+            .profile-textarea {
+              min-height: 100px;
+              resize: vertical;
+            }
+
+            .profile-select {
+              appearance: none;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234a5568'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: right 0.75rem center;
+              background-size: 1rem;
+              padding-right: 2.5rem;
+            }
+
+            .profile-btn {
+              background-color: #3b82f6;
+              color: white;
+              padding: 0.75rem 2rem;
+              border: none;
+              border-radius: 8px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              display: block;
+              margin: 0 auto;
+            }
+
+            .profile-btn:hover {
+              background-color: #2563eb;
+              transform: translateY(-1px);
+            }
+
+            .profile-btn:active {
+              transform: translateY(0);
+            }
+
+            .full-width {
+              grid-column: 1 / -1;
+            }
+
+            @media (max-width: 768px) {
+              .profile-card {
+                padding: 1rem;
+              }
+
+              .profile-grid {
+                gap: 1rem;
+              }
+
+              .profile-btn {
+                width: 100%;
+              }
+            }
+          </style>
+        </div>
+        <!-- Menu Management Page -->
+        <div id="menu" class="page">
+          <div class="page-header">
+            <h2>Menu Management</h2>
+          </div>
+
+          <div class="card">
+            <h3>Add New Menu Item</h3>
+            <div class="form-container">
+              <form
+                id="addMenuItemForm"
+                th:action="@{/addMenuItem}"
+                method="post"
+              >
+                <div class="form-group">
+                  <label for="addMenuName">Menu Item Name:</label>
+                  <input
+                    type="text"
+                    id="addMenuName"
+                    name="name"
+                    required
+                    th:field="*{name}"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="addMenuDescription">Description:</label>
+                  <textarea
+                    id="addMenuDescription"
+                    name="description"
+                    required
+                    th:field="*{description}"
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="addMenuCategory">Category:</label>
+                  <select
+                    id="addMenuCategory"
+                    name="category"
+                    required
+                    th:field="*{category}"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="appetizer">Appetizer</option>
+                    <option value="soup">Soup</option>
+                    <option value="salad">Salad</option>
+                    <option value="entree">Entree</option>
+                    <option value="mainCourse">Main Course</option>
+                    <option value="pasta">Pasta</option>
+                    <option value="pizza">Pizza</option>
+                    <option value="sandwich">Sandwich</option>
+                    <option value="dessert">Dessert</option>
+                    <option value="beverage">Beverage</option>
+                    <option value="sides">Sides</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="imageUrl">Image URL:</label>
+                  <input
+                    type="text"
+                    id="imageUrl"
+                    name="imageUrl"
+                    required
+                    th:field="*{imageUrl}"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="status">Status</label>
+                  <select
+                    id="status"
+                    name="status"
+                    required
+                    th:field="*{status}"
+                  >
+                    <option value="">Select Status</option>
+                    <option value="popular">Popular</option>
+                    <option value="regular">Regular</option>
+                    <option value="lowDemand">Low Demand</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="price">Price:</label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    step="0.01"
+                    required
+                    th:field="*{price}"
+                  />
+                </div>
+                <button type="submit" class="btn">Add Menu Item</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Menu Items</h3>
+            <div class="order-filters">
+              <select id="filterStatus">
+                <option value="all">All Items</option>
+                <option value="popular">Popular</option>
+                <option value="regular">Regular</option>
+                <option value="lowDemand">Low Demand</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Search menu items..."
+                id="searchMenu"
+              />
+              <button class="btn" id="searchMenuBtn">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+
+            <div class="menu-items" id="menuItemsContainer">
+              <div th:each="menuItem : ${menuItems}" class="menu-item">
+                <div class="item-image">
+                  <img th:src="${menuItem.imageUrl}" alt="Menu Item" />
+                </div>
+                <div class="item-details">
+                  <h3 class="item-name" th:text="${menuItem.name}">
+                    Menu Item Name
+                  </h3>
+                  <span class="item-category" th:text="${menuItem.category}"
+                    >Category</span
+                  >
+                  <p class="item-description" th:text="${menuItem.description}">
+                    Description
+                  </p>
+                  <div>
+                    <span
+                      class="item-status status-${menuItem.status}"
+                      th:text="${menuItem.status}"
+                      >Status</span
+                    >
+                    <span class="item-price" th:text="|$$${menuItem.price}|"
+                      >$0.00</span
+                    >
+                  </div>
+                  <div class="item-actions">
+                    <button
+                      class="btn btn-primary edit-btn"
+                      th:data-id="${menuItem.id}"
+                      th:data-name="${menuItem.name}"
+                      th:data-description="${menuItem.description}"
+                      th:data-category="${menuItem.category}"
+                      th:data-imageurl="${menuItem.imageUrl}"
+                      th:data-status="${menuItem.status}"
+                      th:data-price="${menuItem.price}"
+                    >
+                      Edit
+                    </button>
+                    <form
+                      th:action="@{/deleteMenuItem(id=${menuItem.id})}"
+                      method="post"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to delete this item?')"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <style>
+            /* Menu Management Page Styles */
+            .menu-page {
+              padding: 20px;
+            }
+
+            /* Form Container Styles */
+            .form-container {
+              background: #fff;
+              padding: 25px;
+              border-radius: 12px;
+              box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+              margin-bottom: 30px;
+            }
+
+            /* Form Group Styles */
+            .form-group {
+              margin-bottom: 20px;
+            }
+
+            .form-group label {
+              display: block;
+              margin-bottom: 8px;
+              color: #2c3e50;
+              font-weight: 500;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+              width: 100%;
+              padding: 12px;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              font-size: 14px;
+              transition: all 0.3s ease;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+              border-color: #4299e1;
+              box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+              outline: none;
+            }
+
+            /* Menu Items Grid */
+            .menu-items {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+              gap: 25px;
+              margin-top: 25px;
+            }
+
+            /* Menu Item Card */
+            .menu-item {
+              background: #fff;
+              border-radius: 12px;
+              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+              transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .menu-item:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Item Image Container */
+            .item-image {
+              height: 200px;
+              overflow: hidden;
+              position: relative;
+            }
+
+            .item-image img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.3s ease;
+            }
+
+            .menu-item:hover .item-image img {
+              transform: scale(1.05);
+            }
+
+            /* Item Details */
+            .item-details {
+              padding: 20px;
+            }
+
+            .item-name {
+              font-size: 1.25rem;
+              font-weight: 600;
+              color: #2d3748;
+              margin-bottom: 8px;
+            }
+
+            .item-category {
+              display: inline-block;
+              padding: 4px 12px;
+              background: #edf2f7;
+              color: #4a5568;
+              border-radius: 15px;
+              font-size: 0.875rem;
+              margin-bottom: 12px;
+            }
+
+            .item-description {
+              color: #4a5568;
+              font-size: 0.95rem;
+              line-height: 1.5;
+              margin-bottom: 15px;
+            }
+
+            .item-price {
+              font-size: 1.25rem;
+              font-weight: 600;
+              color: #48bb78;
+            }
+
+            /* Status Badges */
+            .item-status {
+              padding: 4px 12px;
+              border-radius: 15px;
+              font-size: 0.875rem;
+              font-weight: 500;
+              margin-right: 10px;
+            }
+
+            .status-popular {
+              background: #ebf8ff;
+              color: #3182ce;
+            }
+
+            .status-regular {
+              background: #e6fffa;
+              color: #319795;
+            }
+
+            .status-lowDemand {
+              background: #fff5f5;
+              color: #e53e3e;
+            }
+
+            /* Action Buttons */
+            .item-actions {
+              display: flex;
+              gap: 10px;
+              margin-top: 15px;
+            }
+
+            .btn {
+              padding: 8px 16px;
+              border-radius: 6px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              border: none;
+            }
+
+            .btn-primary {
+              background: #4299e1;
+              color: white;
+            }
+
+            .btn-primary:hover {
+              background: #3182ce;
+            }
+
+            .btn-danger {
+              background: #f56565;
+              color: white;
+            }
+
+            .btn-danger:hover {
+              background: #e53e3e;
+            }
+
+            /* Modal Styles */
+            .modal {
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 1000;
+              justify-content: center;
+              align-items: center;
+            }
+
+            .modal-content {
+              background: white;
+              border-radius: 12px;
+              padding: 25px;
+              width: 90%;
+              max-width: 600px;
+              max-height: 90vh;
+              overflow-y: auto;
+              position: relative;
+            }
+
+            .modal-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              padding-bottom: 15px;
+              border-bottom: 1px solid #e2e8f0;
+            }
+
+            .close-modal {
+              background: none;
+              border: none;
+              font-size: 24px;
+              cursor: pointer;
+              color: #4a5568;
+            }
+
+            .close-modal:hover {
+              color: #2d3748;
+            }
+
+            /* Responsive Styles */
+            @media (max-width: 768px) {
+              .menu-items {
+                grid-template-columns: 1fr;
+              }
+
+              .modal-content {
+                width: 95%;
+                margin: 20px;
+              }
+
+              .form-container {
+                padding: 15px;
+              }
+            }
+          </style>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Menu Item Modal -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Menu Item</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <form
+          id="editMenuItemForm"
+          th:action="@{/updateMenuItem}"
+          method="post"
+        >
+          <input type="hidden" id="editItemId" name="id" />
+          <div class="form-group">
+            <label for="editMenuName">Menu Item Name:</label>
+            <input type="text" id="editMenuName" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="editMenuDescription">Description:</label>
+            <textarea
+              id="editMenuDescription"
+              name="description"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="editMenuCategory">Category:</label>
+            <select id="editMenuCategory" name="category" required>
+              <option value="">Select Category</option>
+              <option value="appetizer">Appetizer</option>
+              <option value="soup">Soup</option>
+              <option value="salad">Salad</option>
+              <option value="entree">Entree</option>
+              <option value="mainCourse">Main Course</option>
+              <option value="pasta">Pasta</option>
+              <option value="pizza">Pizza</option>
+              <option value="sandwich">Sandwich</option>
+              <option value="dessert">Dessert</option>
+              <option value="beverage">Beverage</option>
+              <option value="sides">Sides</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editImageUrl">Image URL:</label>
+            <input type="text" id="editImageUrl" name="imageUrl" required />
+          </div>
+          <div class="form-group">
+            <label for="editStatus">Status:</label>
+            <select id="editStatus" name="status" required>
+              <option value="">Select Status</option>
+              <option value="popular">Popular</option>
+              <option value="regular">Regular</option>
+              <option value="lowDemand">Low Demand</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editPrice">Price:</label>
+            <input
+              type="number"
+              id="editPrice"
+              name="price"
+              step="0.01"
+              required
+            />
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeEditModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Update Menu Item
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Decline Order Modal -->
+    <div class="modal" id="declineModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Decline Order</h3>
+          <button class="close-modal" onclick="closeDeclineModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="declineReason">Reason for Declining:</label>
+            <textarea id="declineReason" required></textarea>
+          </div>
+          <input type="hidden" id="declineOrderId" />
+          <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeDeclineModal()">
+              Cancel
+            </button>
+            <button class="btn btn-danger" onclick="declineOrder()">
+              Confirm Decline
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Add these functions at the end of your existing script section
+      function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+      }
+
+      // When the page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get all edit buttons
+        const editButtons = document.querySelectorAll(".edit-btn");
+
+        // Add click event to each edit button
+        editButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Get data from button attributes
+            const id = this.getAttribute("data-id");
+            const name = this.getAttribute("data-name");
+            const description = this.getAttribute("data-description");
+            const category = this.getAttribute("data-category");
+            const imageUrl = this.getAttribute("data-imageurl");
+            const status = this.getAttribute("data-status");
+            const price = this.getAttribute("data-price");
+
+            // Fill the form
+            document.getElementById("editItemId").value = id;
+            document.getElementById("editMenuName").value = name;
+            document.getElementById("editMenuDescription").value = description;
+            document.getElementById("editMenuCategory").value = category;
+            document.getElementById("editImageUrl").value = imageUrl;
+            document.getElementById("editStatus").value = status;
+            document.getElementById("editPrice").value = price;
+
+            // Show the modal
+            document.getElementById("editModal").style.display = "flex";
+          });
+        });
+
+        // Close modal when clicking the close button
+        document
+          .querySelector("#editModal .close-modal")
+          .addEventListener("click", closeEditModal);
+
+        // Close modal when clicking outside
+        window.addEventListener("click", function (event) {
+          if (event.target === document.getElementById("editModal")) {
+            closeEditModal();
+          }
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Navigation handling
+        const navLinks = document.querySelectorAll(".sidebar-menu a");
+        const pages = document.querySelectorAll(".page");
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Remove active class from all links
+            navLinks.forEach((l) => l.classList.remove("active"));
+
+            // Add active class to clicked link
+            this.classList.add("active");
+
+            // Hide all pages
+            pages.forEach((page) => {
+              page.classList.remove("active");
+            });
+
+            // Show the selected page
+            const targetId = this.getAttribute("href").substring(1);
+            document.getElementById(targetId).classList.add("active");
+          });
+        });
+
+        // Filter orders by status
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", function () {
+            const status = this.value;
+            const orderCards = document.querySelectorAll(".order-card");
+
+            orderCards.forEach((card) => {
+              if (
+                status === "" ||
+                card.classList.contains(`status-${status}`)
+              ) {
+                card.style.display = "block";
+              } else {
+                card.style.display = "none";
+              }
+            });
+          });
+
+        // Filter orders by priority
+        document
+          .getElementById("priorityFilter")
+          .addEventListener("change", function () {
+            const priority = this.value;
+            const orderCards = document.querySelectorAll(".order-card");
+
+            orderCards.forEach((card) => {
+              if (priority === "" || card.dataset.priority === priority) {
+                card.style.display = "block";
+              } else if (
+                !card.style.display ||
+                card.style.display === "block"
+              ) {
+                card.style.display = "none";
+              }
+            });
+          });
+
+        // Menu Item Edit Modal
+        const editModal = document.getElementById("editModal");
+        const closeModalBtn = document.querySelector(".close-modal");
+        const editButtons = document.querySelectorAll(".edit-btn");
+
+        // Open modal with pre-filled data
+        editButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const itemId = this.getAttribute("data-id");
+            const itemName = this.getAttribute("data-name");
+            const itemDescription = this.getAttribute("data-description");
+            const itemCategory = this.getAttribute("data-category");
+            const itemImageUrl = this.getAttribute("data-imageurl");
+            const itemStatus = this.getAttribute("data-status");
+            const itemPrice = this.getAttribute("data-price");
+
+            // Fill form fields
+            document.getElementById("editItemId").value = itemId;
+            document.getElementById("editMenuName").value = itemName;
+            document.getElementById("editMenuDescription").value =
+              itemDescription;
+            document.getElementById("editMenuCategory").value = itemCategory;
+            document.getElementById("editImageUrl").value = itemImageUrl;
+            document.getElementById("editStatus").value = itemStatus;
+            document.getElementById("editPrice").value = itemPrice;
+
+            // Show modal
+            editModal.style.display = "flex";
+          });
+        });
+
+        // Close modal
+        closeModalBtn.addEventListener("click", function () {
+          editModal.style.display = "none";
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener("click", function (event) {
+          if (event.target === editModal) {
+            editModal.style.display = "none";
+          }
+        });
+
+        // Filter menu items by status
+        document
+          .getElementById("filterStatus")
+          .addEventListener("change", function () {
+            const filter = this.value;
+
+            // Filter menu items
+            document.querySelectorAll(".menu-item").forEach((item) => {
+              if (filter === "all" || item.querySelector(`.status-${filter}`)) {
+                item.style.display = "block";
+              } else {
+                item.style.display = "none";
+              }
+            });
+          });
+
+        // Search functionality
+        document
+          .getElementById("searchMenuBtn")
+          .addEventListener("click", function () {
+            const searchTerm = document
+              .getElementById("searchMenu")
+              .value.toLowerCase();
+            const menuItems = document.querySelectorAll(".menu-item");
+
+            menuItems.forEach((item) => {
+              const name = item
+                .querySelector(".item-name")
+                .textContent.toLowerCase();
+              const description = item
+                .querySelector(".item-description")
+                .textContent.toLowerCase();
+
+              if (
+                name.includes(searchTerm) ||
+                description.includes(searchTerm)
+              ) {
+                item.style.display = "block";
+              } else {
+                item.style.display = "none";
+              }
+            });
+          });
+
+        // Auto-trigger search on input
+        document
+          .getElementById("searchMenu")
+          .addEventListener("input", function () {
+            document.getElementById("searchMenuBtn").click();
+          });
+
+        // Initialize Charts
+        const salesCtx = document.getElementById("salesChart").getContext("2d");
+        new Chart(salesCtx, {
+          type: "line",
+          data: {
+            labels: [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
+            datasets: [
+              {
+                label: "Monthly Sales",
+                data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 85, 90],
+                backgroundColor: "rgba(0, 123, 255, 0.2)",
+                borderColor: "rgba(0, 123, 255, 1)",
+                borderWidth: 2,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        const popularItemsCtx = document
+          .getElementById("popularItemsChart")
+          .getContext("2d");
+        new Chart(popularItemsCtx, {
+          type: "bar",
+          data: {
+            labels: ["Pizza", "Burger", "Pasta", "Salad", "Sushi"],
+            datasets: [
+              {
+                label: "Orders",
+                data: [25, 20, 15, 10, 5],
+                backgroundColor: "#007bff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        const satisfactionCtx = document
+          .getElementById("satisfactionChart")
+          .getContext("2d");
+        new Chart(satisfactionCtx, {
+          type: "radar",
+          data: {
+            labels: [
+              "Food Quality",
+              "Service",
+              "Delivery Speed",
+              "Value for Money",
+              "Ambiance",
+            ],
+            datasets: [
+              {
+                label: "Rating",
+                data: [4.5, 4.2, 4.0, 4.3, 4.6],
+                backgroundColor: "rgba(0, 123, 255, 0.2)",
+                borderColor: "rgba(0, 123, 255, 1)",
+                borderWidth: 2,
+                pointBackgroundColor: "#007bff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 5,
+              },
+            },
+          },
+        });
+      });
+
+      // Order Management Functions
+      function acceptOrder(button) {
+        const orderId = button.getAttribute("data-orderid");
+        fetch(`/api/orders/${orderId}/accept`, {
+          method: "POST",
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Order accepted successfully");
+              updateOrderCardStatus(orderId, "accepted");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function showDeclineModal(button) {
+        const orderId = button.getAttribute("data-orderid");
+        document.getElementById("declineOrderId").value = orderId;
+        document.getElementById("declineModal").style.display = "flex";
+      }
+
+      function closeDeclineModal() {
+        document.getElementById("declineModal").style.display = "none";
+      }
+
+      function declineOrder() {
+        const orderId = document.getElementById("declineOrderId").value;
+        const reason = document.getElementById("declineReason").value;
+
+        if (!reason.trim()) {
+          alert("Please provide a reason for declining");
+          return;
+        }
+
+        fetch(`/api/orders/${orderId}/decline`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reason: reason }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Order declined successfully");
+              updateOrderCardStatus(orderId, "declined");
+              closeDeclineModal();
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function updateOrderStatus(button, status) {
+        const orderId = button.getAttribute("data-orderid");
+        fetch(`/api/orders/${orderId}/status`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: status }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert(`Order status updated to ${status}`);
+              updateOrderCardStatus(orderId, status);
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function updateOrderCardStatus(orderId, status) {
+        const orderCard = document
+          .querySelector(`[data-orderid="${orderId}"]`)
+          .closest(".order-card");
+        const statusElement = orderCard.querySelector(".order-status");
+        statusElement.textContent =
+          status.charAt(0).toUpperCase() + status.slice(1);
+        orderCard.className = `order-card status-${status}`;
+      }
+    </script>
+  </body>
+</html>

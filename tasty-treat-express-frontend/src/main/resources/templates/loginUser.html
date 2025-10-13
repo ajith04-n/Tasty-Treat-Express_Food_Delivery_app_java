@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Tasty Treat Express</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            animation: gradientBackground 5s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Background Video */
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: blur(5px);
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content:end;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 20px;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .navbar a:hover {
+            background-color: rgba(224, 155, 112, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            color: #fff;
+            padding-top: 50px;
+            animation: heroTextSlideIn 1s ease-out;
+           
+        }
+
+        .hero h1 {
+            font-size: 50px;
+            font-weight: bold;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-top: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Login Box Styling */
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            width: 50%;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .login-box input {
+            width: 95%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-box input:focus {
+            border-color: #FF5722;
+            box-shadow: 0 0 8px rgba(255, 87, 34, 0.7);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 15px 30px;
+            background-color: #FF5722;
+            border: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .login-box button:hover {
+            background-color: #FF7043;
+            transform: scale(1.05);
+        }
+
+        /* Link Styling */
+        a {
+            color: #FF5722;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 20px;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #FF7043;
+        }
+
+        /* Keyframes for Animations */
+        @keyframes heroTextSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            }
+            50% {
+                background: linear-gradient(to bottom right, #6a82fb, #fc5c7d);
+            }
+            100% {
+                background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video : https://www.w3schools.com/html/mov_bbb.mp4   -->
+    <video autoplay loop muted class="background-video">
+        <source src="assets/img/bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    </div>
+
+   
+    <section class="hero">
+        <h1>Login</h1>
+        <p>Enter your credentials to log in!</p>
+    </section>
+
+ 
+    <div class="login-box">
+        <form id="loginForm" method="post" action="/loginReq">
+            <input type="email" id="email" name="email" placeholder="Email" required />
+            <input type="password" id="password" name="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="/register">Register here</a></p>
+    </div>
+
+    <script>
+        function validateEmail(email) {
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePassword(password) {
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+            return passwordRegex.test(password);
+        }
+
+        function loginUser() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            // Validate email
+            if (!validateEmail(email)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Email',
+                    text: 'Please enter a valid email address (e.g., example@domain.com).',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Validate password
+            if (!validatePassword(password)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Password',
+                    text: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const formData = new FormData(document.getElementById("loginForm"));
+            const urlEncodedData = new URLSearchParams(formData).toString();
+
+            fetch("http://localhost:8082/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: urlEncodedData,
+                credentials: 'include',
+                mode: 'cors'
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Login successful");
+                    window.location.href = "/"; // Redirect to home page on success
+                } else {
+                    console.log("Login failed");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: 'Invalid email or password. Please try again.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while logging in. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+        
+    </script>
+
+</body>
+</html>

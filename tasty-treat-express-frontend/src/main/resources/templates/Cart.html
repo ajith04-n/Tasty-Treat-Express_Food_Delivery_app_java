@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasty Treat Express - Cart</title>
+    <link rel="icon" type="image/x-icon" href="logo.jpg" />
+    <!-- Font Awesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-orange: #ff5722;
+        --soft-orange: #ff8a65;
+        --thyme-green: #388e3c;
+        --neutral-gray: #333333;
+        --soft-white: #f5f5f5;
+        --light-gray: #b0bec5;
+        --card-bg: #ffffff;
+        --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --footer-bg: #1a1a1a;
+        --icon-bg: #444444;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--neutral-gray);
+        background: var(--soft-white);
+      }
+      .navbar {
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            box-shadow: var(--shadow);
+        }
+        .navbar .logo-text {
+            font-size: 2.5rem;
+            color: var(--primary-orange);
+            font-weight: bold;
+        }
+        .navbar .nav-links a {
+            color: var(--primary-orange);
+            margin-left: 2rem;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        .navbar .nav-links a:hover {
+            color: var(--neutral-gray);
+        }
+        .nav-item {
+            margin-right: 20px;
+        }
+        
+        .nav-link {
+            font-weight: bold;
+            color: #D50000;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #000000;
+        }
+      .hero-bg {
+        position: relative;
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 4rem;
+        padding-top: 80px;
+        overflow: hidden;
+      }
+      .hero-bg::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* background: linear-gradient(
+              to bottom,
+              rgba(148, 149, 150, 0.8),
+              rgba(38, 38, 37, 0.8)
+            ); */
+        z-index: 1;
+      }
+      .hero-slideshow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+      }
+      .hero-slide.active {
+        opacity: 1;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        text-align: left;
+      }
+      .hero-content h1 {
+        font-size: 4rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+        line-height: 1.2;
+      }
+      .hero-content p {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+        color: #ffffff;
+        line-height: 1.6;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      .search-container {
+        display: flex;
+        gap: 1rem;
+        margin: 2rem 0;
+        position: relative;
+      }
+      .location-box,
+      .search-box {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: #ffffff;
+        border-radius: 50px;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+      .location-box:hover,
+      .search-box:hover {
+        background: #f0f0f0;
+        transform: scale(1.05);
+      }
+      .location-box i,
+      .search-box i {
+        color: var(--primary-orange);
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+      }
+      .location-box span,
+      .search-box span {
+        font-size: 1rem;
+        color: var(--neutral-gray);
+        font-weight: 500;
+      }
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+      }
+      .overlay-container {
+        background: #2a2a2a;
+        border-radius: 16px;
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+          -8px -8px 16px rgba(80, 80, 80, 0.2);
+        width: 100%;
+        max-width: 450px;
+        padding: 2rem;
+        position: relative;
+        color: #f5f5f5;
+      }
+      .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        color: #f5f5f5;
+        cursor: pointer;
+      }
+      .tab-group {
+        display: flex;
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: none;
+        border: none;
+        color: #b0bec5;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+      }
+      .tab-btn.active {
+        color: var(--primary-orange);
+      }
+      .tab-underline {
+        position: absolute;
+        bottom: 0;
+        height: 3px;
+        background: var(--primary-orange);
+        width: 50%;
+        transition: all 0.3s ease;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+      .input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b0bec5;
+        font-size: 1rem;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        background: #3a3a3a;
+        border: 1px solid #444;
+        border-radius: 8px;
+        color: #f5f5f5;
+        font-size: 1rem;
+      }
+      .input-group input::placeholder {
+        color: rgba(245, 245, 245, 0.6);
+      }
+      .password-strength {
+        height: 4px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        margin-top: 5px;
+        border-radius: 2px;
+      }
+      .neu-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--primary-orange);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .neu-btn:hover {
+        background: var(--soft-orange);
+      }
+      /* Location Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: var(--shadow);
+        position: relative;
+      }
+      .modal-content h3 {
+        margin-top: 0;
+        color: var(--primary-orange);
+      }
+      .modal-content input {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border: 1px solid var(--light-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      .modal-content button {
+        background: var(--primary-orange);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      .modal-content button:hover {
+        background: var(--soft-orange);
+      }
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--neutral-gray);
+      }
+      /* Search Suggestions Dropdown */
+      .search-suggestions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        width: 250px;
+        z-index: 150;
+        padding: 1rem;
+      }
+      .search-suggestions.active {
+        display: block;
+      }
+      .search-suggestions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .search-suggestions li {
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      .search-suggestions li:hover {
+        background: #f0f0f0;
+      }
+      .section {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: var(--soft-white);
+      }
+      .section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: var(--neutral-gray);
+      }
+      .carousel-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+      .carousel {
+        display: flex;
+        gap: 1rem;
+        transition: transform 0.5s ease-in-out;
+      }
+      .carousel.no-transition {
+        transition: none;
+      }
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1rem;
+        width: 300px;
+        flex-shrink: 0;
+        box-shadow: var(--shadow);
+        color: var(--neutral-gray);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      .card.active {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      .card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      .card h5 {
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
+        color: var(--primary-orange);
+      }
+      .card p {
+        color: var(--neutral-gray);
+      }
+      .card .rating {
+        color: var(--thyme-green);
+        font-size: 0.9rem;
+      }
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--primary-orange);
+        color: #ffffff;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        z-index: 10;
+      }
+      .carousel-btn:hover {
+        background: var(--soft-orange);
+      }
+      .prev-btn {
+        left: 10px;
+      }
+      .next-btn {
+        right: 10px;
+      }
+      .features {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+      .feature-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        width: 250px;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+      .feature-card i {
+        font-size: 2rem;
+        color: var(--primary-orange);
+        margin-bottom: 1rem;
+      }
+      .feature-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      .feature-card p {
+        font-size: 0.9rem;
+        color: var(--neutral-gray);
+      }
+      footer {
+        background: var(--footer-bg);
+        padding: 3rem 2rem;
+        color: #ffffff;
+      }
+      footer .footer-container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      footer .footer-column {
+        flex: 1;
+        min-width: 200px;
+      }
+      footer .footer-column .logo-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: var(--primary-orange);
+      }
+      footer .footer-column p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+      footer .footer-column a {
+        color: #b0bec5;
+        text-decoration: none;
+        display: block;
+        margin: 0.5rem 0;
+      }
+      footer .footer-column a:hover {
+        color: var(--primary-orange);
+      }
+      footer .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      footer .social-icons a {
+        color: #ffffff;
+        font-size: 1.2rem;
+        background: var(--icon-bg);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.3s ease;
+      }
+      footer .social-icons a:hover {
+        background: var(--primary-orange);
+        color: #ffffff;
+      }
+      footer .footer-bottom {
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1rem;
+      }
+      footer .footer-bottom p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+      footer .footer-bottom a {
+        color: #b0bec5;
+        text-decoration: none;
+        margin: 0 0.5rem;
+      }
+      footer .footer-bottom a:hover {
+        color: var(--primary-orange);
+      }
+      @media (max-width: 768px) {
+        .navbar .nav-links {
+          display: none;
+        }
+        .hero-bg {
+          padding-left: 2rem;
+          padding-top: 60px;
+          justify-content: center;
+          text-align: center;
+        }
+        .hero-content h1 {
+          font-size: 2.5rem;
+        }
+        .hero-content p {
+          font-size: 1.2rem;
+        }
+        .search-container {
+          flex-direction: column;
+          gap: 0.75rem;
+          align-items: center;
+        }
+        .location-box,
+        .search-box {
+          width: 80%;
+          justify-content: center;
+        }
+        .card {
+          width: 250px;
+        }
+        footer .footer-container {
+          flex-direction: column;
+          text-align: center;
+        }
+        footer .social-icons {
+          justify-content: center;
+        }
+      }
+      @media (max-width: 480px) {
+        .hero-content h1 {
+          font-size: 2rem;
+        }
+        .hero-content p {
+          font-size: 1rem;
+        }
+        .location-box,
+        .search-box {
+          padding: 0.75rem 1rem;
+          font-size: 0.9rem;
+        }
+      }
+
+      /* Cart Page Specific Styles */
+      .cart-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .cart-item {
+        display: flex;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        padding: 15px;
+      }
+
+      .cart-item img {
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-right: 15px;
+      }
+
+      .cart-item-details {
+        flex: 1;
+      }
+
+      .cart-item-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .cart-item-price {
+        color: var(--primary-orange);
+        font-weight: 600;
+        margin: 5px 0;
+      }
+
+      .cart-item-description {
+        color: var(--light-gray);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+
+      .cart-item-controls {
+        display: flex;
+        align-items: center;
+      }
+
+      .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: white;
+        border: 1px solid #d4d5d9;
+        color: var(--primary-orange);
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .quantity {
+        margin: 0 10px;
+        min-width: 20px;
+        text-align: center;
+      }
+
+      .remove-btn {
+        background: none;
+        border: none;
+        color: var(--primary-orange);
+        cursor: pointer;
+        margin-left: 15px;
+      }
+
+      .cart-summary {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .summary-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e9e9eb;
+      }
+
+      .bill-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .bill-total {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 15px;
+      }
+
+      .checkout-btn {
+        background: var(--primary-orange);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        width: 100%;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- App Header -->
+    <nav class="navbar">
+      <div class="logo-text">
+        <i class="fas fa-utensils"></i> TastyTreatExpress.
+      </div>
+      <div class="nav-links">
+        <a class="nav-link" href="2.Landing_pageAFT.html"
+          ><i class="fas fa-home"></i> Home</a
+        >
+        <a class="nav-link" href="5.placeOrder.html"
+          ><i class="fas fa-shopping-bag"></i> Place Orders</a
+        >
+      </div>
+    </nav>
+
+    <!-- Cart Page -->
+    <div class="cart-container">
+      <div class="cart-header">
+        <h2>Shopping Cart</h2>
+        <a href="/" class="btn btn-primary"
+          >Continue Shopping</a
+        >
+      </div>
+
+      <div class="cart-items">
+        <div class="cart-item">
+          <img
+            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Margherita Pizza"
+          />
+          <div class="cart-item-details">
+            <div class="cart-item-name">Margherita Pizza</div>
+            <div class="cart-item-price">$9.99</div>
+            <div class="cart-item-description">
+              Classic pizza with tomato sauce, mozzarella, and basil
+            </div>
+            <div class="cart-item-controls">
+              <button class="quantity-btn">-</button>
+              <span class="quantity">1</span>
+              <button class="quantity-btn">+</button>
+              <button class="remove-btn">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-item">
+          <img
+            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fHww"
+            alt="Pepperoni Pizza"
+          />
+          <div class="cart-item-details">
+            <div class="cart-item-name">Pepperoni Pizza</div>
+            <div class="cart-item-price">$11.99</div>
+            <div class="cart-item-description">
+              Classic pizza with tomato sauce, mozzarella, and pepperoni
+            </div>
+            <div class="cart-item-controls">
+              <button class="quantity-btn">-</button>
+              <span class="quantity">1</span>
+              <button class="quantity-btn">+</button>
+              <button class="remove-btn">Remove</button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-title">Order Summary</div>
+
+        <div class="bill-row">
+          <span>Subtotal</span>
+          <span>$21.98</span>
+        </div>
+        <div class="bill-row">
+          <span>Delivery Fee</span>
+          <span>$2.99</span>
+        </div>
+        <div class="bill-row">
+          <span>Taxes</span>
+          <span>$1.76</span>
+        </div>
+
+        <div class="bill-total">
+          <span>Total</span>
+          <span>$26.73</span>
+        </div>
+
+        <button class="checkout-btn">Proceed to Checkout</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-column">
+          <div class="logo-text">TastyTreatExpress.</div>
+          <p>
+            Delivering delicious food from your favorite local restaurants
+            straight to your door.
+          </p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <a href="#">Home</a>
+          <a href="#">About Us</a>
+          <a href="#">Services</a>
+          <a href="#">Menu</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-column">
+          <h3>For Customers</h3>
+          <a href="#">Sign Up</a>
+          <a href="#">Login</a>
+          <a href="#">Order Food</a>
+          <a href="#">Payment Options</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <p>
+            <i class="fas fa-map-marker-alt"></i> 123 Food Street, Tasty City
+          </p>
+          <p>
+            <a href="tel:+1234567890"
+              ><i class="fas fa-phone"></i> +1 234 567 890</a
+            >
+          </p>
+          <p>
+            <a href="mailto:info@tastytreatexpress.com"
+              ><i class="fas fa-envelope"></i> info@tastytreatexpress.com</a
+            >
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 TastyTreatExpress. All rights reserved.</p>
+        <div>
+          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> |
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Quantity controls
+      document.querySelectorAll(".quantity-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const quantityElement = this.parentElement.querySelector(".quantity");
+          let quantity = parseInt(quantityElement.textContent);
+
+          if (this.textContent === "+") {
+            quantity++;
+          } else if (this.textContent === "-" && quantity > 0) {
+            quantity--;
+          }
+
+          quantityElement.textContent = quantity;
+          updateCartTotal();
+        });
+      });
+
+      // Remove item from cart
+      document.querySelectorAll(".remove-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const cartItem = this.closest(".cart-item");
+          cartItem.remove();
+          updateCartTotal();
+        });
+      });
+
+      // Update cart total
+      function updateCartTotal() {
+        let subtotal = 0;
+        let tax = 0;
+        let total = 0;
+        let deliveryFee = 2.99;
+
+        document.querySelectorAll(".cart-item").forEach((item) => {
+          const price = parseFloat(
+            item.querySelector(".cart-item-price").textContent.replace("$", "")
+          );
+          const quantity = parseInt(
+            item.querySelector(".quantity").textContent
+          );
+          subtotal += price * quantity;
+        });
+
+        tax = subtotal * 0.08;
+        total = subtotal + tax + deliveryFee;
+
+        document.querySelector(
+          ".bill-row:nth-child(1) span:last-child"
+        ).textContent = `$${subtotal.toFixed(2)}`;
+        document.querySelector(
+          ".bill-row:nth-child(3) span:last-child"
+        ).textContent = `$${tax.toFixed(2)}`;
+        document.querySelector(
+          ".bill-total span:last-child"
+        ).textContent = `$${total.toFixed(2)}`;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasty Treat Express</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+    />
+    <link rel="icon" type="image/x-icon" href="logo.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-orange: #ff5722;
+        --soft-orange: #ff8a65;
+        --thyme-green: #388e3c!;
+        --neutral-gray: #333333;
+        --soft-white: #f5f5f5;
+        --light-gray: #b0bec5;
+        --card-bg: #ffffff;
+        --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --footer-bg: #1a1a1a;
+        --icon-bg: #444444;
+      }
+      html {
+        font-size: 100%;
+      }
+
+      body {
+        font-size: 1rem;
+      }
+      .hero-content h1 {
+        font-size: clamp(2rem, 5vw, 4rem);
+      }
+      .section {
+        padding: 2rem 1rem;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      .card {
+        width: min(300px, 90vw);
+        flex-shrink: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--neutral-gray);
+        background: var(--soft-white);
+      }
+
+      /* Navbar Styles */
+      .navbar {
+        padding: 1rem 2rem;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+        box-shadow: var(--shadow);
+      }
+
+      .navbar .logo-text {
+        font-size: 1.8rem;
+        color: var(--primary-orange);
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .navbar .nav-links a {
+        color: var(--primary-orange);
+        margin-left: 2rem;
+        text-decoration: none;
+        font-size: 1rem;
+      }
+
+      .navbar .nav-links a:hover {
+        color: var(--neutral-gray);
+      }
+
+      .nav-link {
+        font-weight: bold;
+        color: #d50000;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover {
+        color: #000000;
+      }
+
+      /* Hero Section */
+      .hero-bg {
+        position: relative;
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 4rem;
+        padding-top: 80px;
+        overflow: hidden;
+      }
+
+      .hero-slideshow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+      }
+
+      .hero-slide.active {
+        opacity: 1;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        text-align: left;
+      }
+
+      .hero-content h1 {
+        font-size: 4rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+        line-height: 1.2;
+      }
+
+      .hero-content p {
+        font-size: 1.5rem;
+        margin: 1rem 0;
+        color: #ffffff;
+        line-height: 1.6;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .search-container {
+        display: flex;
+        gap: 1rem;
+        margin: 2rem 0;
+        position: relative;
+      }
+
+      .location-box,
+      .search-box {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: #ffffff;
+        border-radius: 50px;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+
+      .location-box:hover,
+      .search-box:hover {
+        background: #f0f0f0;
+        transform: scale(1.05);
+      }
+
+      .location-box i,
+      .search-box i {
+        color: var(--primary-orange);
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+      }
+
+      .location-box span,
+      .search-box span {
+        font-size: 1rem;
+        color: var(--neutral-gray);
+        font-weight: 500;
+      }
+
+      /* Overlay Styles */
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .overlay-container {
+        background: #2a2a2a;
+        border-radius: 16px;
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+          -8px -8px 16px rgba(80, 80, 80, 0.2);
+        width: 100%;
+        max-width: 450px;
+        padding: 2rem;
+        position: relative;
+        color: #f5f5f5;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        color: var(--primary-orange);
+        cursor: pointer;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .tab-group {
+        display: flex;
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 0.75rem;
+        background: none;
+        border: none;
+        color: #b0bec5;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      .tab-btn.active {
+        color: var(--primary-orange);
+      }
+
+      .tab-underline {
+        position: absolute;
+        bottom: 0;
+        height: 3px;
+        background: var(--primary-orange);
+        width: 50%;
+        transition: all 0.3s ease;
+        left: 0;
+      }
+
+      .tab-group .tab-btn:nth-child(2).active ~ .tab-underline {
+        left: 50%;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b0bec5;
+        font-size: 1rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        background: #3a3a3a;
+        border: 1px solid #444;
+        border-radius: 8px;
+        color: #f5f5f5;
+        font-size: 1rem;
+      }
+
+      .input-group input::placeholder {
+        color: rgba(245, 245, 245, 0.6);
+      }
+
+      .password-strength {
+        height: 4px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        margin-top: 5px;
+        border-radius: 2px;
+      }
+
+      .neu-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--primary-orange);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .neu-btn:hover {
+        background: var(--soft-orange);
+      }
+
+      /* Location Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: var(--shadow);
+        position: relative;
+      }
+
+      .modal-content h3 {
+        margin-top: 0;
+        color: var(--primary-orange);
+      }
+
+      .modal-content input {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border: 1px solid var(--light-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+
+      .modal-content button {
+        background: var(--primary-orange);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .modal-content button:hover {
+        background: var(--soft-orange);
+      }
+
+      /* Search Suggestions Dropdown */
+      .search-suggestions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        width: 250px;
+        z-index: 150;
+        padding: 1rem;
+      }
+
+      .search-suggestions.active {
+        display: block;
+      }
+
+      .search-suggestions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .search-suggestions li {
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .search-suggestions li:hover {
+        background: #f0f0f0;
+      }
+
+      /* Section Styles */
+      .section {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: var(--soft-white);
+      }
+
+      .section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: var(--neutral-gray);
+      }
+
+      /* Carousel Styles */
+      .carousel-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      .carousel {
+        display: flex;
+        gap: 1rem;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .carousel.no-transition {
+        transition: none;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1rem;
+        width: 300px;
+        flex-shrink: 0;
+        box-shadow: var(--shadow);
+        color: var(--neutral-gray);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .card.active {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .card h5 {
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
+        color: var(--primary-orange);
+      }
+
+      .card p {
+        color: var(--neutral-gray);
+      }
+
+      .card .rating {
+        color: var(--thyme-green);
+        font-size: 0.9rem;
+      }
+
+      .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--primary-orange);
+        color: #ffffff;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        z-index: 10;
+      }
+
+      .carousel-btn:hover {
+        background: var(--soft-orange);
+      }
+
+      .prev-btn {
+        left: 10px;
+      }
+
+      .next-btn {
+        right: 10px;
+      }
+
+      /* Features Section */
+      .features {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+
+      .feature-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        width: 250px;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .feature-card i {
+        font-size: 2rem;
+        color: var(--primary-orange);
+        margin-bottom: 1rem;
+      }
+
+      .feature-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-card p {
+        font-size: 0.9rem;
+        color: var(--neutral-gray);
+      }
+
+      /* Footer Styles */
+      footer {
+        background: var(--footer-bg);
+        padding: 3rem 2rem;
+        color: #ffffff;
+      }
+
+      footer .footer-container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+
+      footer .footer-column {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      footer .footer-column .logo-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: var(--primary-orange);
+      }
+
+      footer .footer-column p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+
+      footer .footer-column a {
+        color: #b0bec5;
+        text-decoration: none;
+        display: block;
+        margin: 0.5rem 0;
+      }
+
+      footer .footer-column a:hover {
+        color: var(--primary-orange);
+      }
+
+      footer .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      footer .social-icons a {
+        color: #ffffff;
+        font-size: 1.2rem;
+        background: var(--icon-bg);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.3s ease;
+      }
+
+      footer .social-icons a:hover {
+        background: var(--primary-orange);
+        color: #ffffff;
+      }
+
+      footer .footer-bottom {
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1rem;
+      }
+
+      footer .footer-bottom p {
+        margin: 0.5rem 0;
+        color: #b0bec5;
+      }
+
+      footer .footer-bottom a {
+        color: #b0bec5;
+        text-decoration: none;
+        margin: 0 0.5rem;
+      }
+
+      footer .footer-bottom a:hover {
+        color: var(--primary-orange);
+      }
+
+      /* Password Validation Styles */
+      .password-message {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        color: #b0bec5;
+      }
+      .password-match {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+      }
+      .match-success {
+        color: #388e3c; /* thyme-green */
+      }
+      .match-error {
+        color: #ff5722; /* primary-orange */
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .navbar .logo-text {
+          font-size: 1.5rem;
+          max-width: 150px;
+        }
+
+        .navbar .nav-links {
+          display: none;
+        }
+
+        .hero-bg {
+          height: 100vh;
+          padding-left: 2rem;
+          padding-top: 60px;
+          justify-content: center;
+          text-align: center;
+        }
+
+        .hero-content h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero-content p {
+          font-size: 1.2rem;
+        }
+
+        .search-container {
+          flex-direction: column;
+          gap: 0.75rem;
+          align-items: center;
+        }
+
+        .location-box,
+        .search-box {
+          width: 80%;
+          justify-content: center;
+        }
+
+        .card {
+          width: 250px;
+        }
+
+        footer .footer-container {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        footer .social-icons {
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .navbar .logo-text {
+          font-size: 1.2rem;
+          max-width: 120px;
+        }
+
+        .hero-content h1 {
+          font-size: 2rem;
+        }
+
+        .hero-content p {
+          font-size: 1rem;
+        }
+
+        .location-box,
+        .search-box {
+          padding: 0.75rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .overlay-container {
+          width: 90%;
+          padding: 1.5rem;
+        }
+
+        .tab-btn {
+          font-size: 0.9rem;
+          padding: 0.5rem;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .navbar .logo-text {
+          font-size: 1rem;
+          max-width: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="logo-text" style="max-width: none">
+        <i class="fas fa-utensils"></i> TastyTreatExpress.
+      </div>
+      <div class="nav-links">
+        <a
+          class="nav-link"
+          th:href="@{${session.userDTO != null or session.restaurantDTO != null} ? '/home' : '/'}"
+          ><i class="fas fa-home"></i> Home</a
+        >
+        <a class="nav-link" href="/faq"
+          ><i class="fas fa-question-circle"></i> Help</a
+        >
+        <a class="nav-link" href="#" onclick="showLogin()"
+          ><i class="fas fa-sign-in-alt"></i> Login</a
+        >
+        <a class="nav-link" href="#" onclick="showRestaurant()"
+          ><i class="fas fa-handshake"></i> Partner with Us</a
+        >
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg">
+      <div class="hero-slideshow">
+        <div
+          class="hero-slide active"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+          "
+        ></div>
+        <div
+          class="hero-slide"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YnVyZ2VyfGVufDB8fDB8fHww');
+          "
+        ></div>
+        <div
+          class="hero-slide"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1432139555190-58524dae6a55?q=80&w=2952&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+          "
+        ></div>
+      </div>
+      <div class="hero-content">
+        <h1>Delicious Food Delivered To Your Door</h1>
+        <p>
+          Order from your favorite restaurants and get food delivered in
+          minutes. Enjoy the convenience of doorstep delivery with our fast and
+          reliable service.
+        </p>
+        <div class="search-container">
+          <div class="location-box" id="locationBtn">
+            <i class="fas fa-map-marker-alt"></i>
+            <span><a href="#">Set Your Location</a></span>
+          </div>
+          <div class="search-suggestions" id="searchSuggestions">
+            <ul>
+              <li>Italian Cuisine</li>
+              <li>Spicy Tacos</li>
+              <li>Vegetarian Delights</li>
+              <li>Burger Bonanza</li>
+              <li>Sushi Rolls</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location Modal -->
+    <div class="modal" id="locationModal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">×</span>
+        <h3>Enter Your Location</h3>
+        <input type="text" placeholder="Enter your address..." />
+        <button>Save Location</button>
+      </div>
+    </div>
+
+    <!-- Restaurants Section -->
+    <section class="section">
+      <h2>Explore Restaurants</h2>
+      <div class="carousel-container">
+        <button class="carousel-btn prev-btn" onclick="moveSlide(-1)">❮</button>
+        <div class="carousel" id="restaurantCarousel">
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?q=80&w=500&auto=format&fit=crop"
+              alt="Burger Barn"
+            />
+            <h5>Burger Barn</h5>
+            <p>Burgers - 15-25 min</p>
+            <p class="rating">4.5 ★ (85 reviews)</p>
+          </div>
+
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=500&auto=format&fit=crop"
+              alt="Green Garden"
+            />
+            <h5>Green Garden</h5>
+            <p>Vegetarian - Stir Fry</p>
+            <p class="rating">4.7 ★ (95 reviews)</p>
+          </div>
+
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=500&auto=format&fit=crop"
+              alt="Sushi Spot"
+            />
+            <h5>Sushi Spot</h5>
+            <p>Japanese - Sushi, Rolls</p>
+            <p class="rating">4.9 ★ (150 reviews)</p>
+          </div>
+
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?q=80&w=500&auto=format&fit=crop"
+              alt="Taco Fiesta"
+            />
+            <h5>Taco Fiesta</h5>
+            <p>Mexican - Tacos, Burritos</p>
+            <p class="rating">4.6 ★ (110 reviews)</p>
+          </div>
+
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=500&auto=format&fit=crop"
+              alt="Green Garden"
+            />
+            <h5>Homely Garden</h5>
+            <p>Vegetarian - Stir Fry</p>
+            <p class="rating">4.7 ★ (195 reviews)</p>
+          </div>
+
+          <div class="card" onclick="showLogin()">
+            <img
+              src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=500&auto=format&fit=crop"
+              alt="Sushi Spot"
+            />
+            <h5>Sushi Spot</h5>
+            <p>Japanese - Sushi, Rolls</p>
+            <p class="rating">4.9 ★ (150 reviews)</p>
+          </div>
+        </div>
+        <button class="carousel-btn next-btn" onclick="moveSlide(1)">❯</button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+      <div class="features">
+        <div class="feature-card">
+          <i class="fas fa-clock"></i>
+          <h3>Fast Delivery</h3>
+          <p>Get your food in 15-30 minutes</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-pizza-slice"></i>
+          <h3>Wide Variety</h3>
+          <p>Pizza, Burgers, Sushi, and more</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-mobile-alt"></i>
+          <h3>Easy Ordering</h3>
+          <p>Order in just a few clicks</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Download Section -->
+    <section class="section" style="background: var(--light-gray)">
+      <h2>Download Our App</h2>
+      <p>Get the best food delivery experience on your mobile device.</p>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          margin-top: 2rem;
+        "
+      >
+        <a href="https://play.google.com/store" target="_blank">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+            alt="Download on Google Play"
+            style="height: 60px"
+          />
+        </a>
+        <a href="https://www.apple.com/app-store/" target="_blank">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4TvlnCKBFdbsJLIemuw06-GPNyjIHZPy-xw&s"
+            alt="Download on the App Store"
+            style="height: 60px"
+          />
+        </a>
+      </div>
+    </section>
+
+    <!-- Login Overlay -->
+    <div class="overlay login-overlay" id="loginOverlay">
+      <div class="overlay-container">
+        <span class="close-btn" onclick="hideLogin()">×</span>
+        <div class="tab-group">
+          <button
+            class="tab-btn active"
+            onclick="showTab('login', 'loginOverlay')"
+          >
+            Login
+          </button>
+          <button class="tab-btn" onclick="showTab('register', 'loginOverlay')">
+            Register
+          </button>
+          <div class="tab-underline"></div>
+        </div>
+
+        <!-------------------------------User Login Form -------------------------------
+        <div class="tab-content active" id="login">
+          <h2 class="text-2xl font-bold mb-6 text-center">Welcome Back</h2>
+          <form action="/user/login" method="post">
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" placeholder="Email" name="email" required />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-login-password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+            </div>
+            <a href="/forgotpassword" class="text-sm block text-right mb-4"
+              >Forgot Password?</a
+            >
+            <button type="submit" class="neu-btn">Sign In</button>
+          </form>
+        </div>
+      -->
+
+        <div class="tab-content active" id="login">
+          <h2 class="text-2xl font-bold mb-6 text-center">Welcome Back</h2>
+          <form id="user-login-form" onsubmit="submitUserLogin(event)">
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                id="user-login-email"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-login-password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+            </div>
+            <a href="/forgotpassword" class="text-sm block text-right mb-4"
+              >Forgot Password?</a
+            >
+            <button type="submit" class="neu-btn">Sign In</button>
+          </form>
+        </div>
+
+        <script>
+          function validateUserLogin(event) {
+            event.preventDefault();
+
+            const email = document.querySelector('[name="email"]').value;
+            const password = document.querySelector('[name="password"]').value;
+
+            if (!email || !password) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fill in all fields.",
+              });
+              return false;
+            }
+            if (password.length < 8) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Password must be at least 8 characters.",
+              });
+              return false;
+            }
+          }
+
+          async function submitUserLogin(event) {
+            event.preventDefault();
+
+            const formData = new FormData(
+              document.getElementById("user-login-form")
+            );
+
+            try {
+              const response = await fetch("http://localhost:9213/user/login", {
+                method: "POST",
+                body: formData,
+              });
+
+              const result = await response.json();
+              console.log(result);
+
+              if (result.status === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Sign In Successful",
+                  text: result.message,
+                  confirmButtonText: "Great!",
+                }).then(() => {
+                  window.location.href = "/home";
+                });
+              } else {
+                if (result.message === "Email not found.") {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Email not found",
+                    text: "The email you entered does not exist. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                } else if (result.message === "Invalid password.") {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Invalid Password",
+                    text: "The password you entered is incorrect. Please try again or use Forgot password.",
+                    confirmButtonText: "Retry",
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Sign In Failed",
+                    text:
+                      result.message ||
+                      "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              }
+            } catch (error) {
+              // console.error("Error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...!",
+                text: "Something went wrong. Please try again.",
+                confirmButtonText: "Ok",
+              });
+            }
+
+            const email = document.querySelector('[name="email"]').value;
+            const password = document.querySelector('[name="password"]').value;
+            console.log(email, password);
+          }
+        </script>
+
+        <!------------------------- User Sign-up--------------------------------
+        <div class="tab-content" id="register">
+          <h2 class="text-2xl font-bold mb-6 text-center">Join Us</h2>
+          <form
+            action="/user/signup"
+            method="post"
+            onsubmit="return validateUserSignup()"
+          >
+            <div class="input-group">
+              <i class="fas fa-user"></i>
+              <input type="text" placeholder="Name" name="name" required />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" placeholder="Email" name="email" required />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-phone"></i>
+              <input
+                type="number"
+                placeholder="Phone Number"
+                name="phoneNumber"
+                required
+                oninput="checkUserPassword()"
+              />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-signup-password"
+                placeholder="Password"
+                name="password"
+                required
+                oninput="checkUserPassword()"
+              />
+              <div id="user-password-message" class="password-message"></div>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-signup-confirm"
+                placeholder="Confirm Password"
+                required
+                oninput="checkUserPassword()"
+              />
+              <div id="user-password-match" class="password-match"></div>
+            </div>
+            <button type="submit" class="neu-btn">Sign Up</button>
+          </form>
+        </div>
+      -->
+
+        <div class="tab-content" id="register">
+          <h2 class="text-2xl font-bold mb-6 text-center">Join Us</h2>
+          <!--
+          <form
+            action="/user/signup"
+            method="post"
+            onsubmit="return validateUserSignup()">-->
+          <form id="user-signup-form" onsubmit="submitUserSignup(event)">
+            <!-- Name Field -->
+            <div class="input-group">
+              <i class="fas fa-user"></i>
+              <input
+                type="text"
+                placeholder="Name"
+                name="name"
+                id="name"
+                required
+              />
+              <div id="name-error" class="error-message"></div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                id="email"
+                required
+              />
+              <div id="email-error" class="error-message"></div>
+            </div>
+
+            <!-- Phone Number Field -->
+            <div class="input-group">
+              <i class="fas fa-phone"></i>
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                name="phoneNumber"
+                id="phoneNumber"
+                required
+                maxlength="10"
+                pattern="^\d{10}$"
+              />
+              <div id="phone-error" class="error-message"></div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-signup-password"
+                placeholder="Password"
+                name="password"
+                onfocus="validatePassword()"
+                onblur="handleBlur()"
+                required
+              />
+              <div id="user-password-message" class="password-message"></div>
+              <div id="password-strength"></div>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="user-signup-confirm"
+                placeholder="Confirm Password"
+                required
+              />
+              <div id="user-password-match" class="password-match"></div>
+            </div>
+
+            <button type="submit" class="neu-btn">Sign Up</button>
+          </form>
+        </div>
+
+        <script>
+          document
+            .getElementById("name")
+            .addEventListener("input", validateName);
+          document
+            .getElementById("email")
+            .addEventListener("input", validateEmail);
+          document
+            .getElementById("phoneNumber")
+            .addEventListener("input", validatePhoneNumber);
+          document
+            .getElementById("user-signup-password")
+            .addEventListener("input", validatePassword);
+          document
+            .getElementById("user-signup-confirm")
+            .addEventListener("input", validateConfirmPassword);
+
+          // Validate Name
+          function validateName() {
+            const name = document.getElementById("name").value.trim();
+            const errorElement = document.getElementById("name-error");
+            console.log(name);
+            if (name.length === 0 || name === null || name.trim() === "") {
+              errorElement.textContent = "Name is required.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          function validateEmail() {
+            const email = document.getElementById("email").value;
+            const errorElement = document.getElementById("email-error");
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+              errorElement.textContent = "Please enter a valid email address.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          function validatePhoneNumber() {
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            const errorElement = document.getElementById("phone-error");
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+              errorElement.textContent =
+                "Phone number should be exactly 10 digits.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          function validatePassword() {
+            const password = document.getElementById(
+              "user-signup-password"
+            ).value;
+            const errorElement = document.getElementById(
+              "user-password-message"
+            );
+            const strengthMeter = document.getElementById("password-strength");
+
+            if (password.length < 8 && password.length >= 0) {
+              strengthMeter.textContent = "";
+              //strengthMeter.style.color = "red";
+            } else if (password.length < 12 && password.length >= 8) {
+              strengthMeter.textContent = "Medium";
+              strengthMeter.style.color = "orange";
+            } else {
+              strengthMeter.textContent = "Strong";
+              strengthMeter.style.color = "green";
+            }
+
+            if (password.length < 8) {
+              errorElement.textContent =
+                "Password should be at least 8 characters.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          function handleBlur() {
+            const password = document.getElementById(
+              "user-signup-password"
+            ).value;
+            const errorElement = document.getElementById(
+              "user-password-message"
+            );
+            const strengthMeter = document.getElementById("password-strength");
+            errorElement.textContent = "";
+            strengthMeter.textContent = "";
+            strengthMeter.style.color = "transparent";
+            errorElement.style.opacity = "0";
+          }
+
+          function validateConfirmPassword() {
+            const password = document.getElementById(
+              "user-signup-password"
+            ).value;
+            const confirmPassword = document.getElementById(
+              "user-signup-confirm"
+            ).value;
+            const errorElement = document.getElementById("user-password-match");
+
+            if (password !== confirmPassword) {
+              errorElement.textContent = "Passwords do not match.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          // Show the form only when all inputs are valid
+          function validateUserSignup() {
+            validateName();
+            validateEmail();
+            validatePhoneNumber();
+            validatePassword();
+            validateConfirmPassword();
+
+            // If any error message is visible, prevent form submission
+            const errors = document.querySelectorAll(
+              ".error-message, .password-message, .password-match"
+            );
+            let hasErrors = false;
+            for (let error of errors) {
+              if (error.style.opacity === "1") {
+                hasErrors = true;
+                break;
+              }
+            }
+
+            if (hasErrors) {
+              event.preventDefault();
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fix the errors in the form before submitting.",
+                confirmButtonText: "Got it!",
+              });
+              return false;
+            }
+          }
+
+          async function submitUserSignup(event) {
+            event.preventDefault();
+
+            if (validateUserSignup()) {
+              const formData = new FormData(
+                document.getElementById("user-signup-form")
+              );
+
+              const email = formData.get("email").trim();
+              const password = formData.get("password").trim();
+              const name = formData.get("name").trim();
+              const phoneNumber = formData.get("phoneNumber").trim();
+
+              if (!email || !password || !name || !phoneNumber) {
+                //  alert("Please fill in all fields.");
+
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Name shouldn't be Empty. Please fill in all fields.",
+                  confirmButtonText: "Got it!",
+                });
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  "http://localhost:9213/user/signup",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                const result = await response.json();
+                console.log(result);
+                if (response.ok && result.status === "success") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Signup Successful!",
+                    text: result.message,
+                    confirmButtonText: "Great!",
+                  }).then(() => {
+                    window.location.href = "/";
+                  });
+                } else {
+                  const parsedMessage = JSON.parse(result.message);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Signup Failed!",
+                    text:
+                      parsedMessage.message ||
+                      "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops!",
+                  text: "There was an error processing your request. Please try again later.",
+                  confirmButtonText: "OK",
+                });
+              }
+            }
+          }
+        </script>
+
+        <style>
+          .input-group i {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            color: #888;
+          }
+          .neu-btn {
+            padding: 12px 25px;
+            background: linear-gradient(145deg, #6e7a7d, #4e565d);
+            border-radius: 30px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+          .neu-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+          }
+
+          .error-message,
+          .password-message,
+          .password-match {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+
+          .error-message {
+            color: red;
+          }
+
+          .password-message {
+            color: red;
+          }
+
+          .password-match {
+            color: red;
+          }
+
+          #password-strength {
+            margin-top: 5px;
+            font-size: 14px;
+          }
+        </style>
+      </div>
+    </div>
+
+    <!-- Partner (Restaurant) Overlay -->
+    <div class="overlay restaurant-overlay" id="restaurantOverlay">
+      <div class="overlay-container">
+        <span class="close-btn" onclick="hideRestaurant()">×</span>
+        <div class="tab-group">
+          <button
+            class="tab-btn active"
+            onclick="showTab('restaurant-login', 'restaurantOverlay')"
+          >
+            Login
+          </button>
+          <button
+            class="tab-btn"
+            onclick="showTab('restaurant-register', 'restaurantOverlay')"
+          >
+            Register
+          </button>
+          <div class="tab-underline"></div>
+        </div>
+
+        <!-------------------------Restaurant Login--------------------------------- 
+        
+        <div class="tab-content active" id="restaurant-login">
+          <h2 class="text-2xl font-bold mb-6 text-center">
+            Restaurant Sign In
+          </h2>
+          <form
+            action="/restaurant/login"
+            method="post"
+            onsubmit="return validateRestaurantLogin()"
+          >
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" placeholder="Email" name="email" required />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-login-password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+            </div>
+            <a href="/res/forgotpassword" class="text-sm block text-right mb-4"
+              >Forgot Password?</a
+            >
+            <button type="submit" class="neu-btn">Sign In</button>
+          </form>
+        </div>
+      -->
+        <div class="tab-content active" id="restaurant-login">
+          <h2 class="text-2xl font-bold mb-6 text-center">
+            Restaurant Sign In
+          </h2>
+          <form
+            id="restaurant-login-form"
+            onsubmit="submitRestaurantLogin(event)"
+          >
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                id="login-email"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-login-password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+            </div>
+            <a href="/res/forgotpassword" class="text-sm block text-right mb-4"
+              >Forgot Password?</a
+            >
+            <button type="submit" class="neu-btn">Sign In</button>
+          </form>
+        </div>
+
+        <script>
+          function validateRestaurantLogin(event) {
+            event.preventDefault();
+
+            const email = document.querySelector('[name="email"]').value;
+            const password = document.querySelector('[name="password"]').value;
+
+            if (!email || !password) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fill in all fields.",
+              });
+              return false;
+            }
+            if (password.length < 8) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Password must be at least 8 characters.",
+              });
+              return false;
+            }
+          }
+
+          async function submitRestaurantLogin(event) {
+            event.preventDefault();
+
+            const formData = new FormData(
+              document.getElementById("restaurant-login-form")
+            );
+
+            try {
+              const response = await fetch(
+                "http://localhost:9213/restaurant/login",
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
+
+              const result = await response.json();
+              console.log(result);
+
+              if (result.status === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Sign In Successful",
+                  text: result.message,
+                  confirmButtonText: "Great!",
+                }).then(() => {
+                  window.location.href = "/restaurant/dashboard";
+                });
+              } else {
+                if (result.message === "Email not found.") {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Email not found",
+                    text: "The email you entered does not exist. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                } else if (result.message === "Invalid password.") {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Invalid Password",
+                    text: "The password you entered is incorrect. Please try again or use Forgot password.",
+                    confirmButtonText: "Retry",
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops... Sign In Failed",
+                    text:
+                      result.message ||
+                      "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...!",
+                text: "Something went wrong. Please try again.",
+                confirmButtonText: "Ok",
+              });
+            }
+            const email = document.querySelector('[name="email"]').value;
+            const password = document.querySelector('[name="password"]').value;
+            console.log(email, password);
+          }
+
+          /*
+          async function submitRestaurantLogin(even) {
+            even.preventDefault();
+
+            const formData = new FormData(
+              document.getElementById("restaurant-login-form")
+            );
+
+            try {
+              const response = await fetch(
+                "http://localhost:9213/restaurant/login",
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
+              const result = await response.json();
+              console.log(result);
+              if (result.status == "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Sign In Successful",
+                  text: result.message,
+                  confirmButtonText: "Great!",
+                }).then(() => {
+                  window.location.href = "/restaurant/dashboard";
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...Sign In Failed",
+                  text:
+                    result.message ||
+                    " Something went wrong. Please try again.",
+                  confirmButtonText: "Retry",
+                });
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...!",
+                text: "Something went wrong. Please try again.",
+                confirmButtonText: "Ok",
+              });
+            }
+            const email = document.querySelector('[name="email"]').value;
+            const password = document.querySelector('[name="password"]').value;
+            console.log(email, password);
+          }
+            */
+        </script>
+
+        <!-------------------------- Restaurant Sign-up ------------------- 
+        <div class="tab-content" id="restaurant-register">
+          <h2 class="text-2xl font-bold mb-6 text-center">Partner with Us</h2>
+          <form
+            action="/restaurant/signup"
+            method="post"
+            onsubmit="return validateRestaurantSignup()"
+          >
+            <div class="input-group">
+              <i class="fas fa-store"></i>
+              <input
+                type="text"
+                placeholder="Business Name"
+                name="name"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" placeholder="Email" name="email" required />
+            </div>
+            <div class="input-group">
+              <i class="fas fa-phone"></i>
+              <input
+                type="number"
+                placeholder="phoneNumber"
+                name="phoneNumber"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-location"></i>
+              <input
+                type="text"
+                placeholder="Address"
+                name="address"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-signup-password"
+                placeholder="Password"
+                name="password"
+                required
+                oninput="checkRestaurantPassword()"
+              />
+              <div
+                id="restaurant-signup-strength"
+                class="password-strength"
+              ></div>
+              <div id="restaurant-password-message" class="password-message">
+                Password must be at least 8 characters
+              </div>
+            </div>
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-signup-confirm"
+                placeholder="Confirm Password"
+                required
+                oninput="checkRestaurantPassword()"
+              />
+              <div id="restaurant-password-match" class="password-match"></div>
+            </div>
+            <button type="submit" class="neu-btn">Sign Up</button>
+          </form>
+        </div>
+      -->
+
+        <div class="tab-content" id="restaurant-register">
+          <h2 class="text-2xl font-bold mb-6 text-center">Partner with Us</h2>
+          <!--
+          <form
+            action="/restaurant/signup"
+            method="post"
+            onsubmit="return validateRestaurantSignup()">   -->
+          <form
+            id="restaurant-signup-form"
+            onsubmit="submitRestaurantSignup(event)"
+          >
+            <!-- Name Field -->
+            <div class="input-group">
+              <i class="fas fa-store"></i>
+              <input
+                type="text"
+                placeholder="Restaurant Name"
+                name="name"
+                id="restaurant-name"
+                required
+              />
+              <div id="restaurant-name-error" class="error-message"></div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                id="restaurant-email"
+                required
+              />
+              <div id="restaurant-email-error" class="error-message"></div>
+            </div>
+
+            <!-- Phone Number Field -->
+            <div class="input-group">
+              <i class="fas fa-phone"></i>
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                name="phoneNumber"
+                id="restaurant-phoneNumber"
+                required
+                maxlength="10"
+                pattern="^\d{10}$"
+              />
+              <div id="restaurant-phone-error" class="error-message"></div>
+            </div>
+
+            <!-- Address Field -->
+            <div class="input-group">
+              <i class="fas fa-location"></i>
+              <input
+                type="text"
+                placeholder="Address"
+                name="address"
+                id="restaurant-address"
+                required
+              />
+              <div id="restaurant-address-error" class="error-message"></div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-signup-password"
+                placeholder="Password"
+                name="password"
+                onfocus="checkRestaurantPassword()"
+                onblur="handleResBlur()"
+                required
+              />
+              <div
+                id="restaurant-password-message"
+                class="password-message"
+              ></div>
+              <div id="res-password-strength"></div>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="input-group">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="restaurant-signup-confirm"
+                placeholder="Confirm Password"
+                required
+              />
+              <div id="restaurant-password-match" class="password-match"></div>
+            </div>
+
+            <button type="submit" class="neu-btn">Sign Up</button>
+          </form>
+        </div>
+
+        <script>
+          // Real-time validation function
+          document
+            .getElementById("restaurant-name")
+            .addEventListener("input", validateRestaurantName);
+          document
+            .getElementById("restaurant-email")
+            .addEventListener("input", validateRestaurantEmail);
+          document
+            .getElementById("restaurant-phoneNumber")
+            .addEventListener("input", validateRestaurantPhoneNumber);
+          document
+            .getElementById("restaurant-address")
+            .addEventListener("input", validateRestaurantAddress);
+          document
+            .getElementById("restaurant-signup-password")
+            .addEventListener("input", checkRestaurantPassword);
+          document
+            .getElementById("restaurant-signup-confirm")
+            .addEventListener("input", validateRestaurantConfirmPassword);
+
+          // Validate Business Name
+          function validateRestaurantName() {
+            const name = document.getElementById("restaurant-name").value;
+            const errorElement = document.getElementById(
+              "restaurant-name-error"
+            );
+            if (name.trim() === "") {
+              errorElement.textContent = "Business Name is required.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          // Validate Email
+          function validateRestaurantEmail() {
+            const email = document.getElementById("restaurant-email").value;
+            const errorElement = document.getElementById(
+              "restaurant-email-error"
+            );
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+              errorElement.textContent = "Please enter a valid email address.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          // Validate Phone Number
+          function validateRestaurantPhoneNumber() {
+            const phoneNumber = document.getElementById(
+              "restaurant-phoneNumber"
+            ).value;
+            const errorElement = document.getElementById(
+              "restaurant-phone-error"
+            );
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+              errorElement.textContent =
+                "Phone number should be exactly 10 digits.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          // Validate Address
+          function validateRestaurantAddress() {
+            const address = document.getElementById("restaurant-address").value;
+            const errorElement = document.getElementById(
+              "restaurant-address-error"
+            );
+            if (address.trim() === "") {
+              errorElement.textContent = "Address is required.";
+              errorElement.style.opacity = "1";
+            } else {
+              errorElement.textContent = "";
+              errorElement.style.opacity = "0";
+            }
+          }
+
+          // Password Strength and Validation
+          function checkRestaurantPassword() {
+            const password = document.getElementById(
+              "restaurant-signup-password"
+            ).value;
+            const confirmPassword = document.getElementById(
+              "restaurant-signup-confirm"
+            ).value;
+            const strengthMeter = document.getElementById(
+              "res-password-strength"
+            );
+            const passwordMessage = document.getElementById(
+              "restaurant-password-message"
+            );
+            const matchMessage = document.getElementById(
+              "restaurant-password-match"
+            );
+
+            // Password strength
+            if (password.length < 8 && password.length >= 0) {
+              strengthMeter.textContent = "";
+              // strengthMeter.style.color = "red";
+            } else if (password.length < 12 && password.length >= 8) {
+              strengthMeter.textContent = "Medium";
+              strengthMeter.style.color = "orange";
+            } else {
+              strengthMeter.textContent = "Strong";
+              strengthMeter.style.color = "green";
+            }
+
+            // Password validation message
+            if (password.length < 8) {
+              passwordMessage.textContent =
+                "Password should be at least 8 characters.";
+              passwordMessage.style.opacity = "1";
+            } else {
+              passwordMessage.textContent = "";
+              passwordMessage.style.opacity = "0";
+            }
+
+            /* // Confirm Password Validation
+                    if (password !== confirmPassword) {
+                      matchMessage.textContent = "Passwords do not match.";
+                      matchMessage.style.opacity = "1";
+                    } else {
+                      matchMessage.textContent = "";
+                      matchMessage.style.opacity = "0";
+                    }
+                    */
+          }
+          function handleResBlur() {
+            const password = document.getElementById(
+              "restaurant-signup-password"
+            ).value;
+            const errorElement = document.getElementById(
+              "restaurant-password-message"
+            );
+            const strengthMeter = document.getElementById(
+              "res-password-strength"
+            );
+            errorElement.textContent = "";
+            strengthMeter.textContent = "";
+            strengthMeter.style.color = "transparent";
+            errorElement.style.opacity = "0";
+          }
+
+          // Validate Confirm Password
+          function validateRestaurantConfirmPassword() {
+            const password = document.getElementById(
+              "restaurant-signup-password"
+            ).value;
+            const confirmPassword = document.getElementById(
+              "restaurant-signup-confirm"
+            ).value;
+            const matchMessage = document.getElementById(
+              "restaurant-password-match"
+            );
+
+            if (password !== confirmPassword) {
+              matchMessage.textContent = "Passwords do not match.";
+              matchMessage.style.opacity = "1";
+            } else {
+              matchMessage.textContent = "";
+              matchMessage.style.opacity = "0";
+            }
+          }
+
+          // Validate the entire form on submission
+          function validateRestaurantSignup(event) {
+            validateRestaurantName();
+            validateRestaurantEmail();
+            validateRestaurantPhoneNumber();
+            validateRestaurantAddress();
+            checkRestaurantPassword();
+            validateRestaurantConfirmPassword();
+
+            // If any error message is visible, prevent form submission and show SweetAlert
+            const errors = document.querySelectorAll(
+              ".error-message, .password-message, .password-match"
+            );
+            let hasErrors = false;
+            for (let error of errors) {
+              if (error.style.opacity === "1") {
+                hasErrors = true;
+                break;
+              }
+            }
+
+            if (hasErrors) {
+              event.preventDefault();
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please fix the errors in the form before submitting.",
+                confirmButtonText: "Got it!",
+              });
+              return false;
+            }
+          }
+
+          async function submitRestaurantSignup(event) {
+            event.preventDefault();
+
+            if (validateRestaurantSignup()) {
+              const formData = new FormData(
+                document.getElementById("restaurant-signup-form")
+              );
+
+              const email = formData.get("email").trim();
+              const password = formData.get("password").trim();
+              const name = formData.get("name").trim();
+              const phoneNumber = formData.get("phoneNumber").trim();
+              const address = formData.get("address").trim();
+
+              if (!email || !password || !name || !phoneNumber || !address) {
+                //  alert("Please fill in all fields.");
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Name shouldn't be Empty. Please fill in all fields.",
+                  confirmButtonText: "Got it!",
+                });
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  "http://localhost:9213/restaurant/signup",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                const result = await response.json();
+                console.log(result);
+                if (response.ok && result.status === "success") {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Signup Successful!",
+                    text: result.message,
+                    confirmButtonText: "Great!",
+                  }).then(() => {
+                    window.location.href = "/home";
+                  });
+                } else {
+                  let errorMessage = result.message;
+                  try {
+                    const parsedError = JSON.parse(errorMessage);
+                    if (parsedError.name) {
+                      errorMessage = parsedError.name;
+                    }
+                  } catch (e) {
+                    console.error("Error parsing message:", e);
+                  }
+                  Swal.fire({
+                    icon: "error",
+                    title: "Signup Failed!",
+                    text:
+                      errorMessage || "Something went wrong. Please try again.",
+                    confirmButtonText: "Retry",
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops!",
+                  text: "There was an error processing your request. Please try again later.",
+                  confirmButtonText: "OK",
+                });
+              }
+            }
+          }
+        </script>
+
+        <style>
+          .input-group i {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            color: #888;
+          }
+          .neu-btn {
+            padding: 12px 25px;
+            background: linear-gradient(145deg, #6e7a7d, #4e565d);
+            border-radius: 30px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+          .neu-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+          }
+          .error-message,
+          .password-message,
+          .password-match {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+          .error-message {
+            color: red;
+          }
+          .password-message {
+            color: red;
+          }
+          .password-match {
+            color: red;
+          }
+          #restaurant-signup-strength {
+            margin-top: 5px;
+            font-size: 14px;
+          }
+        </style>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-column">
+          <div class="logo-text">TastyTreatExpress.</div>
+          <p>
+            Delivering delicious food from your favorite local restaurants
+            straight to your door.
+          </p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <a href="/">Home</a>
+          <a href="#">About Us</a>
+          <a href="#">Services</a>
+          <a href="#">Menu</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-column">
+          <h3>For Customers</h3>
+          <a href="#">Sign Up</a>
+          <a href="#">Login</a>
+          <a href="#">Order Food</a>
+          <a href="#">Payment Options</a>
+          <a href="/faq">FAQ</a>
+        </div>
+        <div class="footer-column">
+          <h3>Contact Us</h3>
+          <p>
+            <i class="fas fa-map-marker-alt"></i> 123 Food Street, Tasty City
+          </p>
+          <p>
+            <a href="tel:+1234567890"
+              ><i class="fas fa-phone"></i> +1 234 567 890</a
+            >
+          </p>
+          <p>
+            <a href="mailto:info@tastytreatexpress.com"
+              ><i class="fas fa-envelope"></i> info@tastytreatexpress.com</a
+            >
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 TastyTreatExpress. All rights reserved.</p>
+        <div>
+          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> |
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Background Slideshow
+      const slides = document.querySelectorAll(".hero-slide");
+      let currentSlideIndex = 0;
+
+      function showNextSlide() {
+        slides[currentSlideIndex].classList.remove("active");
+        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        slides[currentSlideIndex].classList.add("active");
+      }
+
+      slides[currentSlideIndex].classList.add("active");
+      setInterval(showNextSlide, 5000);
+
+      // Location Modal Toggle
+      const locationBtn = document.getElementById("locationBtn");
+      const locationModal = document.getElementById("locationModal");
+      const closeModal = document.getElementById("closeModal");
+
+      locationBtn.addEventListener("click", () => {
+        locationModal.style.display = "flex";
+      });
+
+      closeModal.addEventListener("click", () => {
+        locationModal.style.display = "none";
+      });
+
+      // Show/hide functions for login overlay
+      function showLogin() {
+        document.getElementById("loginOverlay").style.display = "flex";
+      }
+
+      function hideLogin() {
+        document.getElementById("loginOverlay").style.display = "none";
+      }
+
+      // Show/hide functions for restaurant/partner overlay
+      function showRestaurant() {
+        document.getElementById("restaurantOverlay").style.display = "flex";
+      }
+
+      function hideRestaurant() {
+        document.getElementById("restaurantOverlay").style.display = "none";
+      }
+
+      // Tab switching function
+      function showTab(tab, context) {
+        const tabs = document.querySelectorAll(`#${context} .tab-content`);
+        const btns = document.querySelectorAll(`#${context} .tab-btn`);
+        const underline = document.querySelector(`#${context} .tab-underline`);
+
+        tabs.forEach((t) => t.classList.remove("active"));
+        btns.forEach((b) => b.classList.remove("active"));
+
+        document.getElementById(tab).classList.add("active");
+        const activeBtn = document.querySelector(
+          `#${context} .tab-btn[onclick*="showTab('${tab}'"]`
+        );
+        activeBtn.classList.add("active");
+
+        // Move the underline
+        if (tab.includes("login") || tab.includes("restaurant-login")) {
+          underline.style.left = "0";
+        } else {
+          underline.style.left = "50%";
+        }
+      }
+
+      // Simple validation functions
+      function validateUserLogin() {
+        return document.getElementById("user-login-password").value.length >= 8;
+      }
+
+      function validateUserSignup() {
+        const pwd = document.getElementById("user-signup-password").value;
+        const confirmPwd = document.getElementById("user-signup-confirm").value;
+        if (pwd.length < 8) {
+          // alert("Password must be at least 8 characters");
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Password must be at least 8 characters.",
+            confirmButtonText: "Got it!",
+          });
+          return false;
+        }
+        if (pwd !== confirmPwd) {
+          // alert("Passwords do not match");
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Passwords do not match.",
+            confirmButtonText: "Got it!",
+          });
+          return false;
+        }
+        return true;
+      }
+
+      function validateRestaurantLogin() {
+        return (
+          document.getElementById("restaurant-login-password").value.length >= 8
+        );
+      }
+
+      function validateRestaurantSignup() {
+        const pwd = document.getElementById("restaurant-signup-password").value;
+        const confirmPwd = document.getElementById(
+          "restaurant-signup-confirm"
+        ).value;
+        if (pwd.length < 8) {
+          // alert("Password must be at least 8 characters");
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Password must be at least 8 characters.",
+            confirmButtonText: "Got it!",
+          });
+
+          return false;
+        }
+        if (pwd !== confirmPwd) {
+          //  alert("Passwords do not match");
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Passwords do not match.",
+            confirmButtonText: "Got it!",
+          });
+          return false;
+        }
+        return true;
+      }
+
+      // User password validation
+      function checkUserPassword() {
+        const password = document.getElementById("user-signup-password").value;
+        const confirmPassword = document.getElementById(
+          "user-signup-confirm"
+        ).value;
+        const message = document.getElementById("user-password-message");
+        const matchMessage = document.getElementById("user-password-match");
+
+        // Check password length
+        if (password.length < 8) {
+          message.textContent = "Password must be at least 8 characters";
+          message.style.color = "#ff5722";
+        } else {
+          message.textContent = "Password length is valid";
+          message.style.color = "#388e3c";
+        }
+
+        // Check password match
+        if (confirmPassword.length > 0) {
+          if (password === confirmPassword) {
+            matchMessage.textContent = "Passwords match";
+            matchMessage.className = "password-match match-success";
+          } else {
+            matchMessage.textContent = "Passwords do not match";
+            matchMessage.className = "password-match match-error";
+          }
+        } else {
+          matchMessage.textContent = "";
+        }
+      }
+
+      // Restaurant password validation
+      function checkRestaurantPassword() {
+        const password = document.getElementById(
+          "restaurant-signup-password"
+        ).value;
+        const confirmPassword = document.getElementById(
+          "restaurant-signup-confirm"
+        ).value;
+        const message = document.getElementById("restaurant-password-message");
+        const matchMessage = document.getElementById(
+          "restaurant-password-match"
+        );
+
+        // Check password length
+        if (password.length < 8) {
+          message.textContent = "Password must be at least 8 characters";
+          message.style.color = "#D20103";
+        } else {
+          message.textContent = "Password length is valid";
+          // message.style.color = "#388e3c";
+        }
+
+        // Check password match
+        if (confirmPassword.length > 0) {
+          if (password === confirmPassword) {
+            matchMessage.textContent = "Passwords match";
+            matchMessage.className = "password-match match-success";
+          } else {
+            matchMessage.textContent = "Passwords do not match";
+            matchMessage.className = "password-match match-error";
+          }
+        } else {
+          matchMessage.textContent = "";
+        }
+      }
+
+      // Carousel Functionality
+      let currentSlide = 1;
+      const carousel = document.getElementById("restaurantCarousel");
+      let slidesCarousel = document.querySelectorAll(".card");
+      const totalSlides = slidesCarousel.length;
+
+      const firstSlideClone = slidesCarousel[0].cloneNode(true);
+      const lastSlideClone = slidesCarousel[totalSlides - 1].cloneNode(true);
+      carousel.appendChild(firstSlideClone);
+      carousel.insertBefore(lastSlideClone, slidesCarousel[0]);
+
+      slidesCarousel = document.querySelectorAll(".card");
+
+      function updateSlide() {
+        const slideWidth = slidesCarousel[0].offsetWidth + 16;
+        const offset = -currentSlide * slideWidth;
+        carousel.style.transform = `translateX(${offset}px)`;
+
+        slidesCarousel.forEach((slide) => slide.classList.remove("active"));
+        slidesCarousel[currentSlide].classList.add("active");
+
+        if (currentSlide === slidesCarousel.length - 1) {
+          setTimeout(() => {
+            carousel.classList.add("no-transition");
+            currentSlide = 1;
+            const newOffset = -currentSlide * slideWidth;
+            carousel.style.transform = `translateX(${newOffset}px)`;
+          }, 500);
+        } else if (currentSlide === 0) {
+          setTimeout(() => {
+            carousel.classList.add("no-transition");
+            currentSlide = slidesCarousel.length - 2;
+            const newOffset = -currentSlide * slideWidth;
+            carousel.style.transform = `translateX(${newOffset}px)`;
+          }, 500);
+        }
+      }
+
+      function moveSlide(direction) {
+        carousel.classList.remove("no-transition");
+        currentSlide += direction;
+        updateSlide();
+      }
+
+      window.addEventListener("resize", updateSlide);
+      updateSlide();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Font Awesome CDN for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <style>
+      /* Gradient Animated Background */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(
+          -45deg,
+          rgb(128, 255, 255),
+          rgb(192, 192, 192),
+          rgb(0, 0, 0),
+          rgb(192, 192, 192)
+        );
+        background-size: 400% 400%;
+        animation: gradientBG 10s ease infinite;
+        position: relative;
+      }
+
+      /* Background Animation */
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Particles */
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 0;
+      }
+
+      /* Payment Container */
+      .container {
+        position: relative;
+        z-index: 1;
+        width: 50%;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      h2 {
+        color: #333;
+      }
+
+      /* Order Summary */
+      .order-summary {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+
+      .order-summary .selected-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+      }
+
+      .order-summary .selected-item span {
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin: 20px 0;
+      }
+
+      .form-group label {
+        font-weight: bold;
+        display: block;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      #delivery-address {
+        width: 90%;
+      }
+      .payment-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .payment-option:hover {
+        background-color: #f8f8f8;
+        transform: scale(1.02);
+      }
+
+      .payment-option i {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #555;
+      }
+
+      .payment-option input {
+        margin-left: auto;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        border: none;
+        background: #28a745;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #218838;
+        transform: scale(1.05);
+      }
+
+      #particles-js {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: linear-gradient(to bottom right, #0072ff, #00c6ff);
+        overflow: hidden;
+      }
+
+      /* Container Styling */
+      .container {
+        position: relative;
+        max-width: 500px;
+        margin: 100px auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        background: #ffffff;
+        text-align: center;
+      }
+
+      h2 {
+        font-family: "Arial", sans-serif;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .order-summary {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin: 20px 0;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .payment-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 0;
+      }
+
+      .payment-option i {
+        font-size: 18px;
+        margin-right: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #0072ff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056cc;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Checkout Page -->
+    <div class="container">
+      <h2>Your Order</h2>
+
+      <!-- Order Summary -->
+      <div class="order-summary" id="selected-items-summary">
+        <!-- Dynamically populated order summary -->
+      </div>
+
+      <!-- Delivery Address Input -->
+      <div class="form-group">
+        <label for="delivery-address">Delivery Address:</label>
+        <input
+          type="text"
+          id="delivery-address"
+          placeholder="Enter your delivery address"
+          required
+        />
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div class="form-group">
+        <label>Select Payment Method:</label>
+        <div class="payment-option">
+          <i class="fa-regular fa-credit-card"></i> Credit Card
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="Credit Card"
+            required
+          />
+        </div>
+        <div class="payment-option">
+          <i class="fa-solid fa-credit-card"></i> Debit Card
+          <input type="radio" name="paymentMethod" value="Debit Card" />
+        </div>
+        <div class="payment-option">
+          <i class="fa-brands fa-google-pay"></i> UPI
+          <input type="radio" name="paymentMethod" value="UPI" />
+        </div>
+        <div class="payment-option">
+          <i class="fa-brands fa-paypal"></i> PayPal
+          <input type="radio" name="paymentMethod" value="PayPal" />
+        </div>
+      </div>
+
+      <!-- Proceed to Payment Button -->
+      <button onclick="processPayment()">Proceed to Payment</button>
+    </div>
+
+    <!-- Particle.js Library -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <script>
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 50 },
+          size: { value: 3 },
+          color: { value: "#2c3e50" },
+          opacity: { value: 1 },
+          move: { speed: 3 },
+        },
+      });
+
+      // Simulating the selected items (this should be dynamically populated from sessionStorage or backend)
+      const selectedItems =
+        JSON.parse(sessionStorage.getItem("orderData"))?.menuItems || [];
+
+      // Function to populate the selected items summary
+      function displayOrderSummary() {
+        const selectedItemsContainer = document.getElementById(
+          "selected-items-summary"
+        );
+
+        if (selectedItems.length > 0) {
+          selectedItemsContainer.innerHTML = ""; // Clear previous items
+
+          selectedItems.forEach((item) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("selected-item");
+            itemDiv.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>x${item.quantity}</span>
+                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                `;
+            selectedItemsContainer.appendChild(itemDiv);
+          });
+        } else {
+          selectedItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+        }
+      }
+
+      // Call the displayOrderSummary function to populate the order summary when the page loads
+      displayOrderSummary();
+
+      const orderData = JSON.parse(localStorage.getItem("orderData"));
+
+      // Check if orderData exists
+      if (orderData) {
+        const {
+          userId,
+          restaurantId,
+          menuItems,
+          paymentMethod,
+          deliveryAddress,
+          totalAmount,
+        } = orderData;
+      } else {
+        console.error("Order data not found!");
+      }
+
+      // Event handler for payment processing
+      function processPayment() {
+        const deliveryAddress =
+          document.getElementById("delivery-address").value;
+
+        const selectedPaymentMethod = document.querySelector(
+          'input[name="paymentMethod"]:checked'
+        );
+
+        const menuItems =
+          JSON.parse(sessionStorage.getItem("orderData"))?.menuItems || [];
+
+        const userId =
+          JSON.parse(sessionStorage.getItem("orderData"))?.userId || 9;
+        const restaurantId =
+          JSON.parse(sessionStorage.getItem("orderData"))?.restaurantId || "34";
+        console.log(userId);
+        console.log(restaurantId);
+
+        if (!selectedPaymentMethod) {
+          alert("Please select a payment method.");
+          return;
+        }
+        if (!deliveryAddress) {
+          alert("Please enter your delivery address.");
+          return;
+        }
+        if (deliveryAddress.trim() === "") {
+          alert("Please enter a valid delivery address.");
+          return;
+        }
+
+        const paymentMethod = selectedPaymentMethod.value;
+
+        // Simulate payment processing
+        Swal.fire({
+          title: "Payment Successful!",
+          text: `Your payment via ${paymentMethod} was successful. Your order will be delivered to: ${deliveryAddress}.`,
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          // After the success message, send the POST request with the order data
+
+          // Prepare the order data to send in the POST request
+          const orderRequestData = {
+            menuItems: menuItems,
+            paymentMethod: paymentMethod,
+            deliveryAddress: deliveryAddress,
+            // totalAmount: totalAmount,
+            //userId: userId,
+            //restaurantId: restaurantId,
+          };
+
+          const url = `http://localhost:8080/api/orders/placeOrder/${userId}/${restaurantId}`;
+
+          fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderRequestData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Order placed successfully:", data);
+              window.location.href = "/home";
+            })
+            .catch((error) => {
+              console.error("Error placing order:", error);
+              alert("There was an issue with your order. Please try again.");
+            });
+        });
+      }
+
+      // Add event listener to your payment button (assuming it exists)
+      document
+        .querySelector(".checkout-btn")
+        .addEventListener("click", processPayment);
+
+      /*
+      // Payment process simulation
+      function processPayment() {
+        const deliveryAddress =
+          document.getElementById("delivery-address").value;
+        const selectedPaymentMethod = document.querySelector(
+          'input[name="paymentMethod"]:checked'
+        );
+
+        if (!deliveryAddress) {
+          alert("Please enter your delivery address.");
+          return;
+        }
+
+        if (!selectedPaymentMethod) {
+          alert("Please select a payment method.");
+          return;
+        }
+
+        const paymentMethod = selectedPaymentMethod.value;
+
+        Swal.fire({
+          title: "Payment Successful!",
+          text: `Your payment via ${paymentMethod} was successful. Your order will be delivered to: ${deliveryAddress}.`,
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.href = "/order-confirmation"; 
+        });
+
+        
+      }
+        */
+    </script>
+  </body>
+</html>

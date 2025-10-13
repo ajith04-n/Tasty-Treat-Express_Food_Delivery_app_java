@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pick Location</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-orange: #ff5722;
+        --soft-orange: #ff8a65;
+        --thyme-green: #388e3c;
+        --neutral-gray: #333333;
+        --soft-white: #f5f5f5;
+        --light-gray: #b0bec5;
+        --dark-bg: #000000;
+        --dark-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        --card-bg: linear-gradient(
+          135deg,
+          rgba(51, 51, 51, 0.9),
+          rgba(30, 30, 30, 0.9)
+        );
+        --light-bg: #f5f5f5;
+        --light-card-bg: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 1rem;
+        color: var(--soft-white);
+        background: var(--dark-bg);
+        text-align: center;
+        overflow-x: hidden;
+        transition: background 0.5s ease, color 0.5s ease;
+      }
+      body.light-theme {
+        background: var(--light-bg);
+        color: var(--neutral-gray);
+      }
+      .background-anim {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+      .background-anim .star {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: float 10s infinite;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .container {
+        max-width: 480px;
+        margin: auto;
+        padding: 0 1.5rem 1.5rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4),
+          -6px -6px 12px rgba(80, 80, 80, 0.2);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+      .container.light-theme {
+        background: var(--light-card-bg);
+        box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1),
+          -6px -6px 12px rgba(255, 255, 255, 0.9);
+      }
+      .container:hover {
+        transform: scale(1.015);
+      }
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-orange),
+          var(--soft-orange)
+        );
+        padding: 0.75rem;
+        border-radius: 12px 12px 0 0;
+        margin: -1.5rem -1.5rem 1.25rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--soft-white);
+        margin: 0;
+        animation: fadeIn 0.5s ease-in;
+      }
+      .input-group {
+        position: relative;
+        margin-bottom: 1rem;
+        width: 425px;
+      }
+      .input-group i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--light-gray);
+        font-size: 0.9rem;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 0.65rem 1rem 0.65rem 2.25rem;
+        background: var(--card-bg);
+        border: none;
+        border-radius: 6px;
+        color: var(--soft-white);
+        font-size: 0.95rem;
+        box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.3),
+          inset -3px -3px 6px rgba(80, 80, 80, 0.1);
+        transition: all 0.3s ease;
+      }
+      .light-theme .input-group input {
+        background: var(--light-card-bg);
+        color: var(--neutral-gray);
+        box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.1),
+          inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+      }
+      .input-group input::placeholder {
+        color: rgba(245, 245, 245, 0.6);
+      }
+      .light-theme .input-group input::placeholder {
+        color: rgba(51, 51, 51, 0.6);
+      }
+      .input-group input:focus {
+        box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4),
+          inset -2px -2px 4px rgba(80, 80, 80, 0.2),
+          0 0 6px rgba(255, 87, 34, 0.3);
+      }
+      .neu-btn {
+        display: block;
+        width: 100%;
+        max-width: 240px;
+        margin: 0.75rem auto;
+        padding: 0.65rem;
+        background: var(--card-bg);
+        border: none;
+        border-radius: 6px;
+        color: var(--light-gray);
+        font-size: 0.95rem;
+        font-weight: 600;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+          -3px -3px 6px rgba(80, 80, 80, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .light-theme .neu-btn {
+        background: var(--light-card-bg);
+        color: var(--neutral-gray);
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1),
+          -3px -3px 6px rgba(255, 255, 255, 0.9);
+      }
+      .neu-btn:hover {
+        color: var(--soft-white);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4),
+          -2px -2px 4px rgba(80, 80, 80, 0.2);
+        transform: translateY(-1px);
+      }
+      .light-theme .neu-btn:hover {
+        color: var(--neutral-gray);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2),
+          -2px -2px 4px rgba(255, 255, 255, 1);
+      }
+      .neu-btn i {
+        margin-right: 0.4rem;
+        color: var(--light-gray);
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+      }
+      .light-theme .neu-btn i {
+        color: var(--neutral-gray);
+      }
+      .neu-btn:hover i {
+        color: var(--soft-white);
+      }
+      .light-theme .neu-btn:hover i {
+        color: var(--neutral-gray);
+      }
+      #proceed-btn {
+        background: var(--primary-orange);
+        color: var(--soft-white);
+        display: none;
+      }
+      #proceed-btn:hover {
+        background: var(--soft-orange);
+      }
+      p#location-info {
+        font-size: 0.9rem;
+        color: var(--light-gray);
+        margin: 0.75rem 0;
+        transition: opacity 0.3s ease;
+      }
+      .light-theme #location-info {
+        color: var(--neutral-gray);
+      }
+      .suggestions {
+        max-height: 120px;
+        overflow-y: auto;
+        margin-top: 0.75rem;
+        padding: 0;
+        list-style-type: none;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.3s ease;
+      }
+      .suggestions.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .suggestions li {
+        padding: 0.5rem;
+        background: var(--card-bg);
+        border-radius: 6px;
+        color: var(--light-gray);
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+          -3px -3px 6px rgba(80, 80, 80, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .light-theme .suggestions li {
+        background: var(--light-card-bg);
+        color: var(--neutral-gray);
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1),
+          -3px -3px 6px rgba(255, 255, 255, 0.9);
+      }
+      .suggestions li:hover,
+      .suggestions li:focus {
+        color: var(--soft-white);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4),
+          -2px -2px 4px rgba(80, 80, 80, 0.2);
+        transform: translateY(-1px);
+      }
+      .light-theme .suggestions li:hover,
+      .light-theme .suggestions li:focus {
+        color: var(--neutral-gray);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2),
+          -2px -2px 4px rgba(255, 255, 255, 1);
+      }
+      .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--light-gray);
+        border-top: 2px solid var(--primary-orange);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0.75rem auto;
+      }
+      .light-theme .spinner {
+        border: 2px solid var(--neutral-gray);
+        border-top: 2px solid var(--primary-orange);
+      }
+      #map-preview {
+        width: 100%;
+        height: 160px;
+        border-radius: 6px;
+        margin-top: 0.75rem;
+        display: none;
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+          -3px -3px 6px rgba(80, 80, 80, 0.1);
+      }
+      .theme-toggle {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        color: var(--soft-white);
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+      .theme-toggle:hover {
+        transform: rotate(180deg);
+      }
+      .light-theme .theme-toggle {
+        color: var(--neutral-gray);
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @media (max-width: 480px) {
+        body {
+          padding: 0.5rem;
+        }
+        .container {
+          padding: 0 1rem 1rem;
+          max-width: 100%;
+        }
+        .header {
+          margin: -1rem -1rem 1rem;
+          padding: 0.5rem;
+        }
+        h2 {
+          font-size: 1.25rem;
+        }
+        .input-group {
+          width: 100%;
+        }
+        .input-group input {
+          padding: 0.5rem 0.75rem 0.5rem 2rem;
+          font-size: 0.85rem;
+        }
+        .input-group i {
+          left: 0.5rem;
+          font-size: 0.8rem;
+        }
+        .neu-btn {
+          max-width: 200px;
+          font-size: 0.85rem;
+          padding: 0.5rem;
+        }
+        .neu-btn i {
+          font-size: 0.8rem;
+        }
+        .suggestions {
+          max-height: 100px;
+        }
+        .suggestions li {
+          font-size: 0.8rem;
+          padding: 0.4rem;
+        }
+        #location-info {
+          font-size: 0.8rem;
+        }
+        #map-preview {
+          height: 120px;
+        }
+        .theme-toggle {
+          top: 0.5rem;
+          right: 0.5rem;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-anim" id="background-anim"></div>
+    <div class="container" role="main">
+      <div class="header">
+        <h2>Select Your Location</h2>
+        <button
+          class="theme-toggle"
+          aria-label="Toggle theme"
+          onclick="toggleTheme()"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          id="location-search"
+          placeholder="Search for a location"
+          aria-label="Search location"
+        />
+      </div>
+      <button class="neu-btn" onclick="getLocation()">
+        <i class="fas fa-map-marker-alt"></i> Detect My Location
+      </button>
+      <div class="spinner" id="spinner"></div>
+      <p id="location-info" aria-live="polite">No location selected</p>
+      <ul class="suggestions" id="suggestions" role="listbox"></ul>
+      <div id="map-preview"></div>
+      <button
+        id="proceed-btn"
+        class="neu-btn"
+        onclick="navigateTo('/address-form')"
+      >
+        Proceed
+      </button>
+    </div>
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDK5Hx8gZb9ZK4yPobbmKMARZDV0qq9Cy8&libraries=places&callback=initAutocomplete"
+      async
+      defer
+    ></script>
+    <script>
+      const locationInfo = document.getElementById("location-info");
+      const proceedBtn = document.getElementById("proceed-btn");
+      const spinner = document.getElementById("spinner");
+      const suggestions = document.getElementById("suggestions");
+      const mapPreview = document.getElementById("map-preview");
+      const locationSearch = document.getElementById("location-search");
+      let selectedLocation = null;
+      let map = null;
+      let marker = null;
+      let autocomplete = null;
+
+      function initAutocomplete() {
+        map = new google.maps.Map(mapPreview, {
+          center: { lat: 37.7749, lng: -122.4194 },
+          zoom: 14,
+          disableDefaultUI: true,
+          styles: [
+            {
+              featureType: "all",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }],
+            },
+          ],
+        });
+        marker = new google.maps.Marker({ map });
+
+        autocomplete = new google.maps.places.Autocomplete(locationSearch, {
+          types: ["geocode"],
+          fields: ["place_id", "name", "geometry", "formatted_address"],
+        });
+        autocomplete.addListener("place_changed", onPlaceChanged);
+
+        autoDetectLocation();
+      }
+
+      function autoDetectLocation() {
+        if (navigator.geolocation) {
+          locationInfo.textContent = "Attempting to detect your location...";
+          spinner.style.display = "block";
+          suggestions.classList.remove("visible");
+          mapPreview.style.display = "none";
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              reverseGeocode(lat, lon);
+            },
+            (error) => {
+              handleLocationError(error);
+            },
+            { timeout: 10000, enableHighAccuracy: true }
+          );
+        } else {
+          locationInfo.textContent =
+            "Geolocation is not supported by your browser. Please search for a location manually.";
+          spinner.style.display = "none";
+        }
+      }
+
+      function getLocation() {
+        if (navigator.geolocation) {
+          spinner.style.display = "block";
+          locationInfo.textContent = "Detecting your location...";
+          suggestions.classList.remove("visible");
+          mapPreview.style.display = "none";
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              reverseGeocode(lat, lon);
+            },
+            (error) => {
+              handleLocationError(error);
+            },
+            { timeout: 10000, enableHighAccuracy: true }
+          );
+        } else {
+          locationInfo.textContent =
+            "Geolocation is not supported by your browser. Please search for a location manually.";
+          spinner.style.display = "none";
+        }
+      }
+
+      function handleLocationError(error) {
+        spinner.style.display = "none";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            locationInfo.textContent =
+              "Permission denied. Please allow location access or search manually.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            locationInfo.textContent =
+              "Location unavailable. Please try again or search manually.";
+            break;
+          case error.TIMEOUT:
+            locationInfo.textContent =
+              "Request timed out. Please try again or search manually.";
+            break;
+          default:
+            locationInfo.textContent =
+              "An error occurred while detecting your location. Please search manually.";
+        }
+      }
+
+      function reverseGeocode(lat, lon) {
+        const geocoder = new google.maps.Geocoder();
+        const latlng = { lat, lng: lon };
+        geocoder.geocode({ location: latlng }, (results, status) => {
+          spinner.style.display = "none";
+          if (status === "OK" && results.length > 0) {
+            selectedLocation = { lat, lon };
+            locationInfo.textContent = `Detected: ${results[0].formatted_address}`;
+            proceedBtn.style.display = "block";
+            showMap(lat, lon);
+            displaySuggestions(results);
+            locationSearch.value = results[0].formatted_address;
+          } else {
+            locationInfo.textContent =
+              "Unable to determine your location details. Please search manually.";
+          }
+        });
+      }
+
+      function onPlaceChanged() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+          locationInfo.textContent =
+            "No details available for the selected location.";
+          return;
+        }
+        const lat = place.geometry.location.lat();
+        const lon = place.geometry.location.lng();
+        selectSuggestion(place.formatted_address, lat, lon);
+      }
+
+      function displaySuggestions(results) {
+        suggestions.innerHTML = "";
+        results.slice(0, 5).forEach((result) => {
+          const li = document.createElement("li");
+          li.textContent = result.formatted_address;
+          li.tabIndex = 0;
+          li.setAttribute("role", "option");
+          li.onclick = () =>
+            selectSuggestion(
+              result.formatted_address,
+              result.geometry.location.lat(),
+              result.geometry.location.lng()
+            );
+          li.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              selectSuggestion(
+                result.formatted_address,
+                result.geometry.location.lat(),
+                result.geometry.location.lng()
+              );
+            }
+          };
+          suggestions.appendChild(li);
+        });
+        suggestions.classList.add("visible");
+      }
+
+      function showMap(lat, lon) {
+        mapPreview.style.display = "block";
+        map.setCenter({ lat, lng: lon });
+        marker.setPosition({ lat, lng: lon });
+      }
+
+      function selectSuggestion(text, lat, lon) {
+        selectedLocation = { lat, lon, name: text };
+        locationInfo.textContent = `Selected: ${text}`;
+        suggestions.classList.remove("visible");
+        proceedBtn.style.display = "block";
+        showMap(lat, lon);
+        locationSearch.value = text;
+      }
+
+      function navigateTo(page) {
+        if (page === "/address-form" && selectedLocation) {
+          window.location.href = `${page}?lat=${selectedLocation.lat}&lon=${
+            selectedLocation.lon
+          }&name=${encodeURIComponent(selectedLocation.name)}`;
+        } else {
+          window.location.href = page;
+        }
+      }
+
+      function initBackground() {
+        const animContainer = document.getElementById("background-anim");
+        for (let i = 0; i < 15; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.width = `${Math.random() * 2 + 1}px`;
+          star.style.height = star.style.width;
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.animationDelay = `${Math.random() * 5}s`;
+          animContainer.appendChild(star);
+        }
+      }
+
+      function toggleTheme() {
+        document.body.classList.toggle("light-theme");
+        document.querySelector(".container").classList.toggle("light-theme");
+        const icon = document.querySelector(".theme-toggle i");
+        icon.classList.toggle("fa-moon");
+        icon.classList.toggle("fa-sun");
+      }
+
+      window.onload = () => {
+        initBackground();
+      };
+    </script>
+  </body>
+</html>

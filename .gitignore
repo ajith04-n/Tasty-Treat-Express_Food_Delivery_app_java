@@ -1,0 +1,69 @@
+###################################
+#        GLOBAL GITIGNORE          #
+#    Tasty-Treat-Express Project   #
+###################################
+
+# ============= JAVA / MAVEN =============
+target/
+bin/
+build/
+!**/src/main/**/target/
+!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+logs/
+*.log
+hs_err_pid*
+replay_pid*
+
+# Maven wrapper and local config
+.mvn/
+mvnw.cmd
+mvnw
+
+# ============= FRONTEND (React/Vue/HTML) =============
+node_modules/
+dist/
+build/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ============= IDE / EDITOR FILES =============
+## Eclipse / STS ##
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+
+## IntelliJ IDEA ##
+.idea/
+*.iml
+*.ipr
+*.iws
+
+## VS Code ##
+.vscode/
+
+# ============= SYSTEM FILES =============
+.DS_Store
+Thumbs.db
+
+# ============= BACKUP & TEMP =============
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+
+# ============= MISC =============
+HELP.md
