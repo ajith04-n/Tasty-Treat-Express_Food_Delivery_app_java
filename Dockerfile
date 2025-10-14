@@ -1,19 +1,20 @@
-# Build stage
+# Stage 1: Build the Spring Boot backend
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy only backend code (adjust if your pom.xml is in /backend)
-COPY backend /app
+# Copy only backend code (your pom.xml is inside Tasty-Treat-Express-Backend)
+COPY Tasty-Treat-Express-Backend /app
 
-# Build your backend
+# Build the backend project
 RUN mvn clean package -DskipTests
 
-# Run stage
+# Stage 2: Run the application
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-# Copy built JAR from the previous stage
+# Copy the built jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
+
 CMD ["java", "-jar", "app.jar"]
