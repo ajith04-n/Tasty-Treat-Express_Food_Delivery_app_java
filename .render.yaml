@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: tasty-treat-backend
-    env: java
-    plan: free
-    rootDir: backend
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/tasty-treat-express-0.0.1-SNAPSHOT.jar
-    autoDeploy: true
