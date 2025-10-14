@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: tte_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: tte_db
+      MYSQL_USER: tte_user
+      MYSQL_PASSWORD: tte_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - tte_network
+
+  backend:
+    build:
+      context: ./tasty-treat-express-backend
+      dockerfile: Dockerfile
+    container_name: tte_backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/tte_db?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: tte_user
+      SPRING_DATASOURCE_PASSWORD: tte_pass
+    ports:
+      - "8080:8080"
+    networks:
+      - tte_network
+
+  frontend:
+    build:
+      context: ./tasty-treat-express-frontend
+      dockerfile: Dockerfile
+    container_name: tte_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - tte_network
+
+volumes:
+  db_data:
+
+networks:
+  tte_network:
+    driver: bridge
