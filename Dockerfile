@@ -2,8 +2,8 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy only backend code (your pom.xml is inside Tasty-Treat-Express-Backend)
-COPY Tasty-Treat-Express-Backend /app
+# Copy only backend code (adjust folder name to match your repo)
+COPY tasty-treat-express-backend /app
 
 # Build the backend project
 RUN mvn clean package -DskipTests
