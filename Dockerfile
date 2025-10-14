@@ -1,20 +1,25 @@
-# Use the official OpenJDK image
-FROM openjdk:17-jdk-slim
+# Use official OpenJDK image with Maven preinstalled
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 # Set working directory
 WORKDIR /app
 
-# Copy the project files
+# Copy project files
 COPY . .
 
-# Give execute permission for Maven Wrapper
-RUN chmod +x mvnw
+# Build the app (skip tests)
+RUN mvn clean package -DskipTests
 
-# Build the project (skip tests to save time)
-RUN ./mvnw clean package -DskipTests
+# Use a smaller image just to run the jar
+FROM openjdk:17-jdk-slim
 
-# Expose port 8080 for Render
+WORKDIR /app
+
+# Copy the built jar from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port
 EXPOSE 8080
 
-# Run the jar file (Spring Boot)
-CMD ["java", "-jar", "target/*.jar"]
+# Run the app
+CMD ["java", "-jar", "app.jar"]
